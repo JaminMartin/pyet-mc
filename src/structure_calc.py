@@ -3,6 +3,9 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 
 def centre_ion(struct,ion):
+    """
+    Return the index of an ion ion of a given species choice
+    """
     structure_sites = struct.sites
     for i in range(len(structure_sites)):
         temp = structure_sites[i]
@@ -16,6 +19,9 @@ def centre_ion(struct,ion):
     return ion_index
        
 def nearest_neighbours(struct,central_ion, radius): 
+    """
+    Return the distances and species of the next nearest neighbors within radius r.
+    """ 
     site = struct.sites[central_ion] #22 ky3f10 8 K2YF5 10 LiYF4 4 NaYF
     nn = struct.get_neighbors(site,radius)
     return nn, site
@@ -36,7 +42,7 @@ def nearest_neighbour_spherical_coords(struct, site, r):
 
     return spc
 
-# cif file from https://materialsproject.org/materials/mp-19426/
+# cif file from https://materialsproject.org
 cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
 cif = CifParser(cif_file)
 struct = cif.get_structures()[0]
