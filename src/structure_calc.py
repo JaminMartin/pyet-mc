@@ -77,8 +77,10 @@ class Structure:
             spc[i, 2] = 180/(np.pi) * (np.arctan2(xyz[1],xyz[0]))
             Species_info.append(NN[i].species_string )
 
-        Species_info = np.asarray(Species_info)
-        return spc, Species_info
+        Species_info = pd.DataFrame(np.asarray(Species_info), columns= ['species'])
+        coordinate_df = pd.DataFrame(spc, columns=['r', 'theta', 'phi'])
+        nearest_neigbours = pd.concat([coordinate_df,Species_info],axis=1)
+        return nearest_neigbours
     
     def structure_plot(self, radius):
         coords_xyz = self.nearest_neighbours_coords(radius)
@@ -90,10 +92,10 @@ class Structure:
         
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d') 
-        ax.scatter(self.origin[0],self.origin[1],self.origin[2])
+        ax.scatter(self.origin[0] ,self.origin[1] ,self.origin[2])
         for i in range(len(UniqueNames)):
             temp = DataFrameDict[UniqueNames[i]]
-            ax.scatter(temp.x,temp.y,temp.z)
+            ax.scatter(temp.x, temp.y, temp.z)
         plt.show()       
    
 
@@ -104,9 +106,8 @@ cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
 KY3F10 = Structure(cif_file= cif_file)
 KY3F10.centre_ion('Y')
 KY3F10.nearest_neighbours(radius = 3.2)
-coords, species = KY3F10.nearest_neighbours_spherical_coords(3.2)
-print(coords)
-print(species)
+coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
+print(coords_spc)
 coords_xyz = KY3F10.nearest_neighbours_coords(5)
 print(coords_xyz)
 KY3F10.structure_plot(3.2)
