@@ -30,9 +30,9 @@ class Structure:
                 pass    
         
         
-    def nearest_neighbours(self, radius): 
+    def nearest_neighbours_info(self, radius): 
         """
-        Return the distances and species of the next nearest neighbors within radius r.
+        Return the radial distance and species of the neighbors within radius r.
         """ 
         self.nn = self.struct.get_neighbors(self.site, radius)
         s = ""
@@ -45,7 +45,7 @@ class Structure:
 
     def nearest_neighbours_coords(self, radius): 
         """
-        Return the distances and species of the next nearest neighbors within radius r.
+        Return the distances and species of the next nearest neighbors within radius r in cartesian coordinates as a pandas dataframe.
         """ 
         NN = self.struct.get_neighbors(self.site, radius)
         XYZ = np.zeros([len(NN), 3])
@@ -59,12 +59,12 @@ class Structure:
         
         Species_info = pd.DataFrame(np.asarray(Species_info), columns= ['species'])
         coordinate_df = pd.DataFrame(XYZ, columns=['x', 'y', 'z'])
-        nearest_neigbours = pd.concat([coordinate_df,Species_info],axis=1)
+        nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours   
     
     def nearest_neighbours_spherical_coords(self,radius): 
         """
-        Return the spherical polar coordinates of the next nearest neighbors within radius r.
+        Return the distances and species of the next nearest neighbors within radius r in spherical polar coordinates as a pandas dataframe.
         """          
         NN = self.struct.get_neighbors(self.site, radius)
         
@@ -79,7 +79,7 @@ class Structure:
 
         Species_info = pd.DataFrame(np.asarray(Species_info), columns= ['species'])
         coordinate_df = pd.DataFrame(spc, columns=['r', 'theta', 'phi'])
-        nearest_neigbours = pd.concat([coordinate_df,Species_info],axis=1)
+        nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours
     
     def structure_plot(self, radius):
@@ -105,9 +105,9 @@ class Structure:
 cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
 KY3F10 = Structure(cif_file= cif_file)
 KY3F10.centre_ion('Y')
-KY3F10.nearest_neighbours(radius = 3.2)
+KY3F10.nearest_neighbours_info(radius = 3.2)
 coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
 print(coords_spc)
 coords_xyz = KY3F10.nearest_neighbours_coords(5)
 print(coords_xyz)
-KY3F10.structure_plot(3.2)
+KY3F10.structure_plot(10)
