@@ -82,7 +82,11 @@ class Structure:
         nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours
     
-    def structure_plot(self, radius):
+    def structure_plot(self, radius, filter = None):
+        '''
+        Renders a 3D plot of a given radius around a specified central ion
+        '''
+
         coords_xyz = self.nearest_neighbours_coords(radius)
         UniqueNames = coords_xyz.species.unique()
 
@@ -93,10 +97,21 @@ class Structure:
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d') 
         ax.scatter(self.origin[0] ,self.origin[1] ,self.origin[2])
-        for i in range(len(UniqueNames)):
-            temp = DataFrameDict[UniqueNames[i]]
-            ax.scatter(temp.x, temp.y, temp.z)
-        plt.show()       
+        if filter == None:
+            for i in range(len(UniqueNames)):
+                temp = DataFrameDict[UniqueNames[i]]
+                ax.scatter(temp.x, temp.y, temp.z)
+            plt.show()       
+        else:
+            try:
+                for i in range(len(filter)):
+                    temp = DataFrameDict[filter[i]] 
+                    ax.scatter(temp.x, temp.y, temp.z)   
+                plt.show()   
+            except:
+                  print('Failed to plot. Filter must be in type "list of strings"')
+                  pass    
+
    
 
 
@@ -107,7 +122,12 @@ KY3F10 = Structure(cif_file= cif_file)
 KY3F10.centre_ion('Y')
 KY3F10.nearest_neighbours_info(radius = 3.2)
 coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
-print(coords_spc)
-coords_xyz = KY3F10.nearest_neighbours_coords(5)
-print(coords_xyz)
-KY3F10.structure_plot(3.2)
+coords_xyz = KY3F10.nearest_neighbours_coords(4)
+KY3F10.structure_plot(5)
+
+
+options = ['Y']
+KY3F10.structure_plot(5, filter=options)   
+
+rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)] 
+print(rslt_df)
