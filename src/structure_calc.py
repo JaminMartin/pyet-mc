@@ -96,17 +96,22 @@ class Structure:
         
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d') 
-        ax.scatter(self.origin[0] ,self.origin[1] ,self.origin[2])
+        ax.scatter(self.origin[0] ,self.origin[1] ,self.origin[2], label=f'central {self.centre_ion_species} ion')
+        ax.set_xlabel('X (Angstrom)')
+        ax.set_ylabel('Y (Angstrom)')
+        ax.set_zlabel('Z (Angstrom)')
         if filter == None:
             for i in range(len(UniqueNames)):
                 temp = DataFrameDict[UniqueNames[i]]
-                ax.scatter(temp.x, temp.y, temp.z)
+                ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
+            ax.legend()    
             plt.show()       
         else:
             try:
                 for i in range(len(filter)):
                     temp = DataFrameDict[filter[i]] 
-                    ax.scatter(temp.x, temp.y, temp.z)   
+                    ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
+                ax.legend()    
                 plt.show()   
             except:
                   print('Failed to plot. Filter must be in type "list of strings"')
@@ -122,7 +127,7 @@ KY3F10 = Structure(cif_file= cif_file)
 KY3F10.centre_ion('Y')
 KY3F10.nearest_neighbours_info(radius = 3.2)
 coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
-coords_xyz = KY3F10.nearest_neighbours_coords(4)
+coords_xyz = KY3F10.nearest_neighbours_coords(5)
 KY3F10.structure_plot(5)
 
 
