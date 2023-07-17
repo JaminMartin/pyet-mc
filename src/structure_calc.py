@@ -3,6 +3,8 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 import matplotlib.pyplot as plt
 import pandas as pd
+
+
 class Structure:
 
     def __init__(self,cif_file):
@@ -28,7 +30,6 @@ class Structure:
             
             else:
                 pass    
-        
         
     def nearest_neighbours_info(self, radius): 
         """
@@ -86,7 +87,6 @@ class Structure:
         '''
         Renders a 3D plot of a given radius around a specified central ion
         '''
-
         coords_xyz = self.nearest_neighbours_coords(radius)
         UniqueNames = coords_xyz.species.unique()
 
@@ -118,6 +118,70 @@ class Structure:
                   pass    
 
    
+class Interaction:
+        def __init__(self, Structure):
+            try:
+                self.structure = Structure
+                print(f' Central ion is {self.structure.centre_ion_species}')
+            except:
+                print('Either structure or central ion is not specified')  
+        
+        def distance_sim(self,radius, concentration, iter): 
+            concentration = concentration / 100
+            coords = self.structure.nearest_neighbours_spherical_coords(radius)
+            filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])].reset_index(drop=True)
+            for i in filtered_coords.index:
+                if np.random.rand() < concentration:
+                    filtered_coords.loc[i, 'species'] = 'Sm'
+
+            return filtered_coords
+        def sim(self, interaction_type, distances):
+            print('Yet to implement')
+
+        def distplot_summary(self, radius, concentration, filter = None):
+            concentration = concentration / 100
+            coords = self.structure.nearest_neighbours_coords(radius)
+            filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])]
+         
+            coords = coords.drop(coords.index[coords['species'] == 'Y'])
+            print(coords)
+            for i in filtered_coords.index:
+        
+                if np.random.rand() < concentration:
+                    filtered_coords.loc[i, 'species'] = 'Sm'
+           
+
+            frames = [coords, filtered_coords]
+
+            result = pd.concat(frames)
+            UniqueNames = result.species.unique()
+            DataFrameDict = {elem : pd.DataFrame() for elem in UniqueNames}
+            for key in DataFrameDict.keys():
+                DataFrameDict[key] = result[:][result.species == key]
+            
+            fig = plt.figure()
+            ax = fig.add_subplot(projection='3d') 
+            ax.scatter(self.structure.origin[0] ,self.structure.origin[1] ,self.structure.origin[2], label=f'central {self.structure.centre_ion_species} ion')
+            ax.set_xlabel('X (Angstrom)')
+            ax.set_ylabel('Y (Angstrom)')
+            ax.set_zlabel('Z (Angstrom)')
+            if filter == None:
+                for i in range(len(UniqueNames)):
+                    temp = DataFrameDict[UniqueNames[i]]
+                    ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
+                ax.legend()    
+                plt.show()       
+            else:
+                try:
+                    for i in range(len(filter)):
+                        temp = DataFrameDict[filter[i]] 
+                        ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
+                    ax.legend()    
+                    plt.show()   
+                except:
+                    print('Failed to plot. Filter must be in type "list of strings"')
+                    pass
+      
 
 
 
@@ -125,14 +189,18 @@ class Structure:
 cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
 KY3F10 = Structure(cif_file= cif_file)
 KY3F10.centre_ion('Y')
-KY3F10.nearest_neighbours_info(radius = 3.2)
-coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
-coords_xyz = KY3F10.nearest_neighbours_coords(5)
-KY3F10.structure_plot(5)
+#KY3F10.nearest_neighbours_info(radius = 3.2)
+#coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
+#coords_xyz = KY3F10.nearest_neighbours_coords(5)
+#KY3F10.structure_plot(radius = 5)
 
 
-options = ['Y']
-KY3F10.structure_plot(5, filter=options)   
+#options = ['Y']
+#KY3F10.structure_plot(5, filter=options)   
 
-rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)] 
-print(rslt_df)
+#rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
+#print(rslt_df)
+
+Distances = Interaction(KY3F10).distance_sim(radius=10, iter=50000, concentration = 5)
+Interaction(KY3F10).distplot_summary(radius=10, concentration = 5, filter = ['Y','Sm'])
+#Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
