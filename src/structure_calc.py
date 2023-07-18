@@ -141,6 +141,9 @@ class Interaction:
             return distances
         
         def sim_single_cross(self, radius, concentration, iter, interaction_type = None):
+            '''
+            TODO : ADD CACHING 
+            '''
             if interaction_type == 'DD':
                 s = 6
             elif interaction_type == 'DQ': 
@@ -205,7 +208,7 @@ class Interaction:
                     pass
       
 
-
+#potato
 
 # cif file from https://materialsproject.org
 cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
@@ -226,7 +229,7 @@ KY3F10.centre_ion('Y')
 inter = Interaction(KY3F10)
 inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
 print(inter.filtered_coords)
-r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='DD', iter=500)
+r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='DD', iter=5)
 print(r)
-#Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
+Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
 #Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
