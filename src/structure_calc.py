@@ -140,7 +140,7 @@ class Interaction:
             distances = distances['r'].to_numpy()
             return distances
         
-        def sim(self, radius, concentration, iter, interaction_type = None):
+        def sim_single_cross(self, radius, concentration, iter, interaction_type = None):
             if interaction_type == 'DD':
                 s = 6
             elif interaction_type == 'DQ': 
@@ -226,7 +226,7 @@ KY3F10.centre_ion('Y')
 inter = Interaction(KY3F10)
 inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
 print(inter.filtered_coords)
-r = Interaction(KY3F10).sim(radius=10, concentration = 5, interaction_type='DD', iter=500)
+r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='DD', iter=500)
 print(r)
 #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
 #Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
