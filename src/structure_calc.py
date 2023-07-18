@@ -126,29 +126,51 @@ class Interaction:
             except:
                 print('Either structure or central ion is not specified')  
         
-        def distance_sim(self,radius, concentration, iter): 
+        def distance_sim(self,radius, concentration, dopant = 'acceptor'): 
             concentration = concentration / 100
             coords = self.structure.nearest_neighbours_spherical_coords(radius)
-            filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])].reset_index(drop=True)
-            for i in filtered_coords.index:
+            self.filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])].reset_index(drop=True)
+            
+       
+            for i in self.filtered_coords.index:
                 if np.random.rand() < concentration:
-                    filtered_coords.loc[i, 'species'] = 'Sm'
+                    self.filtered_coords.loc[i, 'species'] = dopant
+            
+            distances = self.filtered_coords.loc[self.filtered_coords['species'].isin([dopant])].reset_index(drop=True)
+            distances = distances['r'].to_numpy()
+            return distances
+        
+        def sim(self, radius, concentration, iter, interaction_type = None):
+            if interaction_type == 'DD':
+                s = 6
+            elif interaction_type == 'DQ': 
+                s = 8   
+            elif interaction_type == 'QQ':
+                s = 10
+            else:
+                'Please specify interaction type'   
+            r_i = np.zeros(iter)
+            for i in range(len(r_i)):
+                distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
+                tmp = np.ones(len(distances))
+                r_tmp = np.sum( np.power((tmp / distances),s))
+                r_i[i] = r_tmp
 
-            return filtered_coords
-        def sim(self, interaction_type, distances):
-            print('Yet to implement')
+            return r_i    
+            
 
-        def distplot_summary(self, radius, concentration, filter = None):
+
+        def distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None):
             concentration = concentration / 100
             coords = self.structure.nearest_neighbours_coords(radius)
             filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])]
          
             coords = coords.drop(coords.index[coords['species'] == 'Y'])
-            print(coords)
+            print(filter)
             for i in filtered_coords.index:
         
                 if np.random.rand() < concentration:
-                    filtered_coords.loc[i, 'species'] = 'Sm'
+                    filtered_coords.loc[i, 'species'] = dopant
            
 
             frames = [coords, filtered_coords]
@@ -201,6 +223,10 @@ KY3F10.centre_ion('Y')
 #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
 #print(rslt_df)
 
-Distances = Interaction(KY3F10).distance_sim(radius=10, iter=50000, concentration = 5)
-Interaction(KY3F10).distplot_summary(radius=10, concentration = 5, filter = ['Y','Sm'])
+inter = Interaction(KY3F10)
+inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
+print(inter.filtered_coords)
+r = Interaction(KY3F10).sim(radius=10, concentration = 5, interaction_type='DD', iter=500)
+print(r)
+#Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
 #Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
