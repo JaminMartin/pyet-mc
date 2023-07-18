@@ -208,7 +208,6 @@ class Interaction:
                     pass
       
 
-#potato
 
 # cif file from https://materialsproject.org
 cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
