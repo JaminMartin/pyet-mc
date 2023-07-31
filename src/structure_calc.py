@@ -161,9 +161,11 @@ class Interaction:
 
             return r_i    
             
-
+         #TODO add exchange interation and cooperative process as an example
+        
 
         def distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None):
+            #TODO clean up plotting & formatting to produce thesis quality pictures & add saving option.
             concentration = concentration / 100
             coords = self.structure.nearest_neighbours_coords(radius)
             filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])]
