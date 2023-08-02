@@ -166,12 +166,13 @@ class Interaction:
 
         def distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None):
             #TODO clean up plotting & formatting to produce thesis quality pictures & add saving option.
+            #TODO port plotting to plotly
             concentration = concentration / 100
             coords = self.structure.nearest_neighbours_coords(radius)
             filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])]
          
             coords = coords.drop(coords.index[coords['species'] == 'Y'])
-            print(filter)
+           
             for i in filtered_coords.index:
         
                 if np.random.rand() < concentration:
@@ -210,27 +211,26 @@ class Interaction:
                     pass
       
 
-
-# cif file from https://materialsproject.org
-cif_file = 'src/cif_files/KY3F10_mp-2943_conventional_standard.cif'
-KY3F10 = Structure(cif_file= cif_file)
-KY3F10.centre_ion('Y')
-#KY3F10.nearest_neighbours_info(radius = 3.2)
-#coords_spc = KY3F10.nearest_neighbours_spherical_coords(3.2)
-#coords_xyz = KY3F10.nearest_neighbours_coords(5)
-#KY3F10.structure_plot(radius = 5)
+if __name__ == "__main__":
+    # cif file from https://materialsproject.org
 
 
-#options = ['Y']
-#KY3F10.structure_plot(5, filter=options)   
+    cif_file = 'cif_files/KY3F10_mp-2943_conventional_standard.cif'
+    KY3F10 = Structure(cif_file= cif_file)
+    KY3F10.centre_ion('Y')
+    coords_xyz = KY3F10.nearest_neighbours_coords(3.2)
+    t1 = coords_xyz.species.unique() == 'F' 
+    assert t1.all() == True , 'Only F ions should be present for this test.'
+    #options = ['Y']
+    #KY3F10.structure_plot(5, filter=options)   
 
-#rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
-#print(rslt_df)
+    #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
+    #print(rslt_df)
 
-inter = Interaction(KY3F10)
-inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
-print(inter.filtered_coords)
-r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='DD', iter=5)
-print(r)
-Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
-#Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
+    #inter = Interaction(KY3F10)
+    #inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
+    #print(inter.filtered_coords)
+    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='DD', iter=5)
+    #print(r)
+    Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
+    #Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
