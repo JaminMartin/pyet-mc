@@ -148,27 +148,30 @@ class Interaction:
             '''
             process = 'singlecross'
             cache_data = cache_reader(process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
-            if cache_data.any != None:
-                
-                if interaction_type == 'DD':
-                    s = 6
-                elif interaction_type == 'DQ': 
-                    s = 8   
-                elif interaction_type == 'QQ':
-                    s = 10
-                else:
-                    'Please specify interaction type'   
-                r_i = np.zeros(iter)
-                for i in range(len(r_i)):
-                    distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
-                    tmp = np.ones(len(distances))
-                    r_tmp = np.sum( np.power((tmp / distances),s))
-                    r_i[i] = r_tmp
+            match cache_data: 
+                case None:
+                    print('File not found in cache, running simulation')
+                    if interaction_type == 'DD':
+                        s = 6
+                    elif interaction_type == 'DQ': 
+                        s = 8   
+                    elif interaction_type == 'QQ':
+                        s = 10
+                    else:
+                        'Please specify interaction type'   
+                    r_i = np.zeros(iter)
+                    for i in range(len(r_i)):
+                        distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
+                        tmp = np.ones(len(distances))
+                        r_tmp = np.sum( np.power((tmp / distances),s))
+                        r_i[i] = r_tmp
 
 
-                cache_writer(r_i, process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
-            else:
-                r_i = cache_data    
+                    cache_writer(r_i, process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
+                case _ :
+    
+                    r_i = cache_data        
+  
             return r_i    
             
          #TODO add exchange interation and cooperative process as an example
@@ -240,7 +243,7 @@ if __name__ == "__main__":
     #inter = Interaction(KY3F10)
     #inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
     #print(inter.filtered_coords)
-    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iter=50)
+    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iter=50000)
     print(r)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
   

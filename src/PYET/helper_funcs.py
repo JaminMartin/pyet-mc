@@ -18,7 +18,6 @@ def cache_writer(r, **params):
 def cache_reader(**params):
     directory = 'cache'
     vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iter"])])
-    print(vmat)
     data = None
     try:
         for filename in os.listdir(directory):
@@ -43,6 +42,3 @@ def cache_reader(**params):
 
 #array = np.array([1,2,3,4,5])
 #d1 = cache_writer(array, process = 'sim_single_cross' , radius=10, concentration = 5, interaction_type='DD', iter=5)
-
-d2 = cache_reader(process = 'singlecross' , radius=10, concentration = 5, interaction_type='QQ', iter=50)
-print(d2.dtype)
