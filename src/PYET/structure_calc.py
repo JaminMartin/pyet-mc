@@ -3,7 +3,7 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 import matplotlib.pyplot as plt
 import pandas as pd
-
+from helper_funcs import cache_reader, cache_writer
 
 class Structure:
 
@@ -125,6 +125,8 @@ class Interaction:
                 print(f' Central ion is {self.structure.centre_ion_species}')
             except:
                 print('Either structure or central ion is not specified')  
+       
+
         
         def distance_sim(self,radius, concentration, dopant = 'acceptor'): 
             concentration = concentration / 100
@@ -142,7 +144,7 @@ class Interaction:
         
         def sim_single_cross(self, radius, concentration, iter, interaction_type = None):
             '''
-            TODO : ADD CACHING 
+            
             '''
             if interaction_type == 'DD':
                 s = 6
@@ -159,6 +161,8 @@ class Interaction:
                 r_tmp = np.sum( np.power((tmp / distances),s))
                 r_i[i] = r_tmp
 
+
+            cache_writer(r_i, process ='sim_single_cross', radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
             return r_i    
             
          #TODO add exchange interation and cooperative process as an example
@@ -230,7 +234,7 @@ if __name__ == "__main__":
     #inter = Interaction(KY3F10)
     #inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
     #print(inter.filtered_coords)
-    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='DD', iter=5)
-    #print(r)
+    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iter=50)
+    print(r)
     Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
-    #Quadpole_Quadpole = Interaction(KY3F10).sim(distances= Distances,interaction_type='Quadrapole-Quadrapole')
+  
