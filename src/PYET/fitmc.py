@@ -8,16 +8,25 @@ x = np.arange(0,500,1)
 def double_exp_test1(dict):
     global x
     return  list(dict.values())[0]*(np.exp(-list(dict.values())[1]*x)- np.exp(-list(dict.values())[2]*x))
+
+
 def chi(dict):
     global y 
     global tot_params
+    global paramx
+    global total_traces
+    global total_free
     ch = 0
     params = []
     i = 0
-  
-    for item in chunks(dict, tot_params):
+    for j in range(total_traces):
+        
+      
+        temp_dict = {'a': list(dict.values())[j], 'b': list(dict.values())[total_free], 'c' :list(dict.values())[total_free+1]}
+        print(temp_dict)
 
-        t = sum(double_exp_test1(item) - y[i])
+
+        t = sum(double_exp_test1(temp_dict) - y[i])
         i += 1
     ch += t
     return ch
@@ -31,10 +40,11 @@ def chunks(data, SIZE=1000):
     
 
 tot_params = 3
-
+total_free = 2
+total_traces = 2
 
 const_dict1  = {'a': 1 , 'b': 0.02, 'c' : 0.83}
-const_dict2  = {'a': 2 , 'b': 0.04, 'c' : 1.6}
+const_dict2  = {'a': 5 , 'b': 0.02, 'c' : 0.83}
 y1 = double_exp_test1(const_dict1)
 y2 = double_exp_test1(const_dict2)
 rng = np.random.default_rng()
@@ -44,8 +54,9 @@ ydata2 = y2 + y_noise
 plt.plot(x,ydata)
 plt.plot(x,ydata2)
 plt.show()                
-guess = {'a' : 1, 'b': 0.02, 'c': 0.83,'a2' : 2, 'b2': 0.04, 'c2': 1.6}
-
+guess = {'amp1' : 1, 'amp2': 5, 'decay1': 0.02,'decay2' : 0.83}
+free = ['amp1','amp2']
+dep = ['decay1', 'decay2']
 y = [ydata,ydata2]
 '''
 
@@ -105,6 +116,7 @@ class Optimiser:
                    self.model_params.append(param) 
                 
                 i += 1
+          return self.model_params      
 
             
 
@@ -117,6 +129,7 @@ class Optimiser:
              
 
 
-#yest = Trace(ydata2, 'stack1')
-#nest = Trace(ydata2, 'stack2')
-#opti = Optimiser([yest,nest],double_exp_test1, 3).constructor(['amplitude'], ['decay1', 'decay2'])
+yest = Trace(ydata2, 'stack1')
+nest = Trace(ydata2, 'stack2')
+opti = Optimiser([yest,nest],double_exp_test1, 3).constructor(['amplitude'], ['decay1', 'decay2'])
+print(opti)
