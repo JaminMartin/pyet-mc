@@ -4,31 +4,30 @@ import scipy.stats as sc
 from numpy.random import normal
 import matplotlib.pyplot as plt
 from itertools import islice
-x = np.arange(0,500,1)
+x = np.arange(0,200,1)
 def double_exp_test1(dict):
     global x
     return  list(dict.values())[0]*(np.exp(-list(dict.values())[1]*x)- np.exp(-list(dict.values())[2]*x))
 
 
 def chi(dict):
+    
     global y 
-    global tot_params
-    global paramx
-    global total_traces
-    global total_free
+    global deps
+    total_traces = len(y)
     ch = 0
-    params = []
-    i = 0
+    
+
     for j in range(total_traces):
-        
-      
-        temp_dict = {'a': list(dict.values())[j], 'b': list(dict.values())[total_free], 'c' :list(dict.values())[total_free+1]}
-        print(temp_dict)
+        keys = deps[j]
+        #print(keys)
+        temp_dict = {'a': dict[keys[0]], 'b':dict[keys[1]] , 'c' :dict[keys[2]]}
+        #print(temp_dict)
 
 
-        t = sum(double_exp_test1(temp_dict) - y[i])
-        i += 1
-    ch += t
+        ch += np.sum(((double_exp_test1(temp_dict) - y[j])**2))
+   
+    #print(ch)
     return ch
         
   
@@ -39,9 +38,6 @@ def chunks(data, SIZE=1000):
 
     
 
-tot_params = 3
-total_free = 2
-total_traces = 2
 
 const_dict1  = {'a': 1 , 'b': 0.02, 'c' : 0.83}
 const_dict2  = {'a': 5 , 'b': 0.02, 'c' : 0.83}
@@ -51,13 +47,12 @@ rng = np.random.default_rng()
 y_noise = 0.02 * rng.normal(size=x.size)
 ydata = y1 + y_noise
 ydata2 = y2 + y_noise
-plt.plot(x,ydata)
-plt.plot(x,ydata2)
-plt.show()                
-guess = {'amp1' : 1, 'amp2': 5, 'decay1': 0.02,'decay2' : 0.83}
-free = ['amp1','amp2']
-dep = ['decay1', 'decay2']
-y = [ydata,ydata2]
+            
+guess = {'amp1': 20, 'amp2': 4, 'decay1': 3,'decay2' : 2}
+y1dep = ['amp1', 'decay1', 'decay2']
+y2dep = ['amp2', 'decay1', 'decay2']
+deps = [y1dep, y2dep]
+y = [ydata, ydata2]
 '''
 
 Actual code
@@ -65,12 +60,15 @@ Actual code
 import scipy.optimize
 
 
-def dict_least_squares(fn, dict0, *args, **kwargs):
+def dict_opt(fn, dict0, *args, **kwargs):
     keys = list(dict0.keys());
     print(keys)
-    result = scipy.optimize.least_squares(
+    print(f'Guess with initial params:{dict0}')
+    result = scipy.optimize.minimize(
+        
         lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
         [dict0[k] for k in keys], # unwrap the initial dictionary
+        method='Nelder-Mead',
         *args, # pass position arguments
         **kwargs # pass named arguments
     )
@@ -82,10 +80,15 @@ def dict_least_squares(fn, dict0, *args, **kwargs):
     return result
 
 
-initial_dict = {"a" : 1, "b" : 0.02, "c" : 0.83}
 chi(guess)
-res = dict_least_squares(chi, guess)
-print(res.x)
+res = dict_opt(chi, guess, tol = 1e-12)
+print(f'resulting fitted params:{res.x}')
+resultdict = res.x
+plt.plot(x,ydata)
+plt.plot(x,ydata2)
+plt.plot(x, double_exp_test1({'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2']}))
+plt.plot(x, double_exp_test1({'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2']}))
+plt.show()
 class Trace:
     def __init__(self, trace, fname, parser = False):
         self.trace = trace
@@ -132,4 +135,4 @@ class Optimiser:
 yest = Trace(ydata2, 'stack1')
 nest = Trace(ydata2, 'stack2')
 opti = Optimiser([yest,nest],double_exp_test1, 3).constructor(['amplitude'], ['decay1', 'decay2'])
-print(opti)
+#print(opti)
