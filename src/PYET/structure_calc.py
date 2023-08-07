@@ -130,6 +130,7 @@ class Interaction:
         
         def distance_sim(self,radius, concentration, dopant = 'acceptor'): 
             concentration = concentration / 100
+            # returns the coordinates of the 
             coords = self.structure.nearest_neighbours_spherical_coords(radius)
             self.filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])].reset_index(drop=True)
             

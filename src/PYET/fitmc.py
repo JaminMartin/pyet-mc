@@ -20,11 +20,12 @@ def chi(dict):
 
     for j in range(total_traces):
         keys = deps[j]
+        
         #print(keys)
         temp_dict = {'a': dict[keys[0]], 'b':dict[keys[1]] , 'c' :dict[keys[2]]}
         #print(temp_dict)
 
-
+        #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
         ch += np.sum(((double_exp_test1(temp_dict) - y[j])**2))
    
     #print(ch)
@@ -61,7 +62,7 @@ import scipy.optimize
 
 
 def dict_opt(fn, dict0, *args, **kwargs):
-    keys = list(dict0.keys());
+    keys = list(dict0.keys())
     print(keys)
     print(f'Guess with initial params:{dict0}')
     result = scipy.optimize.minimize(
