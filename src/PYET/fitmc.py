@@ -57,7 +57,7 @@ print(len(x))
 y1 = general_energy_transfer(x, interact, const_dict1)
 y2 = general_energy_transfer(x, interact, const_dict2)
 rng = np.random.default_rng()
-y_noise = 0.006 * rng.normal(size=x.size)
+y_noise = 0.01 * rng.normal(size=x.size)
 ydata1 = y1 + y_noise
 ydata2 = y2 + y_noise
 dt = timer() - start
@@ -66,7 +66,6 @@ print ("Datageneration ran in %f s" % dt)
 #y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
 #y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
 
-guess = {'amp1': 1, 'amp2': 2, 'decay1': 2e9,'decay2' : 50, 'offset1': 1 , 'offset2': 0}
 
 '''
 
@@ -182,15 +181,19 @@ class Optimiser:
                 
 
              
-
+#TODO add plot rendering & output logging to fitting
 
 data1 = Trace(ydata1, x,  '2%', interact)
 data2 = Trace(ydata2, x, '5%', interact)
 y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
 y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
 opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
-guess = {'amp1': 1, 'amp2': 2, 'decay1': 2e9,'decay2' : 50, 'offset1': 1 , 'offset2': 0}
-res = opti.fit(guess, method = 'Nelder-Mead')
+guess = {'amp1': 0.2, 'amp2': 4, 'decay1': 1e9,'decay2' : 500, 'offset1': 1 , 'offset2': 0}
+start = timer()
+res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+dt = timer() - start
+print ("Unoptimised python implementation ran in %f s" % dt)
+print(f'resulting fitted params:{res.x}')
 resultdict = res.x
 plt.plot(x,ydata1)
 plt.plot(x,ydata2)
