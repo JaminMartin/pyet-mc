@@ -15,9 +15,11 @@ def test_double_exp(time,dictionary):
 
 
 
-def general_energy_transfer (time, radial_data, dictionary):
+def general_energy_transfer(time, radial_data, dictionary):
     n = len(radial_data)
-    return list(dictionary.values())[0]/n * sum([ np.exp(-1*time*(list(dictionary.values())[1]*radial_data[i] + list(dictionary.values())[2]))  for i in range(n)]) + list(dictionary.values())[3]
+    exponentials = np.exp(-1 * time[:, np.newaxis] * (list(dictionary.values())[1] * radial_data + list(dictionary.values())[2]))
+    result = list(dictionary.values())[0] / n * np.sum(exponentials, axis=1) + list(dictionary.values())[3]
+    return result
 
 def chi(dictionary):
     
@@ -52,7 +54,7 @@ const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
 const_dict2  = {'a': 2 , 'b': 3e9, 'c' : 144, 'd': 0}
 start = timer()
 #res = dict_opt(chi, guess, tol = 1e-12)
-x = np.arange(0,0.01,0.00001)
+x = np.arange(0,0.01,0.000001)
 print(len(x))
 y1 = general_energy_transfer(x, interact, const_dict1)
 y2 = general_energy_transfer(x, interact, const_dict2)
