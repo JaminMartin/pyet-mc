@@ -8,7 +8,7 @@ import json
 from timeit import default_timer as timer
 import scipy.optimize
 
-def double_exp_test1(time,dictionary):
+def test_double_exp(time,dictionary):
  
     return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*x))
 
