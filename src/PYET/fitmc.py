@@ -4,13 +4,22 @@ import scipy.stats as sc
 from numpy.random import normal
 import matplotlib.pyplot as plt
 from itertools import islice
-x = np.arange(0,200,1)
-def double_exp_test1(dict):
-    global x
-    return  list(dict.values())[0]*(np.exp(-list(dict.values())[1]*x)- np.exp(-list(dict.values())[2]*x))
+import json
+from timeit import default_timer as timer
+import scipy.optimize
+
+def double_exp_test1(time,dictionary):
+ 
+    return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*x))
 
 
-def chi(dict):
+
+
+def general_energy_transfer (time, radial_data, dictionary):
+    n = len(radial_data)
+    return list(dictionary.values())[0]/n * sum([ np.exp(-1*time*(list(dictionary.values())[1]*radial_data[i] + list(dictionary.values())[2]))  for i in range(n)]) + list(dictionary.values())[3]
+
+def chi(dictionary):
     
     global y 
     global deps
@@ -22,43 +31,47 @@ def chi(dict):
         keys = deps[j]
         
         #print(keys)
-        temp_dict = {'a': dict[keys[0]], 'b':dict[keys[1]] , 'c' :dict[keys[2]]}
+        temp_dict = {key: dictionary[key] for key in keys}
         #print(temp_dict)
 
         #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
-        ch += np.sum(((double_exp_test1(temp_dict) - y[j])**2))
+        ch += np.sum(((general_energy_transfer(temp_dict) - y[j])**2))
    
     #print(ch)
     return ch
         
   
-def chunks(data, SIZE=1000):
-    it = iter(data)
-    for i in range(0, len(data), SIZE):
-        yield {k:data[k] for k in islice(it, SIZE)}
+
 
     
 
-
-const_dict1  = {'a': 1 , 'b': 0.02, 'c' : 0.83}
-const_dict2  = {'a': 5 , 'b': 0.02, 'c' : 0.83}
-y1 = double_exp_test1(const_dict1)
-y2 = double_exp_test1(const_dict2)
+with open('cache/singlecross_10_5_QQ_50000.json') as json_file:
+    dict = json.load(json_file)
+    interact = np.asarray(dict['r_components'])
+const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
+const_dict2  = {'a': 2 , 'b': 3e9, 'c' : 144, 'd': 0}
+start = timer()
+#res = dict_opt(chi, guess, tol = 1e-12)
+x = np.arange(0,0.01,0.00001)
+print(len(x))
+y1 = general_energy_transfer(x, interact, const_dict1)
+y2 = general_energy_transfer(x, interact, const_dict2)
 rng = np.random.default_rng()
-y_noise = 0.02 * rng.normal(size=x.size)
-ydata = y1 + y_noise
+y_noise = 0.006 * rng.normal(size=x.size)
+ydata1 = y1 + y_noise
 ydata2 = y2 + y_noise
-            
-guess = {'amp1': 20, 'amp2': 4, 'decay1': 3,'decay2' : 2}
-y1dep = ['amp1', 'decay1', 'decay2']
-y2dep = ['amp2', 'decay1', 'decay2']
-deps = [y1dep, y2dep]
-y = [ydata, ydata2]
+dt = timer() - start
+print ("Datageneration ran in %f s" % dt)            
+#these need to be in the correct order!
+#y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
+#y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
+
+guess = {'amp1': 1, 'amp2': 2, 'decay1': 2e9,'decay2' : 50, 'offset1': 1 , 'offset2': 0}
+
 '''
 
 Actual code
 '''
-import scipy.optimize
 
 
 def dict_opt(fn, dict0, *args, **kwargs):
@@ -69,7 +82,8 @@ def dict_opt(fn, dict0, *args, **kwargs):
         
         lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
         [dict0[k] for k in keys], # unwrap the initial dictionary
-        method='Nelder-Mead',
+        
+        
         *args, # pass position arguments
         **kwargs # pass named arguments
     )
@@ -81,19 +95,25 @@ def dict_opt(fn, dict0, *args, **kwargs):
     return result
 
 
-chi(guess)
-res = dict_opt(chi, guess, tol = 1e-12)
-print(f'resulting fitted params:{res.x}')
-resultdict = res.x
-plt.plot(x,ydata)
-plt.plot(x,ydata2)
-plt.plot(x, double_exp_test1({'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2']}))
-plt.plot(x, double_exp_test1({'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2']}))
-plt.show()
+#chi(guess)
+#start = timer()
+#res = dict_opt(chi, guess, method = 'Nelder-Mead')
+#dt = timer() - start
+#print ("Unoptimised python implementation ran in %f s" % dt)
+#print(f'resulting fitted params:{res.x}')
+#resultdict = res.x
+#plt.plot(x,ydata)
+#plt.plot(x,ydata2)
+#plt.plot(x, fun_original({'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
+#plt.plot(x, fun_original({'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
+#plt.yscale('log')
+#plt.show()
 class Trace:
-    def __init__(self, trace, fname, parser = False):
-        self.trace = trace
+    def __init__(self, ydata, xdata, fname, radial_data, parser = False):
+        self.trace = ydata
         self.name = fname
+        self.time = xdata
+        self.radial_data = radial_data
         if parser == True:
             self.trace = self.parse(self.trace)
 
@@ -103,27 +123,58 @@ class Trace:
     
 class Optimiser:
      
-    def __init__(self, Traces, model, total_params):
-      self.Traces = Traces
-      self.model = model
-      self.params = {}
-    
-    def constructor(self, independent_params, dependent_params):
-          self.model_params = []
-          i = 0
-          for trace in self.Traces:
-                for param in independent_params:
-                  param = param + f'_{i}'
-    
-                  self.model_params.append(param)  
-                for param in dependent_params:    
-                   self.model_params.append(param) 
-                
-                i += 1
-          return self.model_params      
+    def __init__(self, Traces, variables, model = 'default'):
+      self.Traces = Traces #list of numpy array containing experimental data
+      self.variables = variables #list of variables for each trace
+      if model == 'default':
+          self.model = general_energy_transfer
+      else:
+          self.model = model    
+
+
+
+    def fit(self, guess,  *args, **kwargs):
+        keys = list(guess.keys())
+        print(keys)
+        print(f'Guess with initial params:{guess}')
+        fn = self.chi
+        self.result = scipy.optimize.minimize(
+            
+            lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
+            [guess[k] for k in keys], # unwrap the initial dictionary
+            
+            
+            *args, # pass position arguments
+            **kwargs # pass named arguments
+        )
+        # wrap the solution in a dictionary
+        try:
+            self.result.x = {k:v for k,v in zip(keys, self.result.x)}
+        except:
+            pass
+        return self.result
 
             
+    def chi(self,dictionary):
+        
 
+        total_traces = len(self.Traces)
+
+        ch = 0
+        
+        
+        for j in range(total_traces):
+            keys = self.variables[j]
+            
+            #print(keys)
+            temp_dict = {key: dictionary[key] for key in keys}
+            #print(temp_dict)
+
+            #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
+            ch += np.sum(((self.model(self.Traces[j].time,self.Traces[j].radial_data, temp_dict) - self.Traces[j].trace)**2))
+            
+        #print(ch)
+        return ch
 
 
 
@@ -133,7 +184,17 @@ class Optimiser:
              
 
 
-yest = Trace(ydata2, 'stack1')
-nest = Trace(ydata2, 'stack2')
-opti = Optimiser([yest,nest],double_exp_test1, 3).constructor(['amplitude'], ['decay1', 'decay2'])
-#print(opti)
+data1 = Trace(ydata1, x,  '2%', interact)
+data2 = Trace(ydata2, x, '5%', interact)
+y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
+y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
+opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
+guess = {'amp1': 1, 'amp2': 2, 'decay1': 2e9,'decay2' : 50, 'offset1': 1 , 'offset2': 0}
+res = opti.fit(guess, method = 'Nelder-Mead')
+resultdict = res.x
+plt.plot(x,ydata1)
+plt.plot(x,ydata2)
+plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
+plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
+plt.yscale('log')
+plt.show()
