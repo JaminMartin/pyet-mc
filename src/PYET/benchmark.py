@@ -10,7 +10,7 @@ with open('cache/singlecross_10_5_QQ_50000.json') as json_file:
     dict = json.load(json_file)
     data = np.asarray(dict['r_components'])
 
-xdata = np.arange(0,0.15,0.00001)
+xdata = np.arange(0,0.15,0.0001)
 print(len(xdata))
 A = 1
 c = 3e5
