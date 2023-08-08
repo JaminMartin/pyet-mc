@@ -8,11 +8,11 @@ import json
 from timeit import default_timer as timer
 import scipy.optimize
 
+
+# Model functions for testing and general use
 def test_double_exp(time,dictionary):
  
     return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*x))
-
-
 
 
 def general_energy_transfer(time, radial_data, dictionary):
@@ -21,94 +21,13 @@ def general_energy_transfer(time, radial_data, dictionary):
     result = list(dictionary.values())[0] / n * np.sum(exponentials, axis=1) + list(dictionary.values())[3]
     return result
 
-def chi(dictionary):
-    
-    global y 
-    global deps
-    total_traces = len(y)
-    ch = 0
-    
-
-    for j in range(total_traces):
-        keys = deps[j]
         
-        #print(keys)
-        temp_dict = {key: dictionary[key] for key in keys}
-        #print(temp_dict)
-
-        #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
-        ch += np.sum(((general_energy_transfer(temp_dict) - y[j])**2))
-   
-    #print(ch)
-    return ch
-        
-  
-
-
-    
-
-with open('cache/singlecross_10_5_QQ_50000.json') as json_file:
-    dict = json.load(json_file)
-    interact = np.asarray(dict['r_components'])
-const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
-const_dict2  = {'a': 2 , 'b': 3e9, 'c' : 144, 'd': 0}
-start = timer()
-#res = dict_opt(chi, guess, tol = 1e-12)
-x = np.arange(0,0.01,0.000001)
-print(len(x))
-y1 = general_energy_transfer(x, interact, const_dict1)
-y2 = general_energy_transfer(x, interact, const_dict2)
-rng = np.random.default_rng()
-y_noise = 0.01 * rng.normal(size=x.size)
-ydata1 = y1 + y_noise
-ydata2 = y2 + y_noise
-dt = timer() - start
-print ("Datageneration ran in %f s" % dt)            
-#these need to be in the correct order!
-#y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
-#y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
-
 
 '''
 
 Actual code
 '''
-
-
-def dict_opt(fn, dict0, *args, **kwargs):
-    keys = list(dict0.keys())
-    print(keys)
-    print(f'Guess with initial params:{dict0}')
-    result = scipy.optimize.minimize(
-        
-        lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
-        [dict0[k] for k in keys], # unwrap the initial dictionary
-        
-        
-        *args, # pass position arguments
-        **kwargs # pass named arguments
-    )
-    # wrap the solution in a dictionary
-    try:
-        result.x = {k:v for k,v in zip(keys, result.x)}
-    except:
-        pass
-    return result
-
-
-#chi(guess)
-#start = timer()
-#res = dict_opt(chi, guess, method = 'Nelder-Mead')
-#dt = timer() - start
-#print ("Unoptimised python implementation ran in %f s" % dt)
-#print(f'resulting fitted params:{res.x}')
-#resultdict = res.x
-#plt.plot(x,ydata)
-#plt.plot(x,ydata2)
-#plt.plot(x, fun_original({'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
-#plt.plot(x, fun_original({'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
-#plt.yscale('log')
-#plt.show()
+#data structure for handling experimental data & radial info
 class Trace:
     def __init__(self, ydata, xdata, fname, radial_data, parser = False):
         self.trace = ydata
@@ -121,7 +40,7 @@ class Trace:
         def parse(self, trace):
             print('not yet implemented')  
     
-    
+#class for handling the fitting, plotting & logging results 
 class Optimiser:
      
     def __init__(self, Traces, variables, model = 'default'):
@@ -184,6 +103,26 @@ class Optimiser:
 
              
 #TODO add plot rendering & output logging to fitting
+
+
+# testing 
+with open('cache/singlecross_10_5_QQ_50000.json') as json_file:
+    dict = json.load(json_file)
+    interact = np.asarray(dict['r_components'])
+const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
+const_dict2  = {'a': 2 , 'b': 3e9, 'c' : 144, 'd': 0}
+start = timer()
+#res = dict_opt(chi, guess, tol = 1e-12)
+x = np.arange(0,0.01,0.00001)
+print(len(x))
+y1 = general_energy_transfer(x, interact, const_dict1)
+y2 = general_energy_transfer(x, interact, const_dict2)
+rng = np.random.default_rng()
+y_noise = 0.01 * rng.normal(size=x.size)
+ydata1 = y1 + y_noise
+ydata2 = y2 + y_noise
+dt = timer() - start
+print ("Datageneration ran in %f s" % dt)   
 
 data1 = Trace(ydata1, x,  '2%', interact)
 data2 = Trace(ydata2, x, '5%', interact)
