@@ -7,7 +7,7 @@ from itertools import islice
 import json
 from timeit import default_timer as timer
 import scipy.optimize
-
+import os
 
 # Model functions for testing and general use
 def test_double_exp(time,dictionary):
@@ -104,41 +104,42 @@ class Optimiser:
              
 #TODO add plot rendering & output logging to fitting
 
-
+if __name__ == "__main__":
 # testing 
-with open('cache/singlecross_10_5_QQ_50000.json') as json_file:
-    dict = json.load(json_file)
-    interact = np.asarray(dict['r_components'])
-const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
-const_dict2  = {'a': 2 , 'b': 3e9, 'c' : 144, 'd': 0}
-start = timer()
-#res = dict_opt(chi, guess, tol = 1e-12)
-x = np.arange(0,0.01,0.00001)
-print(len(x))
-y1 = general_energy_transfer(x, interact, const_dict1)
-y2 = general_energy_transfer(x, interact, const_dict2)
-rng = np.random.default_rng()
-y_noise = 0.01 * rng.normal(size=x.size)
-ydata1 = y1 + y_noise
-ydata2 = y2 + y_noise
-dt = timer() - start
-print ("Datageneration ran in %f s" % dt)   
+    cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cache'))
+    with open(f'{cache_dir}/singlecross_10_5_QQ_50000.json') as json_file:
+        dict = json.load(json_file)
+        interact = np.asarray(dict['r_components'])
+    const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
+    const_dict2  = {'a': 2 , 'b': 3e9, 'c' : 144, 'd': 0}
+    start = timer()
+    #res = dict_opt(chi, guess, tol = 1e-12)
+    x = np.arange(0,0.01,0.00001)
+    print(len(x))
+    y1 = general_energy_transfer(x, interact, const_dict1)
+    y2 = general_energy_transfer(x, interact, const_dict2)
+    rng = np.random.default_rng()
+    y_noise = 0.01 * rng.normal(size=x.size)
+    ydata1 = y1 + y_noise
+    ydata2 = y2 + y_noise
+    dt = timer() - start
+    print ("Datageneration ran in %f s" % dt)   
 
-data1 = Trace(ydata1, x,  '2%', interact)
-data2 = Trace(ydata2, x, '5%', interact)
-y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
-y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
-opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
-guess = {'amp1': 0.2, 'amp2': 4, 'decay1': 1e9,'decay2' : 500, 'offset1': 1 , 'offset2': 0}
-start = timer()
-res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
-dt = timer() - start
-print ("Unoptimised python implementation ran in %f s" % dt)
-print(f'resulting fitted params:{res.x}')
-resultdict = res.x
-plt.plot(x,ydata1)
-plt.plot(x,ydata2)
-plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
-plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
-plt.yscale('log')
-plt.show()
+    data1 = Trace(ydata1, x,  '2%', interact)
+    data2 = Trace(ydata2, x, '5%', interact)
+    y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
+    y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
+    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
+    guess = {'amp1': 0.2, 'amp2': 4, 'decay1': 1e9,'decay2' : 500, 'offset1': 1 , 'offset2': 0}
+    start = timer()
+    res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+    dt = timer() - start
+    print ("Unoptimised python implementation ran in %f s" % dt)
+    print(f'resulting fitted params:{res.x}')
+    resultdict = res.x
+    plt.plot(x,ydata1)
+    plt.plot(x,ydata2)
+    plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
+    plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
+    plt.yscale('log')
+    plt.show()

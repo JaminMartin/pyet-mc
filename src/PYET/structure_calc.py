@@ -3,8 +3,8 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 import matplotlib.pyplot as plt
 import pandas as pd
-from helper_funcs import cache_reader, cache_writer
-
+import helper_funcs 
+import os
 class Structure:
 
     def __init__(self,cif_file):
@@ -148,7 +148,7 @@ class Interaction:
             
             '''
             process = 'singlecross'
-            cache_data = cache_reader(process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
+            cache_data = helper_funcs.cache_reader(process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
             match cache_data: 
                 case None:
                     print('File not found in cache, running simulation')
@@ -168,7 +168,7 @@ class Interaction:
                         r_i[i] = r_tmp
 
 
-                    cache_writer(r_i, process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
+                    helper_funcs.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
                 case _ :
     
                     r_i = cache_data        
@@ -228,8 +228,9 @@ class Interaction:
 if __name__ == "__main__":
     # cif file from https://materialsproject.org
 
-
-    cif_file = 'cif_files/KY3F10_mp-2943_conventional_standard.cif'
+    # Get the absolute path of the ciffiles directory
+    cif_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cif_files'))
+    cif_file = os.path.join(cif_dir, 'KY3F10_mp-2943_conventional_standard.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
     coords_xyz = KY3F10.nearest_neighbours_coords(3.2)

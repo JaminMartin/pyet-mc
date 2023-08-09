@@ -2,21 +2,24 @@ import os
 import sys
 import json
 import numpy as np
-if not os.path.exists('cache'):
-    os.mkdir('cache')
+
+cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cache'))
+
+if not os.path.exists(cache_dir):
+    os.mkdir(cache_dir)
 
 def cache_writer(r, **params):
     file_name = f'{params["process"]}_{params["radius"]}_{params["concentration"]}_{params["interaction_type"]}_{params["iter"]}'
     temp = {}
     temp['r_components'] = r.tolist()
     dictionary = params | temp
-    with open(f'cache/{file_name}.json', 'w') as fp:
+    with open(f'{cache_dir}/{file_name}.json', 'w') as fp:
         json.dump(dictionary, fp)
     
      
 
 def cache_reader(**params):
-    directory = 'cache'
+    directory = cache_dir
     vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iter"])])
     data = None
     try:
@@ -34,7 +37,7 @@ def cache_reader(**params):
                 pass  
          
     except:
-         print('File/cache not found running simulation and setting up cache')
+         print('File not found')
          pass
     return data    
 
