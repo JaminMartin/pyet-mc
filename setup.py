@@ -8,10 +8,10 @@ install_requires = [str(req.requirement) for req in requirements]
 setup(
     name='pyet',
     version='0.1',
-    description='Library for calculating energy transfer rates between lanthanide ions',
+    description='Python package for calculating energy transfer rates between lanthanide ions',
     url='https://github.com/JaminMartin/pyet-mc',
     author='Jamin Martin',
-    
+    author_email='jamin.martin@pg.canterbury.ac.nz',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=install_requires,
