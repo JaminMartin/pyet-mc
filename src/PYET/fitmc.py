@@ -139,7 +139,10 @@ if __name__ == "__main__":
     resultdict = res.x
     plt.plot(x,ydata1)
     plt.plot(x,ydata2)
-    plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
-    plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
+    plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}),  label='2%')
+    plt.plot(x, general_energy_transfer(x, interact, {'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}),  label='5%')
     plt.yscale('log')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Intensity (arb. units.)')
+    plt.legend() 
     plt.show()
