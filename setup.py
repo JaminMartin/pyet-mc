@@ -8,10 +8,10 @@ install_requires = [str(req.requirement) for req in requirements]
 setup(
     name='pyet',
     version='0.1',
-    description='A short description of your package',
-    url='https://github.com/your_username/pyet',
+    description='Library for calculating energy transfer rates between lanthanide ions',
+    url='https://github.com/JaminMartin/pyet-mc',
     author='Jamin Martin',
-    author_email='your_email@example.com',
+    
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=install_requires,
