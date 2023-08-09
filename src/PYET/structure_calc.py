@@ -3,7 +3,7 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 import matplotlib.pyplot as plt
 import pandas as pd
-import helper_funcs 
+import helper_funcs
 import os
 class Structure:
 
