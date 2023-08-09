@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from . import helper_funcs
 import os
+#add documentation
 class Structure:
 
     def __init__(self,cif_file):
