@@ -29,7 +29,7 @@ This can be done with the following:
 ``` 
 Output:
 ```
-Nearest neighbors within radius 3.2 Angstroms of a Y ion:
+Nearest neighbours within radius 3.2 Angstroms of a Y ion:
 Species = F, r = 2.386628 Angstrom
 Species = F, r = 2.227665 Angstrom
 Species = F, r = 2.386628 Angstrom

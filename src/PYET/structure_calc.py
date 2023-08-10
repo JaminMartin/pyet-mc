@@ -46,7 +46,7 @@ class Structure:
         """ 
         self.nn = self.struct.get_neighbors(self.site, radius)
         s = ""
-        heading = f"Nearest neighbors within radius {radius} Angstroms of a {self.centre_ion_species} ion:\n"
+        heading = f"Nearest neighbours within radius {radius} Angstroms of a {self.centre_ion_species} ion:\n"
         s += (heading)
         for n in self.nn:
             s += "Species = %s, r = %f Angstrom\n" % (n[0].species.chemical_system, self.site.distance(n[0]))
