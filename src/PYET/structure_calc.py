@@ -7,8 +7,13 @@ from . import helper_funcs
 import os
 #add documentation
 class Structure:
-
+    '''
+    A class for handling the structural info of a host crystal. A central ion, e.g. a Ytrrium ion must be specified for the associated methods to work. Once this ion has been specified the nearest neigbour ions can be calculated. This can either return cartesian or spherical polar coordinates for further calculations or plotting. There is also a simple function for printing off this information for a quick analyis. Lastly this class provides plotting functionality directly for visualisation purposes. 
+    '''
     def __init__(self,cif_file):
+        '''
+        cif_file: a .cif file containing the structural information of the host material
+        '''
         try:
             self.cif = CifParser(cif_file)
             self.struct = self.cif.get_structures()[0]
@@ -18,6 +23,8 @@ class Structure:
     def centre_ion(self,ion):
         """
         Return the index of an ion ion of a given species choice
+
+        ion: type string, e.g. "Y" 
         """
         structure_sites = self.struct.sites
         for i in range(len(structure_sites)):
@@ -35,6 +42,7 @@ class Structure:
     def nearest_neighbours_info(self, radius): 
         """
         Return the radial distance and species of the neighbors within radius r.
+        radius: float/int value e.g 3.6.
         """ 
         self.nn = self.struct.get_neighbors(self.site, radius)
         s = ""
@@ -48,6 +56,7 @@ class Structure:
     def nearest_neighbours_coords(self, radius): 
         """
         Return the distances and species of the next nearest neighbors within radius r in cartesian coordinates as a pandas dataframe.
+        radius: float/int value e.g 3.6.
         """ 
         NN = self.struct.get_neighbors(self.site, radius)
         XYZ = np.zeros([len(NN), 3])
@@ -67,6 +76,7 @@ class Structure:
     def nearest_neighbours_spherical_coords(self,radius): 
         """
         Return the distances and species of the next nearest neighbors within radius r in spherical polar coordinates as a pandas dataframe.
+        radius: float/int value e.g 3.6.
         """          
         NN = self.struct.get_neighbors(self.site, radius)
         
@@ -86,7 +96,9 @@ class Structure:
     
     def structure_plot(self, radius, filter = None):
         '''
-        Renders a 3D plot of a given radius around a specified central ion
+        Renders a 3D plot of a given radius around a specified central ion. A filter can provided as a list of strings 
+        radius: float/int value e.g 3.6.
+        filter: list of strings e.g ["Y", "F"]
         '''
         coords_xyz = self.nearest_neighbours_coords(radius)
         UniqueNames = coords_xyz.species.unique()
