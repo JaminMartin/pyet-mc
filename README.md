@@ -16,7 +16,8 @@ We then need to specify a central ion which all subsequent information will be c
 KY3F10.centre_ion('Y')
 
 ```
-This will set the central ion to be a Ytrrium ion and yields the following output
-> Output: Central ion is Y
-
+This will set the central ion to be a Ytrrium ion and yields the following output:
+```
+Central ion is Y
+```
 
