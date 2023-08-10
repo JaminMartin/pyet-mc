@@ -258,7 +258,7 @@ if __name__ == "__main__":
     #inter = Interaction(KY3F10)
     #inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
     #print(inter.filtered_coords)
-    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iter=50000)
-    print(r)
+    #r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iter=50000)
+    #print(r)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
   
