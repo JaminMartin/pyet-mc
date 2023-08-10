@@ -246,6 +246,7 @@ if __name__ == "__main__":
     cif_file = os.path.join(cif_dir, 'KY3F10_mp-2943_conventional_standard.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
+    KY3F10.nearest_neighbours_info(3.2)
     coords_xyz = KY3F10.nearest_neighbours_coords(3.2)
     t1 = coords_xyz.species.unique() == 'F' 
     assert t1.all() == True , 'Only F ions should be present for this test.'
