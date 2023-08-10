@@ -9,6 +9,7 @@ if not os.path.exists(cache_dir):
     os.mkdir(cache_dir)
 
 def cache_writer(r, **params):
+    #fix! if concentration is non-integer, replace . with pt
     file_name = f'{params["process"]}_{params["radius"]}_{params["concentration"]}_{params["interaction_type"]}_{params["iter"]}'
     temp = {}
     temp['r_components'] = r.tolist()
