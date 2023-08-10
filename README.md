@@ -60,7 +60,8 @@ filtered_ions = ['F']
 KY3F10.structure_plot(5, filter = filtered_ions)  
 ```
 This gives us a filtered plot:
+<p align="center">
 <img width="610" alt="filtered plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/8c44b3c1-8451-4862-99ea-d331d8edc092">
-
+</p>
 
 In future, the colours will be handled based on the ion, much like the materials project and moved to plotly, the current plotting is purely a placeholder for functionality. This is a WIP.
