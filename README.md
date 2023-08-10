@@ -43,4 +43,21 @@ Species = F, r = 2.227665 Angstrom
 Species = F, r = 2.386628 Angstrom
 
 ```
+We can then plot this if we would like, but for ilistrative purposes we will increase the radius. We can use the inbuilt plotting to this.
+```python
+ KY3F10.structure_plot(5)   
+```
+which yields the following figure:
 
+
+
+We can also specify a filter to only show ions we care about. For example, we may only care about the fluoride ions. 
+```python
+filtered_ions = ['F']
+
+KY3F10.structure_plot(5, filter = filtered_ions)  
+```
+This gives us a filtered plot:
+
+
+In future the colours will be handled based on the ion much like the materials project. This is a WIP.

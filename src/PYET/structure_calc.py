@@ -250,8 +250,8 @@ if __name__ == "__main__":
     coords_xyz = KY3F10.nearest_neighbours_coords(3.2)
     t1 = coords_xyz.species.unique() == 'F' 
     assert t1.all() == True , 'Only F ions should be present for this test.'
-    #options = ['Y']
-    #KY3F10.structure_plot(5, filter=options)   
+    filtered_ions = ['F']
+    KY3F10.structure_plot(5, filter = filtered_ions)   
 
     #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     #print(rslt_df)
