@@ -3,6 +3,7 @@
 # pyet-mc
 
 </p>
+
 <p align="center">
  <img width="602" alt="example lifetime and energy transfer fitting plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/0716c0b9-73e1-4d4a-90db-69ed73eaf982">
 </p>
@@ -17,6 +18,7 @@
     - [A note on caching](#a-note-on-caching)
     - [Adding your own energy transfer model](#adding-your-own-energy-transfer-model)
   - [Fitting experimental data to energy transfer models](#fitting-experimental-data-to-energy-transfer-models)
+- [Referencing this project](#referencing-this-project)  
 - [License](#license)
 
 # Introduction
@@ -92,6 +94,8 @@ In future, the colours will be handled based on the ion, much like the materials
 ### Adding your own energy transfer model
 WIP
 ## Fitting experimental data to energy transfer models
+
+# Referencing this project
 
 # License
 The project is licensed under the GNU GENERAL PUBLIC LICENSE.

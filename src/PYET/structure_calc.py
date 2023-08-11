@@ -176,7 +176,7 @@ class Interaction:
                     r_i = np.zeros(iter)
                     for i in range(len(r_i)):
                         distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
-                        tmp = np.ones(len(distances))
+                        tmp = np.ones(len(distances)) 
                         r_tmp = np.sum( np.power((tmp / distances),s))
                         r_i[i] = r_tmp
 
