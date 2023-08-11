@@ -9,8 +9,9 @@ if not os.path.exists(cache_dir):
     os.mkdir(cache_dir)
 
 def cache_writer(r, **params):
-    #fix! if concentration is non-integer, replace . with pt
+
     file_name = f'{params["process"]}_{params["radius"]}_{params["concentration"]}_{params["interaction_type"]}_{params["iter"]}'
+    file_name = file_name.replace('.', 'pt')
     temp = {}
     temp['r_components'] = r.tolist()
     dictionary = params | temp
@@ -22,6 +23,8 @@ def cache_writer(r, **params):
 def cache_reader(**params):
     directory = cache_dir
     vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iter"])])
+    for i in range(len(vmat)):
+        vmat[i] = vmat[i].replace('.', 'pt')
     data = None
     try:
         for filename in os.listdir(directory):
