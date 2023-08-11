@@ -5,12 +5,19 @@ Contains functions for visualising crystal structure around a central donor ion,
 <p align="center">
  <img width="602" alt="example lifetime and energy transfer fitting plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/0716c0b9-73e1-4d4a-90db-69ed73eaf982">
 </p>
+
+## Table of Contents
+- [Install](#install)
+- [Use](#use)
+  - [Generating a structure & plotting](#generating-a-structure--plotting)
+  - [Modelling energy transfer](#modelling-energy-transfer)
+
+
 # Install
 WIP
-
 # Use 
 
-
+## Generating a structure & plotting
 Firstly a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide cif data. It is highly recommended as it also provides additional functionality such as XRD patterns, etc. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
 We can create our structure with the following code. However, this may differ if you are using the materials project API. 
 ```python
@@ -65,3 +72,4 @@ This gives us a filtered plot:
 </p>
 
 In future, the colours will be handled based on the ion, much like the materials project and moved to plotly, the current plotting is purely a placeholder for functionality. This is a WIP.
+## Modelling energy transfer 
