@@ -1,21 +1,23 @@
 # pyet-mc
-Collection of tools for modelling the energy transfer processes in lanthanide-doped materials. 
-
-Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
 <p align="center">
  <img width="602" alt="example lifetime and energy transfer fitting plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/0716c0b9-73e1-4d4a-90db-69ed73eaf982">
 </p>
 
 ## Table of Contents
-- [Install](#install)
-- [Use](#use)
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
   - [Generating a structure & plotting](#generating-a-structure--plotting)
   - [Modelling energy transfer](#modelling-energy-transfer)
 
+# Introduction
+Collection of tools for modelling the energy transfer processes in lanthanide-doped materials. 
 
-# Install
+Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
+
+# Installation
 WIP
-# Use 
+# Usage 
 
 ## Generating a structure & plotting
 Firstly a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide cif data. It is highly recommended as it also provides additional functionality such as XRD patterns, etc. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
@@ -73,3 +75,6 @@ This gives us a filtered plot:
 
 In future, the colours will be handled based on the ion, much like the materials project and moved to plotly, the current plotting is purely a placeholder for functionality. This is a WIP.
 ## Modelling energy transfer 
+
+# License
+Project is licensed under the MIT License.
