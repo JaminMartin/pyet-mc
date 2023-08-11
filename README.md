@@ -77,4 +77,4 @@ In future, the colours will be handled based on the ion, much like the materials
 ## Modelling energy transfer 
 
 # License
-Project is licensed under the MIT License.
+The project is licensed under the GNU GENERAL PUBLIC LICENSE.
