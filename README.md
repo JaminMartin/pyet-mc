@@ -92,7 +92,12 @@ In future, the colours will be handled based on the ion, much like the materials
 ### A note on caching
 As these calculations can be quite time consuming for large iterations, and that for said large iterations the difference between runs should be minimal, caching was implemented to speed up subsequent runs.
 
-When first used, pyet will create a cache directory. All interaction simulations will cache their interaction components along with info regarding the conditions of the simulation in JSON format. 
+When first used, pyet will create a cache directory. All interaction simulations will cache their interaction components along with info regarding the conditions of the simulation in JSON format. The generated JSON file is named in the following convention:
+
+```
+process_radius_concentration_interactiontype_iterations.json
+```
+We can query and return the interaction components of the JSON file with the following code:
 ```python
 from pyet import helper_funcs as hf
 
@@ -136,6 +141,7 @@ Run "cache_clear()" to clear the cache
 ### Adding your own energy transfer model
 WIP
 ## Fitting experimental data to energy transfer models
+
 
 
 # Referencing this project
