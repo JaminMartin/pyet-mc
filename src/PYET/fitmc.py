@@ -12,7 +12,7 @@ import os
 # Model functions for testing and general use
 def test_double_exp(time,dictionary):
  
-    return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*x))
+    return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*time))
 
 
 def general_energy_transfer(time, radial_data, dictionary):
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
     guess = {'amp1': 1, 'amp2': 1, 'decay1': 2e9,'decay2' : 500, 'offset1': 0 , 'offset2': 0}
     start = timer()
-    res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+    #res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
     dt = timer() - start
     print ("Unoptimised python implementation ran in %f s" % dt)
     print(f'resulting fitted params:{res.x}')
