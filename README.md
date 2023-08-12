@@ -123,7 +123,7 @@ You can also specify a file of a given simulation configuration as was done abov
 If you are wanting to know the status of your cache, you can also use cache list to get the details including file names and size. Like cache_clear(), a simple command is all you need!
 
 ```python
-cache_list()
+hf.cache_list()
 ```
 ```
 #======# Cached Files #======#
