@@ -96,7 +96,7 @@ $$ \gamma_{tr,j} = C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s $$
 
 
 we can define an average energy transfer rate $\gamma_{av}$ defined as:
-$\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$
+$$\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$$
 ### Modelling energy transfer processes
 Note: Currently, there is only one energy transfer process implemented and so this section may be subject to change in future releases. 
 
