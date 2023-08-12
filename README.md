@@ -86,8 +86,60 @@ This gives us a filtered plot:
 
 In future, the colours will be handled based on the ion, much like the materials project and moved to plotly, the current plotting is purely a placeholder for functionality. This is a WIP.
 ## Energy transfer models
+$$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t}$$
+for a single step cross relaxation process (currently the only model implemented) $\gamma_{tr,j}$ takes the form: 
+$$\gamma_{tr,j} = C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s$$
 
+$\gamma_{av}$, i.e an average energy transfer rate may be defined as $\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$. 
 ### Modelling energy transfer processes
+Note: Currently, there is only one energy transfer process implemented and so this section may be subject to change in future releases. 
+
+Consider our crystal structure we previously generated. We wish to now "dope" that structure with some lanthanide ions randomly around some central donor ion. We will replace our previously defined "central yttrium atom" with samarium. We will then randomly (based on the concentration of the dopant in the crystal) dope samarium ions around this central samarium ion. This step needs to performed many times in order to "build up" many random unique samarium-samarium donor-acceptor configurations. When the number of random configurations is large enough, this should accurately represent a physical crystal sample. This is the Monte-Carlo aspect of our energy transfer analyis. 
+
+To generate our random samples we utilise the interaction class. This class takes in our structure class and provides additional methods for calculating our interaction components as well as more specific plotting methods for doped crystals. We can simply inact this class simply by passing our structure to the interaction class:
+```python
+crystal_interaction = Interaction(KY3F10)
+```
+
+```python
+coords = inter.distance_sim(radius=10, concentration = 15, dopant='Sm')
+```
+This returns a list of radial distances in angstroms of the dopant samarium ions in relation to the central samarium donor ion.
+```
+[8.28402747 7.17592429 7.17592429 9.33368811 8.28402747 4.30030493
+ 8.28402747 7.17592429 9.33368811 7.17592429 3.98372254 8.28402747]
+```
+
+We can also take a more detailed look at what has happend by calling 
+```python
+print(coords.filtered_coords)
+```
+```
+           r       theta           phi species
+0   7.175924  115.071364 -1.156825e+02       Y
+1   7.175924  115.071364 -1.543175e+02       Y
+2   8.284027   90.000000 -1.350000e+02       Y
+3   7.175924   66.886668 -1.525658e+02       Y
+4   7.175924   66.886668 -1.174342e+02       Y
+5   9.192125  109.317471 -1.800000e+02       Y
+6   5.861968   92.188550 -1.800000e+02       Y
+7   9.333688  162.434187 -1.800000e+02       Y
+8   8.284027  135.000000  1.800000e+02      Sm
+9   7.175924  115.071364  1.156825e+02      Sm
+10  7.175924  115.071364  1.543175e+02       Y
+11  4.300305  135.000000 -1.800000e+02       Y
+12  3.983723   45.000000 -1.800000e+02       Y
+13  7.175924   66.886668  1.525658e+02      Sm
+14  9.333688   72.434187 -1.800000e+02      Sm
+15  8.284027   45.000000 -1.800000e+02       Y
+16  9.192125   19.317471 -1.800000e+02       Y
+17  8.284027   90.000000  1.350000e+02       Y
+18  7.175924   66.886668  1.174342e+02       Y
+19  9.192125  109.317471 -9.000000e+01       Y
+20  5.861968   92.188550 -9.000000e+01       Y
+```
+As we can see some of the yttrium ions have been replaced by samarium ions, as expected. 
+
 
 ### A note on caching
 As these calculations can be quite time consuming for large iterations, and that for said large iterations the difference between runs should be minimal, caching was implemented to speed up subsequent runs.
@@ -141,7 +193,10 @@ Run "cache_clear()" to clear the cache
 ### Adding your own energy transfer model
 WIP
 ## Fitting experimental data to energy transfer models
+Fitting of exerpimental lifetime transients to determine energy transfer parameters is the primary purpose of this library and so will utilise all the previous components covered. 
+We will utilise some of our previously generated single step cross relaxation 
 
+Recalling previously our two quadrapole-quadrapole datasets for 2.5% and 5% doping respectively, If you dont have these generatd interaction components please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes) we can can use them to generate some arifical data given some additional parameters. 
 
 
 # Referencing this project

@@ -132,7 +132,7 @@ class Structure:
 
    
 class Interaction:
-        def __init__(self, Structure):
+        def __init__(self, Structure,):
             try:
                 self.structure = Structure
                 print(f' Central ion is {self.structure.centre_ion_species}')
@@ -251,15 +251,17 @@ if __name__ == "__main__":
     t1 = coords_xyz.species.unique() == 'F' 
     assert t1.all() == True , 'Only F ions should be present for this test.'
     filtered_ions = ['F']
-    KY3F10.structure_plot(5, filter = filtered_ions)   
+    #KY3F10.structure_plot(5, filter = filtered_ions)   
 
     #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     #print(rslt_df)
 
-    #inter = Interaction(KY3F10)
-    #inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
+    inter = Interaction(KY3F10)
+
+    #coords = inter.distance_sim(radius=10, concentration = 15, dopant='Sm')
+    #print(coords)
     #print(inter.filtered_coords)
-    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 1, interaction_type='QQ', iterations=50000)
+    #r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 1, interaction_type='QQ', iterations=50000)
     #print(r)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
   
