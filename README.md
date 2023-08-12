@@ -90,10 +90,53 @@ In future, the colours will be handled based on the ion, much like the materials
 ### Modelling energy transfer processes
 
 ### A note on caching
+As these calculations can be quite time consuming for large iterations, and that for said large iterations the difference between runs should be minimal, caching was implemented to speed up subsequent runs.
 
+When first used, pyet will create a cache directory. All interaction simulations will cache their interaction components along with info regarding the conditions of the simulation in JSON format. 
+```python
+from pyet import helper_funcs as hf
+
+conc2pt5pct = hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
+conc5pct =  hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'QQ')
+```
+If what you have specified is not found in the cache, there will be a console log such as this:
+```
+File not found, check your inputs or consider running a simulation with these parameters
+```
+This will also return a None type which will need to be handled accordingly, such as using a python match statement. This will be shown in a following section. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
+
+```
+file found in cache, returning interaction components
+```
+Following a major update to pyet, it is also recomended that you clear the cache in the event a bug is discovered in the existing code. This will be highlighted in any release notes.
+
+This can be done using:
+```python
+hf.cache_clear()
+```
+This will prompt you if you are sure you would like to delete the cache.
+```
+Are you sure you want to delete all the cache files? [Y/N]?
+```
+You can also specify a file of a given simulation configuration as was done above. In the event you may have made a mistake and forgot to change a .cif file etc. Happens to the best of us...
+
+If you are wanting to know the status of your cache, you can also use cache list to get the details including file names and size. Like cache_clear(), a simple command is all you need!
+
+```python
+cache_list()
+```
+```
+#======# Cached Files #======#
+singlecross_10_2pt5_QQ_50000.json (958053 bytes)
+singlecross_10_5_QQ_50000.json (1121375 bytes)
+Total cache size: 2.08 MB
+Run "cache_clear()" to clear the cache
+#============================#
+```
 ### Adding your own energy transfer model
 WIP
 ## Fitting experimental data to energy transfer models
+
 
 # Referencing this project
 

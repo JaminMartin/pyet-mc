@@ -156,15 +156,15 @@ class Interaction:
             distances = distances['r'].to_numpy()
             return distances
         
-        def sim_single_cross(self, radius, concentration, iter, interaction_type = None):
+        def sim_single_cross(self, radius, concentration, iterations, interaction_type = None):
             '''
             
             '''
             process = 'singlecross'
-            cache_data = helper_funcs.cache_reader(process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
+            cache_data = helper_funcs.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
             match cache_data: 
                 case None:
-                    print('File not found in cache, running simulation')
+                    print('Simulator: File not found in cache, running simulation')
                     if interaction_type == 'DD':
                         s = 6
                     elif interaction_type == 'DQ': 
@@ -173,7 +173,7 @@ class Interaction:
                         s = 10
                     else:
                         'Please specify interaction type'   
-                    r_i = np.zeros(iter)
+                    r_i = np.zeros(iterations)
                     for i in range(len(r_i)):
                         distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
                         tmp = np.ones(len(distances)) 
@@ -181,7 +181,7 @@ class Interaction:
                         r_i[i] = r_tmp
 
 
-                    helper_funcs.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iter = iter, interaction_type = interaction_type)
+                    helper_funcs.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
                 case _ :
     
                     r_i = cache_data        
@@ -259,7 +259,7 @@ if __name__ == "__main__":
     #inter = Interaction(KY3F10)
     #inter.distance_sim(radius=10, concentration = 5, dopant='Sm')
     #print(inter.filtered_coords)
-    #r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 2.5, interaction_type='QQ', iter=50000)
+    r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 1, interaction_type='QQ', iterations=50000)
     #print(r)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
   
