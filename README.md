@@ -88,7 +88,12 @@ In future, the colours will be handled based on the ion, much like the materials
 ## Energy transfer models
 $$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t}$$
 for a single step cross relaxation process (currently the only model implemented) $\gamma_{tr,j}$ takes the form: 
-$$\gamma_{tr,j} = C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s$$
+```math
+\gamma_{tr,j} = C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s
+```
+
+
+
 
 $\gamma_{av}$, i.e an average energy transfer rate may be defined as $\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$. 
 ### Modelling energy transfer processes
