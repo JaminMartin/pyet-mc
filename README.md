@@ -95,7 +95,8 @@ for a single step cross relaxation process (currently the only model implemented
 
 
 
-$\gamma_{av}$, i.e an average energy transfer rate may be defined as $\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$. 
+$\gamma_{av}$, i.e an average energy transfer rate may be defined as:
+$$\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$$
 ### Modelling energy transfer processes
 Note: Currently, there is only one energy transfer process implemented and so this section may be subject to change in future releases. 
 
