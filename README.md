@@ -280,16 +280,16 @@ We then construct a trace object that takes our experimental data, a label and o
     trace2pt5pct = Trace(params2pt5pct, time,  '2.5%', interaction_components2pt5pct)
     trace5pct = Trace(params5pct, time, '5%', interaction_components5pct)
 ```
-these objects and our list of variables can be passed to the optimiser for fitting. 
+These objects and our list of variables can be passed to the optimiser for fitting. 
 ```python
  opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
-We choose the default model, as this is our energy transfer model discussed above. 
+We choose the default model, which isour energy transfer model discussed above. 
 We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
 guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
 ```
-As you can see, we only need to specify the unique set of parameters, in this case, six, rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may not be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components is off. 
+As you can see, we only need to specify the unique set of parameters, in this case, six rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may only be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components is off. 
 
 Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the scipy.optimise methods and any other keywords, e.g. bounds or tolerance. 
 ```python
@@ -306,11 +306,11 @@ Which is close to our given parameters and can be used to plot our final fitted 
 
 # Troubleshooting
 - pyet is using too much memory
-  - this is a known issue. Numpy does not seem to free up its arrays fast enough, so it can consume a lot of memory. For example, a 50,000 iteration interaction component and 15,000 time points will consume 60GB of memory. This is why this library does not use pre-allocation as it is too easy to accidentally run out of memory and use swap memory, slowing things down further. I have a Rust implementation that does not suffer from this issue due to better memory management, This will be part of future releases.
+  - this is a known issue. Numpy does not seem to free up its arrays fast enough, so it can consume a lot of memory. For example, a 50,000 iteration interaction component and 15,000 time points will consume 60GB of memory. This is why this library does not use pre-allocation, as it is too easy to accidentally run out of memory and use swap memory, slowing things down further. I have a Rust implementation that does not suffer from this issue due to better memory management; This will be part of future releases.
 - pyet is slow
   - this is also a known issue. This boils down to the number of exponential calls. This is documented here: https://github.com/JaminMartin/pyet-mc/issues/2
 
 # Referencing this project
-
+To reference this project, please use the citation tool in the About info of this repository. Details can also be found in the .cff file in the source code. 
 # License
 The project is licensed under the GNU GENERAL PUBLIC LICENSE.
