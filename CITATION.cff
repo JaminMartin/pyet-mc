@@ -7,7 +7,16 @@ type: software
 authors:
   - given-names: Jamin Luke Bruce
     family-names: Martin
+    affiliation: University of Canterbury
     orcid: 'https://orcid.org/0000-0002-7204-231X'
+repository-code: 'https://github.com/JaminMartin/pyet-mc'
+abstract: >-
+  Collection of methods for modelling the energy transfer
+  processes in lanthanide-doped materials.
+keywords:
+  - lanthanides
+  - energy transfer
+  - spectroscopy
+  - rare-earths
 license: GPL-3.0+
-version: '0.01'
 date-released: '2023-08-13'
