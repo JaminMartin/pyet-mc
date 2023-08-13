@@ -22,6 +22,7 @@ def cache_writer(r, **params):
 
 def cache_reader(**params):
     directory = cache_dir
+
     vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"])])
     for i in range(len(vmat)):
         vmat[i] = vmat[i].replace('.', 'pt')
@@ -38,8 +39,9 @@ def cache_reader(**params):
                     data = np.asarray(dict['r_components'])
                     break
             else:
-                raise  
-         
+                pass  
+        if data is None:
+            raise 
     except:
          print('File not found, check your inputs or consider running a simulation with these parameters')
          pass
