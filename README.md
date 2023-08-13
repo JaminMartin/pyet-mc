@@ -234,8 +234,8 @@ Run "cache_clear()" to clear the cache
 ## Fitting experimental data to energy transfer models
 Fitting of exerpimental lifetime transients to determine energy transfer parameters is the primary purpose of this library and so will utilise all the previous components covered. 
 
-Recalling previously our two quadrapole-quadrapole datasets for 2.5% and 5% doping respectively, If you dont have these generatd interaction components please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes) we can can use them to generate some arifical data given some additional parameters. 
-For this particular model we must provide it with four additional parameters: an amplitude, cross relaxation rate ($C_{cr}$), a radiative decay rate and horizontal offset. 
+Recalling our two quadrapole-quadrapole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
+For this particular model, we must provide it with four additional parameters: an amplitude, cross-relaxation rate ($C_{cr}$), a radiative decay rate and horizontal offset. 
 
 ```python
     #specify additional constants
@@ -262,49 +262,51 @@ We can generate some synthetic data and plot it:
     plt.legend() 
     plt.show()
 ```
-gives the follpwing result: 
-
+gives the following result: 
+<p align="center">
+<img width="592" alt="image" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/43569a8b-4ae1-4e7b-bf93-a9a03a7da57a">
+</p>
 as we would expect!
 
-We can no attempt to fit the parameters used to initially used to generate this data. Pyet provides a a wrapper around the scipy.optimise library in order to fit multiple data traces that _should_ have the same physical parameters e.g. our radiative cross relaxation rates, while allowing our offset and amplitude to vary independantly. 
+We cannot attempt to fit the parameters initially used to generate this data. Pyet provides a wrapper around the scipy.optimise library to fit multiple data traces that _should_ have the same physical parameters, e.g. our radiative cross-relaxation rates while allowing our offset and amplitude to vary independently. 
 
 We must first specify our independent and dependent parameters. We can achieve this by giving our variables either different (independent variables) or the same name (dependent variables)
 ```python
     params2pt5pct = ['amp1', 'cr', 'rad', 'offset1']
     params5pct = ['amp2', 'cr', 'rad', 'offset2']
 ```
-We then construct a trace object, that takes our experimental data, a label and our interaction components 
+We then construct a trace object that takes our experimental data, a label and our interaction components 
 ```python
     trace2pt5pct = Trace(params2pt5pct, time,  '2.5%', interaction_components2pt5pct)
     trace5pct = Trace(params5pct, time, '5%', interaction_components5pct)
 ```
-these objects along with our list of variables can be passed to the optimiser for fitting. 
+these objects and our list of variables, can be passed to the optimiser for fitting. 
 ```python
  opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
-we choose the defult model, as this is our energy transfer model discussed above. 
-We then give our model a guess. This can be inferred by inspecting the data, or being very patient with the fitting / choice of optimiser. 
+We choose the default model, as this is our energy transfer model discussed above. 
+We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of optimiser. 
 ```python
 guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
 ```
-As you can see, we only need to specify the unique set of paramters, in this case six, rather than eight total parameters. This will force the fitting to use the same cross relaxation rate and radiative rate for both traces. This is what we would expect to be the case physically. The concentration depedence is handled by our interaction components. In a real experimental situation you may not be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross relaxation parameters vary greatly this is a good indication your concentrations used to calculate the interaction components is off. 
+As you can see, we only need to specify the unique set of parameters, in this case, six, rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may not be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components is off. 
 
-Regardless, we can finally attempt to fit the data. We simply tell our optimiser to fit andgive it one of the scipy.optimise methods and any other keywords e.g. bounds or tolerance. 
+Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the scipy.optimise methods and any other keywords, e.g. bounds or tolerance. 
 ```python
 res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
 ```
-this will return a dictionary of fitted parameters:
+This will return a dictionary of fitted parameters:
 ```
 resulting fitted params:{'amp1': 0.9986081008725805, 'amp2': 0.9988932473105345, 'cr': 2959861049.259426, 'rad': 144.3620393193168, 'offset1': 0.0005717044745801453, 'offset2': 0.0009540139936924453}
 ```
-Which is close to our given parameters, which can be used to plot our final fitted results!
+Which is close to our given parameters and can be used to plot our final fitted results!
 <p align="center">
  <img width="602" alt="example lifetime and energy transfer fitting plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/0716c0b9-73e1-4d4a-90db-69ed73eaf982">
 </p>
 
 # Troubleshooting
 - pyet is using too much memory
-  - this is a known issue. Numpy does not seem to free up its arrays fast enough and so it can consume a lot of memory. for example a 50,000 iteration interaction component and 15,000 time points will consume 60GB of memory. This is why this library does not use pre-alocation as it is too easy to accidentially run out of memory and use swap memory, slowing things down further. I have a Rust implementation that does not suffer from this issue due to better memory managment, This will be part of future releases.
+  - this is a known issue. Numpy does not seem to free up its arrays fast enough, so it can consume a lot of memory. For example, a 50,000 iteration interaction component and 15,000 time points will consume 60GB of memory. This is why this library does not use pre-allocation as it is too easy to accidentally run out of memory and use swap memory, slowing things down further. I have a Rust implementation that does not suffer from this issue due to better memory management, This will be part of future releases.
 - pyet is slow
   - this is also a known issue. This boils down to the number of exponential calls. This is documented here: https://github.com/JaminMartin/pyet-mc/issues/2
 
