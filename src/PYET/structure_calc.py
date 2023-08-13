@@ -256,12 +256,12 @@ if __name__ == "__main__":
     #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     #print(rslt_df)
 
-    inter = Interaction(KY3F10)
+    crystal_interaction = Interaction(KY3F10)
 
-    #coords = inter.distance_sim(radius=10, concentration = 15, dopant='Sm')
+    #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     #print(coords)
-    #print(inter.filtered_coords)
-    #r = Interaction(KY3F10).sim_single_cross(radius=10, concentration = 1, interaction_type='QQ', iterations=50000)
-    #print(r)
+    #print(crystal_interaction.filtered_coords)
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type='QQ')
+    #print(interaction_components)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
-  
+    #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')

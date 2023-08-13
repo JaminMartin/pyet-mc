@@ -12,7 +12,7 @@ import os
 # Model functions for testing and general use
 def test_double_exp(time,dictionary):
  
-    return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*time))
+    return  list(dictionary.values())[0]*(np.exp(-list(dictionary.values())[1]*time)- np.exp(-list(dictionary.values())[2]*x))
 
 
 def general_energy_transfer(time, radial_data, dictionary):
@@ -130,20 +130,20 @@ if __name__ == "__main__":
 
     data1 = Trace(ydata1, x,  '2%', interact1)
     data2 = Trace(ydata2, x, '5%', interact2)
-    y1dep = ['amp1', 'decay1', 'decay2', 'offset1']
-    y2dep = ['amp2', 'decay1', 'decay2', 'offset2']
+    y1dep = ['amp1', 'cr', 'rad', 'offset1']
+    y2dep = ['amp2', 'cr', 'rad', 'offset2']
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
-    guess = {'amp1': 1, 'amp2': 1, 'decay1': 2e9,'decay2' : 500, 'offset1': 0 , 'offset2': 0}
+    guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
     start = timer()
-    #res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+    res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
     dt = timer() - start
     print ("Unoptimised python implementation ran in %f s" % dt)
     print(f'resulting fitted params:{res.x}')
     resultdict = res.x
     plt.plot(x,ydata2, label='2.5%')
     plt.plot(x,ydata1,  label='5%')
-    plt.plot(x, general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['decay1'], 'c': resultdict['decay2'],'d': resultdict['offset1']}))
-    plt.plot(x, general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['decay1'], 'c': resultdict['decay2'], 'd': resultdict['offset2']}))
+    plt.plot(x, general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']}))
+    plt.plot(x, general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']}))
     plt.yscale('log')
     plt.xlabel('Time (s)')
     plt.ylabel('Intensity (arb. units.)')
