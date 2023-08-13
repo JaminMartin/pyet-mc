@@ -201,12 +201,12 @@ If what you have specified is not found in the cache, there will be a console lo
 ```
 File not found, check your inputs or consider running a simulation with these parameters
 ```
-This will also return a None type which will need to be handled accordingly, such as using a python match statement. This will be shown in a following section. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
+This will also return a None type, which must be handled accordingly, such as using a Python match statement. This will be shown in the following section. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
 
 ```
 file found in cache, returning interaction components
 ```
-Following a major update to pyet, it is also recomended that you clear the cache in the event a bug is discovered in the existing code. This will be highlighted in any release notes.
+Following a major update to pyet, it is also recommended that you clear the cache in the event a bug is discovered in the existing code. This will be highlighted in any release notes.
 
 This can be done using:
 ```python
@@ -216,9 +216,9 @@ This will prompt you if you are sure you would like to delete the cache.
 ```
 Are you sure you want to delete all the cache files? [Y/N]?
 ```
-You can also specify a file of a given simulation configuration as was done above. In the event you may have made a mistake and forgot to change a .cif file etc. Happens to the best of us...
+You can also specify a file of a given simulation configuration, as was done above. In the event, you may have made a mistake and forgot to change a .cif file etc. It happens to the best of us...
 
-If you are wanting to know the status of your cache, you can also use cache list to get the details including file names and size. Like cache_clear(), a simple command is all you need!
+If you are wanting to know the status of your cache, you can also use the cache list to get the details including file names and size. Like cache_clear(), a simple command is all you need!
 
 ```python
 hf.cache_list()
@@ -232,9 +232,9 @@ Run "cache_clear()" to clear the cache
 #============================#
 ```
 ## Fitting experimental data to energy transfer models
-Fitting of exerpimental lifetime transients to determine energy transfer parameters is the primary purpose of this library and so will utilise all the previous components covered. 
+Fitting experimental lifetime transients to determine energy transfer parameters is the primary purpose of this library and so will utilise all the previous components covered. 
 
-Recalling our two quadrapole-quadrapole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
+Recalling our two quadrupole-quadrupole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
 For this particular model, we must provide it with four additional parameters: an amplitude, cross-relaxation rate ($C_{cr}$), a radiative decay rate and horizontal offset. 
 
 ```python
@@ -280,16 +280,16 @@ We then construct a trace object that takes our experimental data, a label and o
     trace2pt5pct = Trace(params2pt5pct, time,  '2.5%', interaction_components2pt5pct)
     trace5pct = Trace(params5pct, time, '5%', interaction_components5pct)
 ```
-these objects and our list of variables, can be passed to the optimiser for fitting. 
+these objects and our list of variables can be passed to the optimiser for fitting. 
 ```python
  opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
 We choose the default model, as this is our energy transfer model discussed above. 
-We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of optimiser. 
+We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
 guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
 ```
-As you can see, we only need to specify the unique set of parameters, in this case, six, rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may not be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components is off. 
+As you can see, we only need to specify the unique set of parameters, in this case, six, rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may not be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components is off. 
 
 Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the scipy.optimise methods and any other keywords, e.g. bounds or tolerance. 
 ```python
