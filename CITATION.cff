@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: pyet
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jamin Luke Bruce
+    family-names: Martin
+    orcid: 'https://orcid.org/0000-0002-7204-231X'
+license: GPL-3.0+
+version: '0.01'
+date-released: '2023-08-13'
