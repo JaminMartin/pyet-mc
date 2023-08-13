@@ -106,21 +106,23 @@ This gives us a filtered plot:
 
 In future, the colours will be handled based on the ion, much like the materials project and moved to plotly, the current plotting is purely a placeholder for functionality. This is a WIP.
 ## Energy transfer models
-
-$$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t}$$
-for a single step cross relaxation process (currently the only model implemented) $\gamma_{tr,j}$ takes the form: 
+The energy transfer process can be modelled for a particular configuration of donor and acceptor ions with the following exponential function 
+$$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t},$$
+here $t$ is time, $\gamma_r$ is the radiative decay rate and $\gamma_{tr,j}$ is the energy transfer rate for this confuration. Assuming a single-step multipole-multipole interaction (currently, the only model implemented), $\gamma_{tr,j}$ may be modelled as a sum over the transfer rates to all acceptors $\gamma_{tr,j}$ takes the form: 
 
 $$ \gamma_{tr,j} = C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s $$
-The term $\sum_i \left(\frac{R_0}{R_i}\right)^s$ forms the basis of our Monte Carlo simulation, we will refer to this as our interaction component
-we can define an average energy transfer rate $\gamma_{av}$ defined as:
+Here $R_i$ is the distance between donor and acceptor, $C_{cr}$ is the energy-transfer rate to an acceptor at $R_0$ the nearest-neighbour distance, and $s$ depends on the type of multipole-multipole interaction ($s$ = 6, 8, 10 for dipole-dipole, dipole-quadrupole and quadrupole-quadrupole interactions respectively).The term $\sum_i \left(\frac{R_0}{R_i}\right)^s$ forms the basis of our Monte Carlo simulation; we will refer to this as our interaction component. The lifetime for an ensemble of donors can be modelled by averaging over many possible configurations of donors and acceptors:
+
+$$I(t) =\frac{1}{n} \sum_{j=1}^n  e^{-(\gamma_{r} + \gamma_{tr,j})t},$$
+where $n$ is the number of unique random configurations. We can also define an average energy transfer rate $\gamma_{av}$ defined as:
 $$\frac{1}{n}\sum_{j=1}^n \gamma_{tr,j}$$
 
 ### Modelling energy transfer processes
-Note: Currently, there is only one energy transfer process implemented and so this section may be subject to change in future releases. 
+Note: Currently, there is only one energy transfer process implemented, and so this section may be subject to change in future releases. 
 
-Consider our crystal structure we previously generated. We wish to now "dope" that structure with some lanthanide ions randomly around some central donor ion. We will replace our previously defined "central yttrium atom" with samarium. We will then randomly (based on the concentration of the dopant in the crystal) dope samarium ions around this central samarium ion. This step needs to performed many times in order to "build up" many random unique samarium-samarium donor-acceptor configurations. When the number of random configurations is large enough, this should accurately represent a physical crystal sample. This is the Monte-Carlo aspect of our energy transfer analyis. 
+Consider the crystal structure we previously generated. We wish to now "dope" that structure with some lanthanide ions randomly around some central donor ion. We will replace our previously defined "central yttrium atom" with a samarium. We will then randomly (based on the concentration of the dopant in the crystal) dope samarium ions around this central samarium ion. This step needs to be performed many times in order to "build up" many random unique samarium-samarium donor-acceptor configurations. When the number of random configurations is large enough, this should accurately represent a physical crystal sample. This is the Monte-Carlo aspect of our energy transfer analysis. 
 
-To generate our random samples we utilise the interaction class. This class takes in our structure class and provides additional methods for calculating our interaction components as well as more specific plotting methods for doped crystals. We can simply inact this class simply by passing our structure to the interaction class:
+To generate our random samples we utilise the interaction class. This class takes in our structure class and provides additional methods for calculating our interaction components as well as more specific plotting methods for doped crystals. We can simply enact this class simply by passing our structure to the interaction class:
 ```python
 crystal_interaction = Interaction(KY3F10)
 ```
