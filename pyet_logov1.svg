@@ -3,8 +3,8 @@
 
 <svg
    width="221.52333mm"
-   height="242.94579mm"
-   viewBox="0 0 221.52333 242.94578"
+   height="219.06613mm"
+   viewBox="0 0 221.52333 219.06613"
    version="1.1"
    id="svg1"
    xml:space="preserve"
@@ -25,12 +25,12 @@
      inkscape:document-units="mm"
      showguides="false"
      inkscape:zoom="0.43964326"
-     inkscape:cx="1334.0362"
+     inkscape:cx="1334.0361"
      inkscape:cy="743.78486"
      inkscape:window-width="1728"
      inkscape:window-height="881"
-     inkscape:window-x="0"
-     inkscape:window-y="38"
+     inkscape:window-x="212"
+     inkscape:window-y="382"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1-0" /><defs
      id="defs1"><rect
@@ -179,11 +179,11 @@
          xml:space="preserve"
          transform="matrix(0.26458333,0,0,0.26458333,-50,-149.06613)"
          id="text8"
-         style="white-space:pre;shape-inside:url(#rect8);fill:none;fill-opacity:0.310881;stroke:#000000;stroke-width:12.0945;stroke-linecap:round;stroke-dasharray:72.5669, 72.5669;stroke-dashoffset:0;stroke-opacity:1" /><text
+         style="white-space:pre;shape-inside:url(#rect8);display:inline;fill:none;fill-opacity:0.310881;stroke:#000000;stroke-width:12.0945;stroke-linecap:round;stroke-dasharray:72.5669, 72.5669;stroke-dashoffset:0;stroke-opacity:1" /><text
          xml:space="preserve"
          transform="matrix(0.26458333,0,0,0.26458333,-50,-149.06613)"
          id="text9"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';white-space:pre;shape-inside:url(#rect9);fill:none;fill-opacity:0.310881;stroke:#000000;stroke-width:12.0945;stroke-linecap:round;stroke-dasharray:72.5669, 72.5669;stroke-dashoffset:0;stroke-opacity:1" /><text
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';white-space:pre;shape-inside:url(#rect9);display:inline;fill:none;fill-opacity:0.310881;stroke:#000000;stroke-width:12.0945;stroke-linecap:round;stroke-dasharray:72.5669, 72.5669;stroke-dashoffset:0;stroke-opacity:1" /><text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';fill:none;fill-opacity:0.310881;stroke:#000000;stroke-width:0.4;stroke-linecap:round;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
          x="195.60242"
@@ -193,18 +193,7 @@
            id="tspan10"
            style="stroke-width:0.4;stroke-dasharray:none;stroke-dashoffset:0"
            x="195.60242"
-           y="-116.1362" /></text><text
-         xml:space="preserve"
-         transform="matrix(0.26458333,0,0,0.26458333,-240.91337,-43.748739)"
-         id="text11"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:85.3333px;font-family:Skia;-inkscape-font-specification:'Skia Bold';white-space:pre;shape-inside:url(#rect11);fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3.77953;stroke-linecap:round;stroke-linejoin:bevel;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         x="181.1666"
-         y="0"><tspan
-           x="914.05087"
-           y="517.53057"
-           id="tspan2"><tspan
-             style="font-family:Rockwell;-inkscape-font-specification:'Rockwell Bold';text-align:center;text-anchor:middle"
-             id="tspan1">PYET-MC</tspan></tspan></text></g><path
+           y="-116.1362" /></text></g><path
        style="fill:none;fill-opacity:0.310881;stroke:#000000;stroke-width:3.2;stroke-linecap:round;stroke-dasharray:19.2, 19.2;stroke-dashoffset:0;stroke-opacity:1;marker-start:url(#ArrowTriangleStylized-5);marker-end:url(#marker8-8)"
        d="m 32.949283,171.42137 c -5.040339,-44.48269 3.7399,-58.7353 21.710505,-75.759114 C 76.686742,74.795821 115.14724,72.464531 132.5458,75.269311"
        id="path6-8"

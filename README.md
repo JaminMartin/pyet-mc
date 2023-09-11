@@ -1,11 +1,8 @@
-<p align="center">
-
-# pyet-mc
-
-</p>
+<h1 align="center">PYET-MC</h1>
 
 <p align="center">
- <img width="602" alt="example lifetime and energy transfer fitting plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/0716c0b9-73e1-4d4a-90db-69ed73eaf982">
+
+  <img  alt="pyet_logo" src="pyet_logov1.svg">
 </p>
 
 ## Table of Contents
