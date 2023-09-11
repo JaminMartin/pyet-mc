@@ -2,7 +2,7 @@
 
 <p align="center">
 
-  <img  alt="pyet_logo" src="pyet_logov1.svg">
+  <img width = "400" height = "400"  alt="pyet_logo" src="pyet_logov1.svg">
 </p>
 
 ## Table of Contents
