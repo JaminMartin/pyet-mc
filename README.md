@@ -10,6 +10,10 @@
     &nbsp;
     <a href="https://www.linkedin.com/in/jamin-martin-87448a167/"><img height="25" src="./images/linkedin.svg" alt="LinkedIn"></a>
     &nbsp;
+        <a href="https://orcid.org/0000-0002-7204-231X"><img height="25" src="./images/ORCID_iD.svg" alt="LinkedIn"></a>
+    &nbsp;
+        <a href="https://www.researchgate.net/profile/Jamin-Martin"><img height="25" src="./images/ResearchGate_icon.svg" alt="LinkedIn"></a>
+    &nbsp;
 </p>
 
 ## Table of Contents
