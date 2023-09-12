@@ -3,8 +3,8 @@
   <img width = "400" height = "400"  alt="pyet_logo" src="./images/pyet_logov1.svg">
 </p>
 
-<h3 align="center">A library to model energy transfer between lanthanide ions</h3>
-<h1 align="center">Get in contact or follow research related to this project</h1>
+<h2 align="center">A library to model energy transfer between lanthanide ions</h2>
+<h3 align="center">Get in contact or follow research related to this project</h3>
 <p align="center">
     <a href="https://github.com/JaminMartin"><img height="50" src="./images/github.svg" alt="Github"></a>
     &nbsp;
