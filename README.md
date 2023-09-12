@@ -6,13 +6,13 @@
 <h3 align="center">A library to model energy transfer between lanthanide ions</h3>
 <h1 align="center">Get in contact or follow research related to this project</h1>
 <p align="center">
-    <a href="https://github.com/JaminMartin"><img height="25" src="./images/github.svg" alt="Github"></a>
+    <a href="https://github.com/JaminMartin"><img height="50" src="./images/github.svg" alt="Github"></a>
     &nbsp;
-    <a href="https://www.linkedin.com/in/jamin-martin-87448a167/"><img height="25" src="./images/linkedin.svg" alt="LinkedIn"></a>
+    <a href="https://www.linkedin.com/in/jamin-martin-87448a167/"><img height="50" src="./images/linkedin.svg" alt="LinkedIn"></a>
     &nbsp;
-        <a href="https://orcid.org/0000-0002-7204-231X"><img height="25" src="./images/ORCID_iD.svg" alt="LinkedIn"></a>
+        <a href="https://orcid.org/0000-0002-7204-231X"><img height="50" src="./images/ORCID_iD.svg" alt="LinkedIn"></a>
     &nbsp;
-        <a href="https://www.researchgate.net/profile/Jamin-Martin"><img height="25" src="./images/ResearchGate_icon.svg" alt="LinkedIn"></a>
+        <a href="https://www.researchgate.net/profile/Jamin-Martin"><img height="50" src="./images/ResearchGate_icon.svg" alt="LinkedIn"></a>
     &nbsp;
 </p>
 
