@@ -2,7 +2,15 @@
 
 <p align="center">
 
-  <img width = "400" height = "400"  alt="pyet_logo" src="pyet_logov1.svg">
+  <img width = "400" height = "400"  alt="pyet_logo" src="./images/pyet_logov1.svg">
+</p>
+<p align="center">A library to model energy transfer between lanthanide ions</p>
+<h1 align="center">Get in contact</h1>
+<p align="center">
+    <a href="https://github.com/JaminMartin"><img height="25" src="./images/github.svg" alt="Github"></a>
+    &nbsp;
+    <a href="https://www.linkedin.com/in/jamin-martin-87448a167/"><img height="25" src="./images/linkedin.svg" alt="LinkedIn"></a>
+    &nbsp;
 </p>
 
 ## Table of Contents
