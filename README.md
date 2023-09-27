@@ -195,7 +195,7 @@ interaction_components5pct = crystal_interaction.sim_single_cross(radius=10, con
 ```
 ### Adding your own interaction model
 Adding your own model should be relatively straight forward. 
-In the above code, we call the: ` .sim_single_cross` method. You can add a different interaction method simply by defining a new function that can inherit the properties of the ` Interaction` class e.g. 
+In the above code, we call the: `.sim_single_cross` method. You can add a different interaction method simply by defining a new function that can inherit the properties of the `Interaction` class e.g. 
 
 ```python
 from pyet import Interaction
