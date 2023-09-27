@@ -199,14 +199,15 @@ In the above code, we call the: `.sim_single_cross` method. You can add a differ
 
 ```python
 from pyet import Interaction
-crystal_interaction = Interaction(KY3F10) 
-# as before
+
+
 def sim_cooperative_energy_transfer(self, arg1, arg2):
     # your code here
 
 crystal_interaction = Interaction(KY3F10) 
 crystal_interaction.sim_cooperative_energy_transfer = sim_cooperative_energy_transfer
 ```
+
 We can then use this method as the above default example.
 
 ### A note on caching
