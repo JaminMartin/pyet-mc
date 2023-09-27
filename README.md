@@ -204,7 +204,7 @@ from pyet import Interaction
 def sim_cooperative_energy_transfer(self, arg1, arg2):
     # your code here
 
-crystal_interaction = Interaction(KY3F10) 
+crystal_interaction = Interaction(KY3F10) # as shown before 
 crystal_interaction.sim_cooperative_energy_transfer = sim_cooperative_energy_transfer
 ```
 
