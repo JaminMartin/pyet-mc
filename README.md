@@ -193,8 +193,22 @@ We can then generate another set of interaction components for a 5% doped sample
 ```python
 interaction_components5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iterations=50000)
 ```
-### Adding your own energy transfer model
-WIP
+### Adding your own interaction model
+Adding your own model should be relatively straight forward. 
+In the above code, we call the: ` .sim_single_cross` method. You can add a different interaction method simply by defining a new function that can inherit the properties of the ` Interaction` class e.g. 
+
+```python
+from pyet import Interaction
+crystal_interaction = Interaction(KY3F10) 
+# as before
+def sim_cooperative_energy_transfer(self, arg1, arg2):
+    # your code here
+
+crystal_interaction = Interaction(KY3F10) 
+crystal_interaction.sim_cooperative_energy_transfer = sim_cooperative_energy_transfer
+```
+We can then use this method as the above default example.
+
 ### A note on caching
 As these calculations can be quite time-consuming for large iterations, and for said large iterations, the difference between runs should be minimal, caching was implemented to speed up subsequent runs.
 
@@ -281,7 +295,7 @@ gives the following result:
 </p>
 as we would expect!
 
-We cannot attempt to fit the parameters initially used to generate this data. Pyet provides a wrapper around the scipy.optimise library to fit multiple data traces that _should_ have the same physical parameters, e.g. our radiative cross-relaxation rates, while allowing our offset and amplitude to vary independently. 
+We can attempt to fit the parameters initially used to generate this data. Pyet provides a wrapper around the scipy.optimise library to simultanously fit multiple data traces that _should_ have the same physical parameters, e.g. our radiative cross-relaxation rates, while allowing our offset and amplitude to vary independently. 
 
 We must first specify our independent and dependent parameters. We can achieve this by giving our variables either different (independent variables) or the same name (dependent variables)
 ```python
@@ -297,7 +311,7 @@ These objects and our list of variables can be passed to the optimiser for fitti
 ```python
  opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
-We choose the default model, which is our energy transfer model discussed above. 
+We choose the default model, which is our energy transfer model discussed above. Note: This model can be suplemented with your own energy transfer model if it differs from the default model. 
 We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
 guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
