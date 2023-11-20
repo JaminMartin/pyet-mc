@@ -261,15 +261,18 @@ class Interaction:
             match cache_data: 
                 case None:
                     print('Simulator: File not found in cache, running simulation')
-                    if interaction_type == 'DD':
-                        s = 6
-                    elif interaction_type == 'DQ': 
-                        s = 8   
-                    elif interaction_type == 'QQ':
-                        s = 10
-                    else:
-                        raise ValueError("Please specify interaction type")  
+                    match interaction_type:
+                        case 'DD':
+                            s = 6
+                        case 'DQ':     
+                            s = 8
+                        case 'QQ':
+                            s = 10   
+                        case _ :
+                            raise ValueError("Please specify interaction type")  
+                        
                     r_i = np.zeros(iterations)
+
                     for i in range(len(r_i)):
                         distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
                         tmp = np.ones(len(distances)) 
@@ -369,7 +372,7 @@ if __name__ == "__main__":
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     #print(coords)
     #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'QQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=5000, interaction_type= 'QQ')
     #print(interaction_components)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
     #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
