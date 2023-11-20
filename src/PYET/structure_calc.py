@@ -139,14 +139,14 @@ class Structure:
         nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours
     
-    def structure_plot(self, radius: float, filter: Optional[List[str]] = None) -> Union[None, Exception]:
+    def structure_plot(self, radius: float, filter: Optional[List[str]] = None, blocking: Optional[bool] = True) -> Union[None, Exception]:
         """
         Renders a 3D plot of a given radius around the central ion. A filter can be provided to only plot certain species.
 
         Parameters:
         radius (float/int): The radius within which to plot neighbors.
         filter (list, optional): A list of species to plot. If not provided, all species are plotted.
-
+        blocking (bool, optional): Sets if the plotting is blocking or not, this is used for testing purposes
         Returns:
         None. The function directly plots the 3D structure using matplotlib.
         """
@@ -163,24 +163,33 @@ class Structure:
         ax.set_xlabel('X (Angstrom)')
         ax.set_ylabel('Y (Angstrom)')
         ax.set_zlabel('Z (Angstrom)')
+
+        if filter is not None:
+            if not isinstance(filter, list):
+                raise TypeError('Filter must be a list of strings.')
+            if not all(isinstance(item, str) for item in filter):
+                raise TypeError('All elements in the filter list must be strings.')
+            if any(item not in DataFrameDict for item in filter):
+                raise KeyError('Some elements in the filter list are not keys of the DataFrame.')
+            
+
         if filter == None:
             for i in range(len(UniqueNames)):
                 temp = DataFrameDict[UniqueNames[i]]
                 ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
             ax.legend()  
-            self.fig = plt.gcf()  
-            plt.show(block=False)       
+            plt.show(block=blocking)  # Ensure plt.show() is called without block parameter
+            self.fig = plt.gcf()     
         else:
-            try:
-                for i in range(len(filter)):
-                    temp = DataFrameDict[filter[i]] 
-                    ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
-                ax.legend()  
-                self.fig = plt.gcf()  
-                plt.show(block=False)   
-            except:
-                  print('Failed to plot. Filter must be in type "list of strings"')
-                  pass    
+         
+            for i in range(len(filter)):
+                temp = DataFrameDict[filter[i]] 
+                ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
+            ax.legend()  
+            plt.show(block=blocking)  # Ensure plt.show() is called without block parameter
+            self.fig = plt.gcf()
+
+
 
    
 class Interaction:
@@ -361,12 +370,8 @@ if __name__ == "__main__":
     cif_file = os.path.join(cif_dir, 'KY3F10_mp-2943_conventional_standard.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
-    KY3F10.nearest_neighbours_info(3.2)
-    coords_xyz = KY3F10.nearest_neighbours_coords(3.2)
-    t1 = coords_xyz.species.unique() == 'F' 
-    assert t1.all() == True , 'Only F ions should be present for this test.'
-    filtered_ions = ['F']
-    #KY3F10.structure_plot(5, filter = filtered_ions)   
+    filtered_ions = ['F','K']
+    KY3F10.structure_plot(5, filter = filtered_ions)   
 
     #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     #print(rslt_df)
@@ -378,5 +383,5 @@ if __name__ == "__main__":
     #print(crystal_interaction.filtered_coords)
     interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'QQ')
     #print(interaction_components)
-    Interaction(KY3F10).distplot_summary(radius=20.0, concentration = 50.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+    #Interaction(KY3F10).distplot_summary(radius=20.0, concentration = 50.0 , dopant = 'Sm' , filter = ['Y','Sm'])
     #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
