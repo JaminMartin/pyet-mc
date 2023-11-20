@@ -3,9 +3,9 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 import matplotlib.pyplot as plt
 import pandas as pd
-from . import helper_funcs
+from . import helper_funcs 
 import os
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 class Structure:
     '''
@@ -20,7 +20,7 @@ class Structure:
     structure_plot(self, radius, filter = None): Generates a 3D plot of the structure.
     """
     '''
-    def __init__(self,cif_file):
+    def __init__(self,cif_file: str):
         """
         Initializes the Structure object with a CIF file.
 
@@ -40,7 +40,7 @@ class Structure:
         except:
             print('Invalid or no CIF file provided')
           
-    def centre_ion(self,ion):
+    def centre_ion(self,ion: str) -> None:
         """
         Identifies the index of a specified ion in the structure.
 
@@ -66,7 +66,7 @@ class Structure:
             else:
                 pass    
         
-    def nearest_neighbours_info(self, radius): 
+    def nearest_neighbours_info(self, radius: float) -> None: 
         """
         Prints the species and radial distance of the neighbors within a specified radius of the central ion.
 
@@ -88,7 +88,7 @@ class Structure:
         s += "\n"
         print(s)
 
-    def nearest_neighbours_coords(self, radius): 
+    def nearest_neighbours_coords(self, radius: float) -> pd.DataFrame: 
         """
         Returns the coordinates of the neighbors within a specified radius of the central ion in cartesian coordinates .
 
@@ -113,7 +113,7 @@ class Structure:
         nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours   
     
-    def nearest_neighbours_spherical_coords(self,radius): 
+    def nearest_neighbours_spherical_coords(self,radius: float) -> pd.DataFrame: 
         """
         Returns the coordinates of the neighbors within a specified radius of the central ion in .
 
@@ -139,7 +139,7 @@ class Structure:
         nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours
     
-    def structure_plot(self, radius, filter = None):
+    def structure_plot(self, radius: float, filter: Optional[List[str]] = None) -> Union[None, Exception]:
         """
         Renders a 3D plot of a given radius around the central ion. A filter can be provided to only plot certain species.
 
@@ -196,7 +196,7 @@ class Interaction:
         sim_single_cross(self, radius, concentration, iterations, interaction_type): Simulates a single cross-relaxation interaction within a given radius.
         distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None): Generates a 3D plot of the structure including dopant ions.
         """
-        def __init__(self, Structure,):
+        def __init__(self, structure: Structure):
             """
             Initializes the Interaction with a Structure instance.
 
@@ -210,14 +210,14 @@ class Interaction:
             The species of the central ion in the Structure instance, or an error message if the Structure instance or the central ion is not specified.
             """
             try:
-                self.structure = Structure
+                self.structure = structure
                 print(f' Central ion is {self.structure.centre_ion_species}')
             except:
                 print('Either structure or central ion is not specified')  
        
 
         
-        def distance_sim(self,radius, concentration, dopant = 'acceptor'): 
+        def distance_sim(self, radius: float, concentration: float, dopant: Optional[str] = 'acceptor') -> np.ndarray:
             """
             Simulates and returns the distances to a specified (but randomly created based on concentration) dopant within a given radius to the central ion.
 
@@ -290,7 +290,7 @@ class Interaction:
          #TODO add exchange interation and cooperative process as an example
         
 
-        def distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None):
+        def distplot_summary(self, radius: float, concentration: float, dopant: str = 'acceptor', filter: Optional[List[str]] = None) -> Union[None, Exception]:
             #TODO clean up plotting & formatting to produce thesis quality pictures & add saving option.
             #TODO port plotting to plotly
             """
@@ -372,7 +372,7 @@ if __name__ == "__main__":
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     #print(coords)
     #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=5000, interaction_type= 'QQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'QQ')
     #print(interaction_components)
-    #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
+    Interaction(KY3F10).distplot_summary(radius=20.0, concentration = 50.0 , dopant = 'Sm' , filter = ['Y','Sm'])
     #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
