@@ -5,15 +5,35 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from . import helper_funcs
 import os
-#add documentation
+
+
 class Structure:
     '''
     A class for handling the structural info of a host crystal. A central ion, e.g. a Ytrrium ion must be specified for the associated methods to work. Once this ion has been specified the nearest neigbour ions can be calculated. This can either return cartesian or spherical polar coordinates for further calculations or plotting. There is also a simple function for printing off this information for a quick analyis. Lastly this class provides plotting functionality directly for visualisation purposes. 
+
+    Methods:
+    __init__(self, cif_file): Initializes the Structure using a CIF file.
+    centre_ion(self,ion): Identifies the index of a specified ion in the structure.
+    nearest_neighbours_info(self, radius): Prints the species and radial distance of the neighbors within a specified radius of the central ion.
+    nearest_neighbours_coords(self, radius): Returns the coordinates of the neighbors within a specified radius of the central ion in x,y,z coords. 
+    nearest_neighbours_spherical_coords(self,radius): Returns the coordinates of the neighbors within a specified radius of the central ion in spherical coords. 
+    structure_plot(self, radius, filter = None): Generates a 3D plot of the structure.
+    """
     '''
     def __init__(self,cif_file):
-        '''
-        cif_file: a .cif file containing the structural information of the host material
-        '''
+        """
+        Initializes the Structure object with a CIF file.
+
+        Parameters:
+        cif_file (str): The path to the CIF file to parse.
+
+        Sets:
+        self.cif (CifParser): The CifParser object for the CIF file.
+        self.struct (Structure): The first structure from the parsed CIF file.
+
+        Raises:
+        Exception: If the CIF file is invalid or not provided.
+        """
         try:
             self.cif = CifParser(cif_file)
             self.struct = self.cif.get_structures()[0]
@@ -22,9 +42,16 @@ class Structure:
           
     def centre_ion(self,ion):
         """
-        Return the index of an ion ion of a given species choice
+        Identifies the index of a specified ion in the structure.
 
-        ion: type string, e.g. "Y" 
+        Parameters:
+        ion (str): The ion to find, e.g. "Y".
+
+        Sets:
+        self.ion_index (int): The index of the ion in the structure.
+        self.site (Site): The site of the ion in the structure.
+        self.centre_ion_species (str): The species of the ion.
+        self.origin (array): The coordinates of the ion.
         """
         structure_sites = self.struct.sites
         for i in range(len(structure_sites)):
@@ -41,9 +68,17 @@ class Structure:
         
     def nearest_neighbours_info(self, radius): 
         """
-        Return the radial distance and species of the neighbors within radius r.
-        radius: float/int value e.g 3.6.
-        """ 
+        Prints the species and radial distance of the neighbors within a specified radius of the central ion.
+
+        Parameters:
+        radius (float/int): The radius within which to find neighbors.
+
+        Sets:
+        self.nn (list): The list of neighbors within the specified radius.
+
+        Prints:
+        A formatted string with the species and radial distance of each neighbor.
+        """
         self.nn = self.struct.get_neighbors(self.site, radius)
         s = ""
         heading = f"Nearest neighbours within radius {radius} Angstroms of a {self.centre_ion_species} ion:\n"
@@ -55,8 +90,13 @@ class Structure:
 
     def nearest_neighbours_coords(self, radius): 
         """
-        Return the distances and species of the next nearest neighbors within radius r in cartesian coordinates as a pandas dataframe.
-        radius: float/int value e.g 3.6.
+        Returns the coordinates of the neighbors within a specified radius of the central ion in cartesian coordinates .
+
+        Parameters:
+        radius (float/int): The radius within which to find neighbors.
+
+        Returns:
+        DataFrame: A DataFrame with columns 'x', 'y', 'z', and 'species', containing the cartesian coordinates coordinates and species of ions within radius r.
         """ 
         NN = self.struct.get_neighbors(self.site, radius)
         XYZ = np.zeros([len(NN), 3])
@@ -75,9 +115,14 @@ class Structure:
     
     def nearest_neighbours_spherical_coords(self,radius): 
         """
-        Return the distances and species of the next nearest neighbors within radius r in spherical polar coordinates as a pandas dataframe.
-        radius: float/int value e.g 3.6.
-        """          
+        Returns the coordinates of the neighbors within a specified radius of the central ion in .
+
+        Parameters:
+        radius (float/int): The radius within which to find neighbors.
+
+        Returns:
+        DataFrame: A DataFrame with columns 'x', 'y', 'z', and 'species', containing the spherical coordinates coordinates and species of ions within radius r.
+        """      
         NN = self.struct.get_neighbors(self.site, radius)
         
         spc = np.zeros([len(NN), 3])
@@ -95,11 +140,16 @@ class Structure:
         return nearest_neigbours
     
     def structure_plot(self, radius, filter = None):
-        '''
-        Renders a 3D plot of a given radius around a specified central ion. A filter can provided as a list of strings 
-        radius: float/int value e.g 3.6.
-        filter: list of strings e.g ["Y", "F"]
-        '''
+        """
+        Renders a 3D plot of a given radius around the central ion. A filter can be provided to only plot certain species.
+
+        Parameters:
+        radius (float/int): The radius within which to plot neighbors.
+        filter (list, optional): A list of species to plot. If not provided, all species are plotted.
+
+        Returns:
+        None. The function directly plots the 3D structure using matplotlib.
+        """
         coords_xyz = self.nearest_neighbours_coords(radius)
         UniqueNames = coords_xyz.species.unique()
 
@@ -132,7 +182,33 @@ class Structure:
 
    
 class Interaction:
+        """
+        Represents an interaction within a given Structure instance.
+
+        The Interaction class inherits the attributes of the Structure class and provides additional methods to simulate distances and interactions.
+
+        Attributes:
+        structure (Structure): An instance of the Structure class.
+
+        Methods:
+        __init__(self, Structure): Initializes the Interaction with a Structure instance.
+        distance_sim(self, radius, concentration, dopant): Simulates and returns the distances to a specified dopant within a given radius.
+        sim_single_cross(self, radius, concentration, iterations, interaction_type): Simulates a single cross-relaxation interaction within a given radius.
+        distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None): Generates a 3D plot of the structure including dopant ions.
+        """
         def __init__(self, Structure,):
+            """
+            Initializes the Interaction with a Structure instance.
+
+            Parameters:
+            Structure (Structure): An instance of the Structure class.
+
+            Sets:
+            self.structure (Structure): The Structure instance.
+
+            Prints:
+            The species of the central ion in the Structure instance, or an error message if the Structure instance or the central ion is not specified.
+            """
             try:
                 self.structure = Structure
                 print(f' Central ion is {self.structure.centre_ion_species}')
@@ -142,8 +218,19 @@ class Interaction:
 
         
         def distance_sim(self,radius, concentration, dopant = 'acceptor'): 
+            """
+            Simulates and returns the distances to a specified (but randomly created based on concentration) dopant within a given radius to the central ion.
+
+            Parameters:
+            radius (float/int): The radius within which to simulate distances.
+            concentration (float): The concentration of the dopant in %.
+            dopant (str, optional): The type of dopant. Defaults to 'acceptor'.
+
+            Returns:
+            numpy.ndarray: An array of distances to the dopant.
+            """
             concentration = concentration / 100
-            # returns the coordinates of the 
+            
             coords = self.structure.nearest_neighbours_spherical_coords(radius)
             self.filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])].reset_index(drop=True)
             
@@ -157,9 +244,18 @@ class Interaction:
             return distances
         
         def sim_single_cross(self, radius, concentration, iterations, interaction_type = None):
-            '''
-            
-            '''
+            """
+            Simulates a single cross-relaxation interaction within a given radius.
+
+            Parameters:
+            radius (float/int): The radius within which to simulate interactions.
+            concentration (float): The concentration of the dopant.
+            iterations (int): The number of iterations to run the simulation.
+            interaction_type (str): The type of interaction. Can be 'DD', 'DQ', or 'QQ'. This must be set.
+
+            Returns:
+            float: The average of r_i, which represents the simulated interaction.
+            """
             process = 'singlecross'
             cache_data = helper_funcs.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
             match cache_data: 
@@ -172,7 +268,7 @@ class Interaction:
                     elif interaction_type == 'QQ':
                         s = 10
                     else:
-                        'Please specify interaction type'   
+                        raise ValueError("Please specify interaction type")  
                     r_i = np.zeros(iterations)
                     for i in range(len(r_i)):
                         distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
@@ -194,6 +290,18 @@ class Interaction:
         def distplot_summary(self, radius, concentration, dopant = 'acceptor', filter = None):
             #TODO clean up plotting & formatting to produce thesis quality pictures & add saving option.
             #TODO port plotting to plotly
+            """
+            Generates a 3D scatter plot of the structure, with the central ion and its neighbors within a given radius.
+
+            Parameters:
+            radius (float/int): The radius within which to plot neighbors.
+            concentration (float): The concentration of the dopant.
+            dopant (str, optional): The type of dopant. Defaults to 'acceptor'.
+            filter (list, optional): A list of species to plot. If not provided, all species are plotted.
+
+            Returns:
+            None. The function directly plots the 3D structure using matplotlib.
+            """
             concentration = concentration / 100
             coords = self.structure.nearest_neighbours_coords(radius)
             filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])]
@@ -261,7 +369,7 @@ if __name__ == "__main__":
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     #print(coords)
     #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type='QQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'QQ')
     #print(interaction_components)
     #Interaction(KY3F10).distplot_summary(radius=20, concentration = 5, dopant = 'Sm' , filter = ['Y','Sm'])
     #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
