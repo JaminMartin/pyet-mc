@@ -167,15 +167,17 @@ class Structure:
             for i in range(len(UniqueNames)):
                 temp = DataFrameDict[UniqueNames[i]]
                 ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
-            ax.legend()    
-            plt.show()       
+            ax.legend()  
+            self.fig = plt.gcf()  
+            plt.show(block=False)       
         else:
             try:
                 for i in range(len(filter)):
                     temp = DataFrameDict[filter[i]] 
                     ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
-                ax.legend()    
-                plt.show()   
+                ax.legend()  
+                self.fig = plt.gcf()  
+                plt.show(block=False)   
             except:
                   print('Failed to plot. Filter must be in type "list of strings"')
                   pass    
@@ -335,15 +337,17 @@ class Interaction:
                 for i in range(len(UniqueNames)):
                     temp = DataFrameDict[UniqueNames[i]]
                     ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
-                ax.legend()    
-                plt.show()       
+                ax.legend()  
+                self.fig = plt.gcf()  
+                plt.show(block=False)       
             else:
                 try:
                     for i in range(len(filter)):
                         temp = DataFrameDict[filter[i]] 
                         ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
-                    ax.legend()    
-                    plt.show()   
+                    ax.legend()  
+                    self.fig = plt.gcf()  
+                    plt.show(block=False)   
                 except:
                     print('Failed to plot. Filter must be in type "list of strings"')
                     pass
