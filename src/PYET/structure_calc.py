@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from . import helper_funcs
 import os
-
+from typing import Union, Optional
 
 class Structure:
     '''
@@ -243,7 +243,7 @@ class Interaction:
             distances = distances['r'].to_numpy()
             return distances
         
-        def sim_single_cross(self, radius, concentration, iterations, interaction_type = None):
+        def sim_single_cross(self, radius: float, concentration: float, iterations: int, interaction_type: Optional[str] = None) -> Union[float, Exception]:
             """
             Simulates a single cross-relaxation interaction within a given radius.
 
