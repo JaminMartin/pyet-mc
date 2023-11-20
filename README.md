@@ -43,7 +43,7 @@ Setup a new Python virtual environment (I personally recommend Conda) and specif
 conda create --name 'name of your env' python=3.11
 ```
 Activate this virtual environment with "conda activate 'name of your env'" This ensures the package doesn't overwrite any of your existing Numpy/Scipy python libraries
-Clone this repository in a location of your choosing, or download as a zip file and extract it
+Clone this repository in a location of your choosing, or download it as a zip file and extract it
 ```
 git clone git@github.com:JaminMartin/pyet-mc.git
 ```
@@ -51,7 +51,7 @@ In the terminal, cd into this directory and tell pip to install this package
 ```
 path/to/my/package/ pip install . 
 ```
-To test that this was successful, create a new Python file (where ever you would like to use pyet, not from within the pyet source code).
+To test that this was successful, create a new Python file (wherever you would like to use pyet, not from within the pyet source code).
 Try to import pyet; assuming no error messages appear, pyet has been successfully installed in your virtual environment
 ```python
 import pyet 
@@ -59,16 +59,16 @@ import pyet
 # Usage 
 
 ## Generating a structure & plotting
-Firstly a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide cif data. It is highly recommended as it provides additional functionality such as XRD patterns. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
+Firstly a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide cif data. It is highly recommended as it provides additional functionality, such as XRD patterns. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
 We can create our structure with the following code. However, this may differ if you are using the materials project API. 
 ```python
  KY3F10 = Structure(cif_file= 'KY3F10_mp-2943_conventional_standard.cif')
 ```
-We then need to specify a central ion which all subsequent information will be calculated in relation to. 
+We then need to specify a central ion, to which all subsequent information will be calculated in relation to. 
 ```python
 KY3F10.centre_ion('Y')
 ```
-This will set the central ion to be a Ytrrium ion and yields the following output:
+This will set the central ion to be a Ytrrium ion and yield the following output:
 ```
 Central ion is Y
 ```
@@ -244,7 +244,7 @@ This will prompt you if you are sure you would like to delete the cache.
 ```
 Are you sure you want to delete all the cache files? [Y/N]?
 ```
-You can also specify a file of a given simulation configuration, as was done above. In the event, you may have made a mistake and forgot to change a .cif file etc. It happens to the best of us...
+You can also specify a file of a given simulation configuration, as was done above. In the event you may have made a mistake and forgot to change a .cif file etc. It happens to the best of us...
 
 If you want to know the status of your cache, you can also use the cache list to get the details, including file names and sizes. Like cache_clear(), a simple command is all you need!
 
@@ -263,7 +263,7 @@ Run "cache_clear()" to clear the cache
 Fitting experimental lifetime transients to determine energy transfer parameters is the primary purpose of this library, and so it will utilise all the previous components covered. 
 
 Recalling our two quadrupole-quadrupole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
-For this particular model, we must provide it with four additional parameters: an amplitude, cross-relaxation rate ($C_{cr}$), a radiative decay rate and horizontal offset. 
+For this particular model, we must provide it with four additional parameters: an amplitude, cross-relaxation rate ($C_{cr}$), a radiative decay rate, and horizontal offset. 
 
 ```python
     #specify additional constants
@@ -296,14 +296,14 @@ gives the following result:
 </p>
 as we would expect!
 
-We can attempt to fit the parameters initially used to generate this data. Pyet provides a wrapper around the scipy.optimise library to simultanously fit multiple data traces that _should_ have the same physical parameters, e.g. our radiative cross-relaxation rates, while allowing our offset and amplitude to vary independently. 
+We can attempt to fit the parameters initially used to generate this data. Pyet provides a wrapper around the scipy.optimise library to simultaneously fit multiple data traces that _should_ have the same physical parameters, e.g. our radiative cross-relaxation rates, while allowing our offset and amplitude to vary independently. 
 
 We must first specify our independent and dependent parameters. We can achieve this by giving our variables either different (independent variables) or the same name (dependent variables)
 ```python
     params2pt5pct = ['amp1', 'cr', 'rad', 'offset1']
     params5pct = ['amp2', 'cr', 'rad', 'offset2']
 ```
-We then construct a trace object that takes our experimental data, a label and our interaction components 
+We then construct a trace object that takes our experimental data, a label, and our interaction components 
 ```python
     trace2pt5pct = Trace(params2pt5pct, time,  '2.5%', interaction_components2pt5pct)
     trace5pct = Trace(params5pct, time, '5%', interaction_components5pct)
@@ -312,12 +312,12 @@ These objects and our list of variables can be passed to the optimiser for fitti
 ```python
  opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
-We choose the default model, which is our energy transfer model discussed above. Note: This model can be suplemented with your own energy transfer model if it differs from the default model. 
+We choose the default model, which is our energy transfer model discussed above. Note: This model can be supplemented with your own energy transfer model if it differs from the default model. 
 We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
 guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
 ```
-As you can see, we only need to specify the unique set of parameters, in this case, six rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may only be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components is off. 
+As you can see, we only need to specify the unique set of parameters, in this case, six rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may only be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components are off. 
 
 Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the scipy.optimise methods and any other keywords, e.g. bounds or tolerance. 
 ```python
@@ -339,7 +339,7 @@ Which is close to our given parameters and can be used to plot our final fitted 
   - this is also a known issue. This boils down to the number of exponential calls. This is documented here: https://github.com/JaminMartin/pyet-mc/issues/2
 
 - pyet does not converge to a good fit
-  -  This could be for a multitude of reasons. The most probable is either the tolerance for the fit or the fitting algorithm. Try decreasing your tolerance and trying some different methods. Global optimise will soon be available to help remedy the need for good initial guesses. The concentration specified for the interaction component may not be accurate, this along side the cross-relaxation parameter being coupled to all traces may cause an inability to converge. Try fit with them uncoupled. 
+  -  This could be for a multitude of reasons. The most probable is either the tolerance for the fit or the fitting algorithm. Try decreasing your tolerance and trying some different methods. Global optimise will soon be available to help remedy the need for good initial guesses. The concentration specified for the interaction component may not be accurate, this along side the cross-relaxation parameter being coupled to all traces may cause an inability to converge. Try to fit with them uncoupled. 
 
 # Referencing this project
 To reference this project, you can use the citation tool in the About info of this repository. Details can also be found in the .cff file in the source code. 
