@@ -181,19 +181,17 @@ class Plot:
         final_layout = {**layout_kwargs}
         self.fig.update_layout(**final_layout)
 
-        plotly.offline.plot(self.fig, filename=f'{cache_dir}/temp_plot.html', auto_open=False)
+        plotly.offline.plot(self.fig, filename=f'{temp_dir}/temp_plot.html', auto_open=False)
 
         app = QApplication(sys.argv)
-
+        
         web = QWebEngineView()
-
-        file_path = f'{cache_dir}/temp_plot.html'
-
+        file_path = f'{temp_dir}/temp_plot.html'
         web.load(QUrl.fromLocalFile(file_path))
 
         web.show()
 
-        sys.exit(app.exec())
+        app.exec_()
 
 
 
