@@ -9,6 +9,9 @@ from PyQt5.QtCore import QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication
 import plotly.io as pio
+from multiprocessing import Process
+import tempfile
+
 pio.templates.default = "none"
 
 cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cache'))
@@ -104,10 +107,13 @@ def cache_list():
     print(f'Total cache size: {total_size_mb:.2f} MB')
     print('Run "cache_clear()" to clear the cache')
     print('#============================#')
-if __name__ == "__main__":
-    #data = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
-    cache_list()
-    #cache_clear()
+
+def run_app(file_path):
+    app = QApplication(sys.argv)
+    web = QWebEngineView()
+    web.load(QUrl.fromLocalFile(file_path))
+    web.show()
+    app.exec_()
 
 
 #TODO make this a standalone package
@@ -115,6 +121,7 @@ class Plot:
     def __init__(self):
         self.fig = go.Figure()
         #these are not currently initialised as they need some refining
+        # TODO find some good defaults & window size for plots that couple well to plotting & saving for standard journal formats. 
         self.default_layout = {
             'title_text': "",
             'margin': dict(l=35, r=35, t=35, b=35),
@@ -176,23 +183,28 @@ class Plot:
         self.fig.add_trace(trace)
 
 
-    def show(self, **layout_kwargs):   
+    def show(self, **layout_kwargs):
         # Set default layout options
         final_layout = {**layout_kwargs}
         self.fig.update_layout(**final_layout)
 
-        plotly.offline.plot(self.fig, filename=f'{temp_dir}/temp_plot.html', auto_open=False)
+        with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
+            plotly.offline.plot(self.fig, filename=temp.name, auto_open=False)
+            self.temp_file_path = os.path.abspath(temp.name)
+            self.process = Process(target=run_app, args=(self.temp_file_path,))
+            self.process.start()
 
-        app = QApplication(sys.argv)
-        
-        web = QWebEngineView()
-        file_path = f'{temp_dir}/temp_plot.html'
-        web.load(QUrl.fromLocalFile(file_path))
-
-        web.show()
-
-        app.exec_()
+    def __del__(self):
+        if hasattr(self, 'temp_file_path'):
+            os.remove(self.temp_file_path)
 
 
-
-    
+if __name__ == "__main__":
+    #data = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
+    cache_list()
+    #cache_clear()    
+    x = [0,2,3,4,6,7,8,9,10]
+    y = [11,12,13,14,15,16,17,18,19 ]
+    figure = Plot()
+    figure.scatter_xy(x,y)
+    figure.show()
