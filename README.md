@@ -42,7 +42,8 @@ Contains functions for visualising crystal structure around a central donor ion,
 - Add alternative to Monte Carlo methods (performance vs accuracy tests required).
 - Move docs to MDbook for continuous integration.
 - Update structure figures to use Jmol colour palette.
-Add more tests. 
+- Optional open-source database where results can be stored, retrieved, and rated based on data quality and fit, much like the ICCD crystallography database. 
+- Add more tests. 
 # Installation
 Currently, pyet is not on the PyPI package repository; this will be the case until this project is more stable. It is still a work in progress. However, if you do wish to use pyet in its current form, it is as simple as the following:
 
