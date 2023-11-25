@@ -18,6 +18,7 @@
 
 ## Table of Contents
 - [Introduction](#introduction)
+- [Road Map](#road-map)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Generating a structure & plotting](#generating-a-structure--plotting)
@@ -34,11 +35,18 @@
 Collection of tools for modelling the energy transfer processes in lanthanide-doped materials. 
 
 Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
-
+# Road Map 
+- Move compute-heavy / memory-intensive functions to Rust for better performance.
+- Add more interaction types e.g., cooperative energy transfer and other more complex energy transfer processes. 
+- Add geometric correction factors and shield factors for various crystal structures and ions.
+- Add alternative to Monte Carlo methods (performance vs accuracy tests required).
+- Move docs to MDbook for continuous integration.
+- Update structure figures to use Jmol colour palette.
+Add more tests. 
 # Installation
 Currently, pyet is not on the PyPI package repository; this will be the case until this project is more stable. It is still a work in progress. However, if you do wish to use pyet in its current form, it is as simple as the following:
 
-Setup a new Python virtual environment (I personally recommend Conda) and specify Python 3.11
+Setup a new Python virtual environment (I recommend Conda) and specify Python 3.11
 ```
 conda create --name 'name of your env' python=3.11
 ```
@@ -59,7 +67,7 @@ import pyet
 # Usage 
 
 ## Generating a structure & plotting
-Firstly a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide cif data. It is highly recommended as it provides additional functionality, such as XRD patterns. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
+Firstly, a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide .cif data. It is highly recommended as it provides additional functionality, such as XRD patterns. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
 We can create our structure with the following code. However, this may differ if you are using the materials project API. 
 ```python
  KY3F10 = Structure(cif_file= 'KY3F10_mp-2943_conventional_standard.cif')
@@ -111,8 +119,7 @@ This gives us a filtered plot:
 <p align="center">
 <img width="610" alt="filtered plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/8c44b3c1-8451-4862-99ea-d331d8edc092">
 </p>
-
-In future, the colours will be handled based on the ion, much like the materials project and moved to plotly; the current plotting is purely a placeholder for functionality. This is a WIP.
+In the future, the colours will be handled based on the ion, much like the materials project, and moved to plotly; the current plotting is purely a placeholder for functionality. This is a current work in progress.
 ## Energy transfer models
 The energy transfer process can be modelled for a particular configuration of donor and acceptor ions with the following exponential function 
 $$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t},$$
@@ -176,7 +183,7 @@ print(coords.filtered_coords)
 20  5.861968   92.188550 -9.000000e+01       Y
 ```
 As we can see, some of the yttrium ions have been replaced by samarium ions, as expected. 
-We can now calculate our interaction component for each random doping configuration. This is handled by the sim method, which currently is referred to as sim_single_cross as it is the only implemented method at the time of writing. However, it is possible to add your own by wrapping distance_method described above for cooperative processes, for example. 
+We can now calculate our interaction component for each random doping configuration. This is handled by the sim method, which currently is referred to as sim_single_cross as it is the only implemented method at the time of writing. However, it is possible to add your own by wrapping 'distance_method' described above for cooperative processes, for example. 
 
 ```python
 interaction_components2pt5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, interaction_type='QQ', iterations=20)
@@ -244,7 +251,7 @@ This will prompt you if you are sure you would like to delete the cache.
 ```
 Are you sure you want to delete all the cache files? [Y/N]?
 ```
-You can also specify a file of a given simulation configuration, as was done above. In the event you may have made a mistake and forgot to change a .cif file etc. It happens to the best of us...
+You can also specify a file of a given simulation configuration, as was done above. In the event, you may have made a mistake and forgot to change a .cif file etc. It happens to the best of us...
 
 If you want to know the status of your cache, you can also use the cache list to get the details, including file names and sizes. Like cache_clear(), a simple command is all you need!
 
@@ -339,7 +346,7 @@ Which is close to our given parameters and can be used to plot our final fitted 
   - this is also a known issue. This boils down to the number of exponential calls. This is documented here: https://github.com/JaminMartin/pyet-mc/issues/2
 
 - pyet does not converge to a good fit
-  -  This could be for a multitude of reasons. The most probable is either the tolerance for the fit or the fitting algorithm. Try decreasing your tolerance and trying some different methods. Global optimise will soon be available to help remedy the need for good initial guesses. The concentration specified for the interaction component may not be accurate, this along side the cross-relaxation parameter being coupled to all traces may cause an inability to converge. Try to fit with them uncoupled. 
+  -  This could be for a multitude of reasons. The most probable is either the tolerance for the fit or the fitting algorithm. Try decreasing your tolerance and trying some different methods. Global optimise will soon be available to help remedy the need for good initial guesses. The concentration specified for the interaction component may not be accurate; this, alongside the cross-relaxation parameter being coupled to all traces, may cause an inability to converge. Try to fit with them uncoupled. 
 
 # Referencing this project
 To reference this project, you can use the citation tool in the About info of this repository. Details can also be found in the .cff file in the source code. 
