@@ -73,16 +73,21 @@
     showgrid = false
     showline = true
     zeroline = false
-    range = [0.0, 0.01]  # Explicitly specify the types as floating-point numbers
+    range = [0.0, 0.05]  # Explicitly specify the types as floating-point numbers
     tickmode = 'linear'
     ticks = 'outside'
     tick0 = 0
-    dtick = 0.01
+    dtick = 0.025
     linewidth = 4
     linecolor = 'black'
-    ticklen = 15
+    ticklen = 14
     tickwidth = 4
     tickcolor = 'black'
+
+    [transient_layout.xaxis.minor]
+      ticks = 'outside'
+      ticklen = 7
+      showgrid = false
 
     [transient_layout.xaxis.tickfont]
       family = 'Times new roman, monospace'
@@ -100,10 +105,18 @@
     showgrid = false
     zeroline = false
     showline = true
-    ticks = ''
+    ticks = 'outside'
+    dtick = 1
+    tickwidth = 4
     showticklabels = false 
+    ticklen = 14
     linewidth = 4
     linecolor = 'black'
+
+    [transient_layout.yaxis.minor]
+      ticks = 'outside'
+      ticklen = 7
+      showgrid = false
 
     [transient_layout.yaxis.titlefont]
       family = 'Times new roman, monospace'
