@@ -1,0 +1,111 @@
+# config.toml
+
+[default_layout]
+  title_text = ""
+  margin = {l = 35, r = 35, t = 35, b = 35}
+  paper_bgcolor = "white"
+  showlegend = true
+  title = ''
+
+  [default_layout.font]
+    family = 'Times New Roman, monospace'
+    size = 20
+    color = 'black'
+
+  [default_layout.xaxis]
+    title = ''
+    exponentformat = 'none'
+    showgrid = false
+    showline = true
+    tickmode = 'linear'
+    ticks = 'outside'
+    dtick = 50
+    showticklabels = false
+    linewidth = 4
+    linecolor = 'black'
+    ticklen = 7.5
+    tickwidth = 4
+    tickcolor = 'black'
+
+    [default_layout.xaxis.tickfont]
+      family = 'Times new roman, monospace'
+      size = 20
+      color = 'black'
+
+    [default_layout.xaxis.titlefont]
+      family = 'Times new roman, monospace'
+      size = 20
+      color = 'black'
+
+  [default_layout.yaxis]
+    title = 'Intensity (arb. units.)'
+    exponentformat = 'none'
+    showgrid = false
+    zeroline = false
+    showline = true
+    ticks = ''
+    tickmode = 'linear'
+    dtick = 10
+    ticklen = 15
+    tickwidth = 4
+    showticklabels = false
+    linewidth = 4
+    linecolor = 'black'
+
+    [default_layout.yaxis.titlefont]
+      family = 'Times new roman, monospace'
+      size = 20
+      color = 'black'
+
+
+
+[transient_layout]
+  title_text = ""
+  
+  [transient_layout.font]
+    family = 'Times New Roman, monospace'
+    size = 20
+    color = 'black'
+
+  [transient_layout.xaxis]
+    title = 'Time (ms)'
+    exponentformat = 'none'
+    showgrid = false
+    showline = true
+    zeroline = false
+    range = [0.0, 0.01]  # Explicitly specify the types as floating-point numbers
+    tickmode = 'linear'
+    ticks = 'outside'
+    tick0 = 0
+    dtick = 0.01
+    linewidth = 4
+    linecolor = 'black'
+    ticklen = 15
+    tickwidth = 4
+    tickcolor = 'black'
+
+    [transient_layout.xaxis.tickfont]
+      family = 'Times new roman, monospace'
+      size = 20
+      color = 'black'
+
+    [transient_layout.xaxis.titlefont]
+      family = 'Times new roman, monospace'
+      size = 20
+      color = 'black'
+
+  [transient_layout.yaxis]
+    title = 'Intensity (arb. units.)'
+    exponentformat = 'none'
+    showgrid = false
+    zeroline = false
+    showline = true
+    ticks = ''
+    showticklabels = false 
+    linewidth = 4
+    linecolor = 'black'
+
+    [transient_layout.yaxis.titlefont]
+      family = 'Times new roman, monospace'
+      size = 20
+      color = 'black'
