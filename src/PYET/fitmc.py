@@ -9,8 +9,8 @@ from timeit import default_timer as timer
 import scipy.optimize
 import os
 from typing import Union, Optional, List, Dict, Callable
-
-
+from . import helper_funcs 
+from .helper_funcs import Trace
 # Model functions for testing and general use
 def test_double_exp(time: np.ndarray ,dictionary: Dict) -> np.ndarray:
     """
@@ -54,38 +54,6 @@ def general_energy_transfer(time: np.ndarray, radial_data:  np.ndarray, dictiona
 
 Actual code
 '''
-#data structure for handling experimental data & radial info
-class Trace:
-    """
-    The Trace class represents a trace of experimental data points, it allows provides some basic functionalaity to aid in plotting (through naming) and data parsing for manipulating in various ways prior to fitting.
-
-    Attributes:
-    trace (np.ndarray): The y-coordinates of the data points.
-    name (str): The name of the trace.
-    time (np.ndarray): The x-coordinates (time points) of the data points.
-    radial_data (np.ndarray): The radial data associated with the trace, this would be pre-calculated based on the concentration of the sample.
-    """
-    def __init__(self, ydata: np.ndarray, xdata: np.ndarray, fname: str, radial_data: np.ndarray, parser = False):
-        """
-        The constructor for the Trace class.
-
-        Parameters:
-        ydata (np.ndarray): The y-coordinates of the data points.
-        xdata (np.ndarray): The x-coordinates (time points) of the data points.
-        fname (str): The name of the trace.
-        radial_data (np.ndarray): The radial data associated with the trace, this would be pre-calculated based on the concentration of the sample.
-        parser (bool, optional): A flag indicating whether to parse the trace data. Defaults to False.
-        """
-        self.trace = ydata
-        self.name = fname
-        self.time = xdata
-        self.radial_data = radial_data
-        if parser == True:
-            self.trace = self.parse(self.trace)
-
-        def parse(self, trace):
-            print('not yet implemented')  
-    
 #class for handling the fitting, plotting & logging results 
 class Optimiser:
     """
@@ -201,6 +169,7 @@ if __name__ == "__main__":
     dt = timer() - start
     print ("Datageneration ran in %f s" % dt)   
 
+
     data1 = Trace(ydata1, x,  '2%', interact1)
     data2 = Trace(ydata2, x, '5%', interact2)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
@@ -213,12 +182,13 @@ if __name__ == "__main__":
     print ("Unoptimised python implementation ran in %f s" % dt)
     print(f'resulting fitted params:{res.x}')
     resultdict = res.x
-    plt.plot(x,ydata2, label='2.5%')
-    plt.plot(x,ydata1,  label='5%')
-    plt.plot(x, general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']}))
-    plt.plot(x, general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']}))
-    plt.yscale('log')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Intensity (arb. units.)')
-    plt.legend() 
-    plt.show()
+    
+    fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
+    fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
+    
+    fig = helper_funcs.Plot()
+    fig.transient(data1)
+    fig.transient(data2)
+    fig.transient(x,fit1, fit=True, name = 'fit 2%')
+    fig.transient(x,fit2, fit = True, name = 'fit 5%')
+    fig.show()
