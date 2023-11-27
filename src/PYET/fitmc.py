@@ -148,17 +148,17 @@ class Optimiser:
 if __name__ == "__main__":
 # testing 
     cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cache'))
-    with open(f'{cache_dir}/singlecross_10_5_QQ_50000.json') as json_file:
+    with open(f'{cache_dir}/singlecross_10_2pt5_DQ_50000.json') as json_file:
         dict = json.load(json_file)
         interact1 = np.asarray(dict['r_components'])
-    with open(f'{cache_dir}/singlecross_10_2pt5_QQ_50000.json') as json_file:
+    with open(f'{cache_dir}/singlecross_10_5_DQ_50000.json') as json_file:
         dict = json.load(json_file)
         interact2 = np.asarray(dict['r_components'])    
-    const_dict1  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd':0}
-    const_dict2  = {'a': 1 , 'b': 3e9, 'c' : 144, 'd': 0}
+    const_dict1  = {'a': 1 , 'b': 3e10, 'c' : 144, 'd':0}
+    const_dict2  = {'a': 1 , 'b': 3e10, 'c' : 144, 'd': 0}
     start = timer()
     #res = dict_opt(chi, guess, tol = 1e-12)
-    x = np.arange(0,0.01,0.00001)
+    x = np.arange(0,0.021,0.00002)
     print(len(x))
     y1 = general_energy_transfer(x, interact1, const_dict1)
     y2 = general_energy_transfer(x, interact2, const_dict2)
@@ -170,12 +170,12 @@ if __name__ == "__main__":
     print ("Datageneration ran in %f s" % dt)   
 
 
-    data1 = Trace(ydata1, x,  '2%', interact1)
+    data1 = Trace(ydata1, x,  '2.5%', interact1)
     data2 = Trace(ydata2, x, '5%', interact2)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
-    guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
+    guess = {'amp1': 1, 'amp2': 1, 'cr': 2e10,'rad' : 500, 'offset1': 0 , 'offset2': 0}
     start = timer()
     res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
     dt = timer() - start
@@ -185,10 +185,17 @@ if __name__ == "__main__":
     
     fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
     fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
-    
+
+    data1.time = data1.time*1000
+    data2.time = data2.time*1000
     fig = helper_funcs.Plot()
     fig.transient(data1)
     fig.transient(data2)
-    fig.transient(x,fit1, fit=True, name = 'fit 2%')
-    fig.transient(x,fit2, fit = True, name = 'fit 5%')
+    fig.transient(x*1000,fit1, fit=True, name = 'fit 2.5%')
+    fig.transient(x*1000,fit2, fit = True, name = 'fit 5%')
     fig.show()
+
+    fig2 = helper_funcs.Plot()
+    fig2.transient(data1)
+    fig2.transient(data2)
+    fig2.show()
