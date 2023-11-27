@@ -13,14 +13,14 @@
     color = 'black'
 
   [default_layout.xaxis]
-    title = ''
+    title = 'test'
     exponentformat = 'none'
     showgrid = false
     showline = true
     tickmode = 'linear'
     ticks = 'outside'
     dtick = 50
-    showticklabels = false
+    showticklabels = true
     linewidth = 4
     linecolor = 'black'
     ticklen = 7.5
