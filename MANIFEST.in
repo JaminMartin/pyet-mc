@@ -1,2 +1,2 @@
 include requirements.txt
-recursive-include src/plotting_config *
+recursive-include src/pyet/plotting_config *
