@@ -2,10 +2,10 @@
 
 [default_layout]
   title_text = ""
-  margin = {l = 35, r = 35, t = 35, b = 35}
-  paper_bgcolor = "white"
   showlegend = true
   title = ''
+  margin = { l = 50, r = 50, t = 20, b = 70 }
+  paper_bgcolor = "white"
 
   [default_layout.font]
     family = 'Times New Roman, monospace'
@@ -61,7 +61,8 @@
 
 [transient_layout]
   title_text = ""
-  
+  margin = { l = 50, r = 50, t = 20, b = 70 }
+  paper_bgcolor = "white"
   [transient_layout.font]
     family = 'Times New Roman, monospace'
     size = 20

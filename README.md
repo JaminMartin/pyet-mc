@@ -36,12 +36,13 @@ Collection of tools for modelling the energy transfer processes in lanthanide-do
 
 Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
 # Road Map 
+- Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started. An example of this transition can be found [here](#fitting-experimental-data-to-energy-transfer-models). Structure figures are coming soon!
+- Update structure figures to use Jmol colour palette.
 - Move compute-heavy / memory-intensive functions to Rust for better performance.
 - Add more interaction types e.g., cooperative energy transfer and other more complex energy transfer processes. 
 - Add geometric correction factors and shield factors for various crystal structures and ions.
 - Add alternative to Monte Carlo methods (performance vs accuracy tests required).
 - Move docs to MDbook for continuous integration.
-- Update structure figures to use Jmol colour palette.
 - Optional open-source database where results can be stored, retrieved, and rated based on data quality and fit, much like the ICCD crystallography database. 
 - Add more tests. 
 # Installation
@@ -275,13 +276,13 @@ For this particular model, we must provide it with four additional parameters: a
 
 ```python
     #specify additional constants
-    const_dict1  = {'amplitude': 1 , 'energy_transfer': 3e9, 'radiative_decay' : 144, 'offset':0}
-    const_dict2  = {'amplitude': 1 , 'energy_transfer': 3e9, 'radiative_decay' : 144, 'offset': 0}
+    const_dict1  = {'amplitude': 1 , 'energy_transfer': 3e10, 'radiative_decay' : 144, 'offset':0}
+    const_dict2  = {'amplitude': 1 , 'energy_transfer': 3e10, 'radiative_decay' : 144, 'offset': 0}
 ```
 We can generate some synthetic data and plot it:
 ```python
     # generate some random data
-    time = np.arange(0,0.01,0.00001) #1000 data points
+    time = np.arange(0,0.02,0.0002) #500 data points
     data_2pt5pct = general_energy_transfer(time, interaction_components2pt5pct, const_dict1)
     data_5pct = general_energy_transfer(time, interaction_components5pct, const_dict2)
     rng = np.random.default_rng()
@@ -290,17 +291,14 @@ We can generate some synthetic data and plot it:
     data_5pct = data_5pct + y_noise
 
     #Plotting
-    plt.plot(x, data_2pt5pct, label='2.5%')
-    plt.plot(x, data_5pct,  label='5%')
-    plt.yscale('log')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Intensity (arb. units.)')
-    plt.legend() 
-    plt.show()
+    fig2 = helper_funcs.Plot()
+    fig2.transient(data1)
+    fig2.transient(data2)
+    fig2.show()
 ```
 gives the following result: 
 <p align="center">
-<img width="592" alt="image" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/43569a8b-4ae1-4e7b-bf93-a9a03a7da57a">
+<img width="592" alt="image" src="./images/generated_data.png">
 </p>
 as we would expect!
 
@@ -337,7 +335,7 @@ resulting fitted params:{'amp1': 0.9986081008725805, 'amp2': 0.9988932473105345,
 ```
 Which is close to our given parameters and can be used to plot our final fitted results!
 <p align="center">
- <img width="602" alt="example lifetime and energy transfer fitting plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/0716c0b9-73e1-4d4a-90db-69ed73eaf982">
+ <img width="602" alt="example lifetime and energy transfer fitting plot" src="./images/generated_data_fited.png">
 </p>
 
 # Troubleshooting
