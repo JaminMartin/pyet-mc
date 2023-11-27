@@ -291,14 +291,14 @@ We can generate some synthetic data and plot it:
     data_5pct = data_5pct + y_noise
 
     #Plotting
-    fig2 = helper_funcs.Plot()
+    fig2 = hf.Plot()
     fig2.transient(data1)
     fig2.transient(data2)
     fig2.show()
 ```
 gives the following result: 
 <p align="center">
-<img width="592" alt="image" src="./images/generated_data.png">
+<img width="700" alt="image" src="./images/generated_data.png">
 </p>
 as we would expect!
 
@@ -331,12 +331,12 @@ res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
 ```
 This will return a dictionary of fitted parameters:
 ```
-resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311, 'cr': 30167580555.275608, 'rad': 146.633387615777, 'offset1': 0.0013088082858218686, 'offset2': 0.00020609427517915668}
+resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311, 'cr': 30167580.555275, 'rad': 0.146633387615, 'offset1': 0.0013088082858218686, 'offset2': 0.00020609427517915668}
 ```
 Which is close to our given parameters and can be used to plot our final fitted results!
 
 ```python
-    fig = helper_funcs.Plot()
+    fig = hf.Plot()
     fig.transient(data1)
     fig.transient(data2)
     fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
@@ -345,7 +345,7 @@ Which is close to our given parameters and can be used to plot our final fitted 
 ```
 Note, the `transient()` method can take either a `Trace` or `x, y` data. the option `fit = True` will display the data in line mode rather than markers. 
 <p align="center">
- <img width="602" alt="example lifetime and energy transfer fitting plot" src="./images/generated_data_fited.png">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/generated_data_fited.png">
 </p>
 
 # Troubleshooting
