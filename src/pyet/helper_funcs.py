@@ -13,17 +13,20 @@ from multiprocessing import Process
 import tempfile
 pio.templates.default = "none"
 import toml
+import pkg_resources
 
-if not os.path.exists('pyet/cache'):
-    os.mkdir('pyet/cache')
+cache_dir_path = os.path.join(os.path.dirname(__file__), 'cache')
 
-cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
-config_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'plotting_config'))
+if not os.path.exists(cache_dir_path):
+    os.makedirs(cache_dir_path)
+
+cache_dir = os.path.abspath(cache_dir_path)
 
 
+config_file = pkg_resources.resource_filename('pyet', '../plotting_config/plotting_config.toml')
 
-with open(f"{config_dir}/plotting_config.toml", "r") as f:
-        config = toml.load(f)
+with open(config_file, "r") as f:
+    config = toml.load(f)
 
 
 def cache_writer(r, **params):
