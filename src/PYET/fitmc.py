@@ -176,6 +176,8 @@ if __name__ == "__main__":
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
     guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
+
+
     start = timer()
     res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
     dt = timer() - start
@@ -198,3 +200,4 @@ if __name__ == "__main__":
     fig2 = helper_funcs.Plot()
     fig2.transient(data1)
     fig2.transient(data2)
+    fig2.show()
