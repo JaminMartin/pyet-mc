@@ -1,5 +1,8 @@
 matplotlib==3.7.2
-numpy==1.25.2
+numpy==1.25.1
 pandas==2.0.3
+plotly==5.15.0
 pymatgen==2023.7.20
+PyQt5==5.15.11
 scipy==1.11.1
+toml==0.10.2
