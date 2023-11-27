@@ -381,7 +381,7 @@ if __name__ == "__main__":
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     #print(coords)
     #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50, interaction_type= 'DQ')
     #print(interaction_components)
     #Interaction(KY3F10).distplot_summary(radius=20.0, concentration = 50.0 , dopant = 'Sm' , filter = ['Y','Sm'])
     #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')

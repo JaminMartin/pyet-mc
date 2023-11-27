@@ -6,3 +6,4 @@ pymatgen==2023.7.20
 PyQt5==5.15.11
 scipy==1.11.1
 toml==0.10.2
+PyQtWebEngine == 5.15.11

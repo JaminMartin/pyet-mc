@@ -14,11 +14,13 @@ import tempfile
 pio.templates.default = "none"
 import toml
 
-cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cache'))
-config_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config'))
+if not os.path.exists('pyet/cache'):
+    os.mkdir('pyet/cache')
 
-if not os.path.exists(cache_dir):
-    os.mkdir(cache_dir)
+cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
+config_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'plotting_config'))
+
+
 
 with open(f"{config_dir}/plotting_config.toml", "r") as f:
         config = toml.load(f)

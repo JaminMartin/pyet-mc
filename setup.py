@@ -15,5 +15,6 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=install_requires,
+    package_data={'': ['config/*']},  
     include_package_data=True,
 )
