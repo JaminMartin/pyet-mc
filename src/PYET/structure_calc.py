@@ -371,7 +371,7 @@ if __name__ == "__main__":
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
     filtered_ions = ['F','K']
-    KY3F10.structure_plot(5, filter = filtered_ions)   
+    #KY3F10.structure_plot(5, filter = filtered_ions)   
 
     #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     #print(rslt_df)
