@@ -22,8 +22,7 @@ if not os.path.exists(cache_dir_path):
 
 cache_dir = os.path.abspath(cache_dir_path)
 
-
-config_file = pkg_resources.resource_filename('pyet', '../plotting_config/plotting_config.toml')
+config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
 
 with open(config_file, "r") as f:
     config = toml.load(f)
