@@ -188,9 +188,9 @@ As we can see, some of the yttrium ions have been replaced by samarium ions, as 
 We can now calculate our interaction component for each random doping configuration. This is handled by the sim method, which currently is referred to as sim_single_cross as it is the only implemented method at the time of writing. However, it is possible to add your own by wrapping 'distance_method' described above for cooperative processes, for example. 
 
 ```python
-interaction_components2pt5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, interaction_type='QQ', iterations=20)
+interaction_components2pt5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, interaction_type='DQ', iterations=20)
 ```
-The sim method takes a radius, concentration, interaction type and number of iterations. The interaction type is given by a two-letter code, i.e. 'QQ' equals quadrupole-quadrupole. 
+The sim method takes a radius, concentration, interaction type and number of iterations. The interaction type is given by a two-letter code, i.e. 'DQ' equals dipole-quadrupole. 
 We will need more iterations than just 20 for fitting, closer to 50,0000. If we rerun this now with 50,0000 iterations, we get the following response:
 ```
 file found in cache, returning interaction components
@@ -200,7 +200,7 @@ The sim returns a Numpy array of interaction components that matches the number 
 
 We can then generate another set of interaction components for a 5% doped sample simply by changing the concentration
 ```python
-interaction_components5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 5, interaction_type='QQ', iterations=50000)
+interaction_components5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 5, interaction_type='DQ', iterations=50000)
 ```
 ### Adding your own interaction model
 Adding your own model should be relatively straight forward. 
@@ -231,8 +231,8 @@ We can query and return the interaction components of the JSON file with the fol
 ```python
 from pyet import helper_funcs as hf
 
-interaction_components2pt5pct = hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
-interaction_components5pct =  hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'QQ')
+interaction_components2pt5pct = hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ')
+interaction_components5pct =  hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ')
 ```
 If what you have specified is not found in the cache, there will be a console log such as this:
 ```
@@ -262,8 +262,8 @@ hf.cache_list()
 ```
 ```
 #======# Cached Files #======#
-singlecross_10_2pt5_QQ_50000.json (958053 bytes)
-singlecross_10_5_QQ_50000.json (1121375 bytes)
+singlecross_10_2pt5_DQ_50000.json (958053 bytes)
+singlecross_10_5_DQ_50000.json (1121375 bytes)
 Total cache size: 2.08 MB
 Run "cache_clear()" to clear the cache
 #============================#
@@ -271,18 +271,18 @@ Run "cache_clear()" to clear the cache
 ## Fitting experimental data to energy transfer models
 Fitting experimental lifetime transients to determine energy transfer parameters is the primary purpose of this library, and so it will utilise all the previous components covered. 
 
-Recalling our two quadrupole-quadrupole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
+Recalling our two dipole-quadrupole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
 For this particular model, we must provide it with four additional parameters: an amplitude, cross-relaxation rate ($C_{cr}$), a radiative decay rate, and horizontal offset. 
 
 ```python
-    #specify additional constants
-    const_dict1  = {'amplitude': 1 , 'energy_transfer': 3e10, 'radiative_decay' : 144, 'offset':0}
-    const_dict2  = {'amplitude': 1 , 'energy_transfer': 3e10, 'radiative_decay' : 144, 'offset': 0}
+    #specify additional constants (the time based constants are in ms^-1)
+    const_dict1  = {'amplitude': 1 , 'energy_transfer': 3e7, 'radiative_decay' : 0.144, 'offset':0}
+    const_dict2  = {'amplitude': 1 , 'energy_transfer': 3e7, 'radiative_decay' : 0.144, 'offset': 0}
 ```
 We can generate some synthetic data and plot it:
 ```python
     # generate some random data
-    time = np.arange(0,0.02,0.0002) #500 data points
+    time = np.arange(0,21,0.02) #1050 data points 0 to 21ms
     data_2pt5pct = general_energy_transfer(time, interaction_components2pt5pct, const_dict1)
     data_5pct = general_energy_transfer(time, interaction_components5pct, const_dict2)
     rng = np.random.default_rng()
@@ -321,7 +321,7 @@ These objects and our list of variables can be passed to the optimiser for fitti
 We choose the default model, which is our energy transfer model discussed above. Note: This model can be supplemented with your own energy transfer model if it differs from the default model. 
 We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
-guess = {'amp1': 1, 'amp2': 1, 'cr': 2e9,'rad' : 500, 'offset1': 0 , 'offset2': 0}
+guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 ```
 As you can see, we only need to specify the unique set of parameters, in this case, six rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may only be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components are off. 
 
@@ -331,9 +331,19 @@ res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
 ```
 This will return a dictionary of fitted parameters:
 ```
-resulting fitted params:{'amp1': 0.9986081008725805, 'amp2': 0.9988932473105345, 'cr': 2959861049.259426, 'rad': 144.3620393193168, 'offset1': 0.0005717044745801453, 'offset2': 0.0009540139936924453}
+resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311, 'cr': 30167580555.275608, 'rad': 146.633387615777, 'offset1': 0.0013088082858218686, 'offset2': 0.00020609427517915668}
 ```
 Which is close to our given parameters and can be used to plot our final fitted results!
+
+```python
+    fig = helper_funcs.Plot()
+    fig.transient(data1)
+    fig.transient(data2)
+    fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
+    fig.transient(x,fit2, fit = True, name = 'fit 5%')
+    fig.show()
+```
+Note, the `transient()` method can take either a `Trace` or `x, y` data. the option `fit = True` will display the data in line mode rather than markers. 
 <p align="center">
  <img width="602" alt="example lifetime and energy transfer fitting plot" src="./images/generated_data_fited.png">
 </p>

@@ -154,11 +154,11 @@ if __name__ == "__main__":
     with open(f'{cache_dir}/singlecross_10_5_DQ_50000.json') as json_file:
         dict = json.load(json_file)
         interact2 = np.asarray(dict['r_components'])    
-    const_dict1  = {'a': 1 , 'b': 3e10, 'c' : 144, 'd':0}
-    const_dict2  = {'a': 1 , 'b': 3e10, 'c' : 144, 'd': 0}
+    const_dict1  = {'a': 1 , 'b': 3e7, 'c' : 0.144, 'd':0}
+    const_dict2  = {'a': 1 , 'b': 3e7, 'c' : 0.144, 'd': 0}
     start = timer()
     #res = dict_opt(chi, guess, tol = 1e-12)
-    x = np.arange(0,0.021,0.00002)
+    x = np.arange(0,21,0.02) 
     print(len(x))
     y1 = general_energy_transfer(x, interact1, const_dict1)
     y2 = general_energy_transfer(x, interact2, const_dict2)
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
-    guess = {'amp1': 1, 'amp2': 1, 'cr': 2e10,'rad' : 500, 'offset1': 0 , 'offset2': 0}
+    guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
     start = timer()
     res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
     dt = timer() - start
@@ -186,16 +186,15 @@ if __name__ == "__main__":
     fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
     fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
 
-    data1.time = data1.time*1000
-    data2.time = data2.time*1000
+    data1.time = data1.time
+    data2.time = data2.time
     fig = helper_funcs.Plot()
     fig.transient(data1)
     fig.transient(data2)
-    fig.transient(x*1000,fit1, fit=True, name = 'fit 2.5%')
-    fig.transient(x*1000,fit2, fit = True, name = 'fit 5%')
+    fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
+    fig.transient(x,fit2, fit = True, name = 'fit 5%')
     fig.show()
 
     fig2 = helper_funcs.Plot()
     fig2.transient(data1)
     fig2.transient(data2)
-    fig2.show()
