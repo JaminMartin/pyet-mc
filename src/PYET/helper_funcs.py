@@ -156,13 +156,23 @@ class Plot:
     def __init__(self, **layout_kwargs):
         self.fig = go.Figure()
         self.plot_type = 'default'
-        #these are not currently initialised as they need some refining
-        # TODO find some good defaults & window size for plots that couple well to plotting & saving for standard journal formats. 
-        self.default_layout = config.get("default_layout", {})
+        self.default_layout = dict(config.get("default_layout", {}))  # Create a new dictionary
         self.default_layout.update(layout_kwargs)
-        self.default_transient_layout = config.get("transient_layout", {})
-        self.default_layout.update(layout_kwargs)
-
+        self.default_transient_layout = dict(config.get("transient_layout", {}))
+        self.default_transient_layout.update(layout_kwargs)
+        
+        # Update any specified keys in the default layout with the provided values
+        for key, value in layout_kwargs.items():
+            if key in self.default_layout:
+                self.default_layout[key].update(value)
+            else:
+                self.default_layout[key] = value
+        
+        for key, value in layout_kwargs.items():
+            if key in self.default_transient_layout:
+                self.default_transient_layout[key].update(value)
+            else:
+                self.default_transient_layout[key] = value
 
     def scatter_xy(self, x, y, *args, **kwargs):
         # Set default scatter trace options
@@ -241,10 +251,9 @@ class Plot:
             self.update_layout_bounds()
             self.fig.update_layout(**self.default_transient_layout) 
             self.fig.update_yaxes(type="log")   
-
         else:
             print('invalid plot type, defaulting to default')  
-            self.fig.update_layout(**self.default_layout) 
+            self.fig.update_layout(**self.default_layout)
 
     
         # Use the system's temporary directory
@@ -280,14 +289,16 @@ if __name__ == "__main__":
     y = [11,12,13,14,15,16,17,18,19 ]
     x2 = [5,6,74,8,99,83,91,100]
     y2 = [11,12,13,14,15,16,17,18,19 ]
-    figure = Plot()
-    figure.scatter_xy(x,y)
-    figure.scatter_xy(x2,y2)
+    # Example usage
+    x_range = [0,50]
+    y_range = [0,100]
+    margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
+    figure = Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
+    print(f"Figure 1 Plot Type: {figure.plot_type}")
+    figure.scatter_xy(x, y)
     figure.show()
 
-
-
-
     figure2 = Plot()
-    figure2.scatter_xy(x2,y2)
+    print(f"Figure 2 Plot Type: {figure2.plot_type}")
+    figure2.scatter_xy(x2, y2)
     figure2.show()
