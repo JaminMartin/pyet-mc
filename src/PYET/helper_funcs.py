@@ -186,10 +186,51 @@ class Plot:
         # Check if x is a Trace instance
         if isinstance(x, Trace):
             trace = go.Scatter(x=x.time, y=x.trace, name=x.name, *args, **trace_options)
+
         else:
             trace = go.Scatter(x=x, y=y, *args, **trace_options)
-
+         
         self.fig.add_trace(trace)
+
+
+    def calculate_nice_round_number(self, value):
+        # Find a nice round number or factor of value
+        nice_round_numbers = [0.01, 0.02, 0.05, 0.1, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]  # You can extend this list with more nice round numbers
+        for nice_number in nice_round_numbers:
+            if value / nice_number <= 5:  # Adjust the threshold as needed
+                return nice_number
+
+        # If no suitable nice round number is found, return a fallback value
+        return 1
+    
+    def update_layout_bounds(self):
+        x_max, y_max = float('-inf'), float('-inf')
+
+        for trace in self.fig.data:
+            # Check if x is not empty or None
+            if trace.x is not None and len(trace.x) > 0:
+                # Update x-axis bounds
+                x_max = max(x_max, max(trace.x))
+
+            # Check if y is not empty or None
+            if trace.y is not None and len(trace.y) > 0:
+                # Update y-axis bounds
+                y_max = max(y_max, max(trace.y))
+
+    
+        t_max = x_max
+        t_min = 0
+        y_max = 1
+        y_min = 0.1 * y_max
+                
+        self.default_transient_layout['yaxis']['range'] = [np.log(y_min), np.log(y_max)]
+        self.default_transient_layout['xaxis']['range'] = [t_min, t_max]
+        
+        t_range = t_max - t_min
+        dtick = self.calculate_nice_round_number(t_range)
+        self.default_transient_layout['xaxis']['dtick'] = dtick
+        
+
 
 
     def show(self):
@@ -197,8 +238,10 @@ class Plot:
             # Set default layout options
             self.fig.update_layout(**self.default_layout)
         elif self.plot_type == 'transient':
+            self.update_layout_bounds()
             self.fig.update_layout(**self.default_transient_layout) 
             self.fig.update_yaxes(type="log")   
+
         else:
             print('invalid plot type, defaulting to default')  
             self.fig.update_layout(**self.default_layout) 
