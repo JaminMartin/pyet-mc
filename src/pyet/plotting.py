@@ -166,7 +166,7 @@ class Plot:
             self.fig.update_yaxes(type="log")  
 
         elif self.plot_type == 'structure_3d':  
-            print('plotting 3d with no config')  
+
             self.fig.update_layout(**self.default_scatter3d_layout)
         else:
             print('invalid plot type, defaulting to default')  
@@ -175,7 +175,7 @@ class Plot:
     
         # Use the system's temporary directory
         temp_dir = tempfile.gettempdir()
-        print(f"Temporary directory for debugging: {temp_dir}")
+        #print(f"Temporary directory for debugging: {temp_dir}")
         
         # Use NamedTemporaryFile to create a temporary file in the system's temp directory
         with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
