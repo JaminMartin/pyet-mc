@@ -123,3 +123,106 @@
       family = 'Times new roman, monospace'
       size = 20
       color = 'black'
+
+
+
+[structure_3d_layout]
+  title = ""
+  margin = { l = 15, r = 30, t = 0, b = 15 }
+  paper_bgcolor = "white"
+
+  [structure_3d_layout.titlefont]
+    family = "Times New Roman, monospace"
+    size = 30
+    color = "black"
+
+  [structure_3d_layout.scene]
+    [structure_3d_layout.scene.camera]
+      eye = {x = 1.5, y = 1.5, z = 1.0}
+
+    [structure_3d_layout.scene.xaxis]
+      showbackground = true
+      backgroundcolor = "rgb(255, 255, 255)"
+      title = ""
+      showgrid = true
+      zeroline = true
+      showline = true
+      linewidth = 5
+      linecolor = "black"
+      mirror = true
+      gridwidth = 1
+      gridcolor = "black"
+      tick0 = 0
+      dtick = 2.5
+      ticklen = 8
+      tickwidth = 1
+      ticks = ""
+      showticklabels = false
+
+      [structure_3d_layout.scene.xaxis.tickfont]
+        family = "Times new roman, monospace"
+        size = 16
+        color = "black"
+
+      [structure_3d_layout.scene.xaxis.titlefont]
+        family = "Times New Roman, monospace"
+        size = 16
+        color = "black"
+
+    [structure_3d_layout.scene.yaxis]
+      showbackground = true
+      backgroundcolor = "rgb(255, 255, 255)"
+      title = ""
+      showgrid = true
+      zeroline = true
+      showline = true
+      linewidth = 5
+      linecolor = "black"
+      mirror = true
+      gridwidth = 1
+      gridcolor = "black"
+      tick0 = 0
+      dtick = 2.5
+      ticklen = 8
+      tickwidth = 1
+      ticks = ""
+      showticklabels = false
+
+      [structure_3d_layout.scene.yaxis.tickfont]
+        family = "Times new roman, monospace"
+        size = 16
+        color = "black"
+
+      [structure_3d_layout.scene.yaxis.titlefont]
+        family = "Times New Roman, monospace"
+        size = 16
+        color = "black"
+
+    [structure_3d_layout.scene.zaxis]
+      showbackground = true
+      backgroundcolor = "rgb(255, 255, 255)"
+      title = ""
+      showgrid = true
+      zeroline = true
+      showline = true
+      linewidth = 5
+      linecolor = "black"
+      mirror = true
+      gridwidth = 1
+      gridcolor = "black"
+      tick0 = 0
+      dtick = 2
+      ticklen = 8
+      tickwidth = 1
+      ticks = ""
+      showticklabels = false
+
+      [structure_3d_layout.scene.zaxis.tickfont]
+        family = "Times new roman, monospace"
+        size = 16
+        color = "black"
+
+      [structure_3d_layout.scene.zaxis.titlefont]
+        family = "Times New Roman, monospace"
+        size = 16
+        color = "black"
