@@ -91,11 +91,10 @@ class Plot:
 
         # Check if x is a Trace instance
         if isinstance(x, Trace):
-            trace = go.Scatter(x=x.time, y=x.trace, name=x.name, *args, **plotting_kwargs)
+            trace = go.Scatter(x=x.time, y=x.trace, name=x.name, *args, **default_trace_options)
 
         else:
-            trace = go.Scatter(x=x, y=y, *args, **plotting_kwargs)
-         
+            trace = go.Scatter(x=x, y=y, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
     def structure_3d(self, x, y, z, *args, **plotting_kwargs):

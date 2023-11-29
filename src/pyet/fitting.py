@@ -180,24 +180,24 @@ if __name__ == "__main__":
     guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
 
-    # start = timer()
-    # res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
-    # dt = timer() - start
-    # print ("Unoptimised python implementation ran in %f s" % dt)
-    # print(f'resulting fitted params:{res.x}')
-    # resultdict = res.x
+    start = timer()
+    res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+    dt = timer() - start
+    print ("Unoptimised python implementation ran in %f s" % dt)
+    print(f'resulting fitted params:{res.x}')
+    resultdict = res.x
     
-    # fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
-    # fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
+    fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
+    fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
 
-    # data1.time = data1.time
-    # data2.time = data2.time
-    # fig = Plot()
-    # fig.transient(data1)
-    # fig.transient(data2)
-    # fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
-    # fig.transient(x,fit2, fit = True, name = 'fit 5%')
-    # fig.show()
+    data1.time = data1.time
+    data2.time = data2.time
+    fig = Plot()
+    fig.transient(data1)
+    fig.transient(data2)
+    fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
+    fig.transient(x,fit2, fit = True, name = 'fit 5%')
+    fig.show()
 
     fig2 = Plot()
     fig2.transient(data1)
