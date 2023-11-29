@@ -106,21 +106,23 @@ Species = F, r = 2.386628 Angstrom
 ```
 We can plot this if we would like, but we will increase the radius for illustrative purposes. We can use the inbuilt plotting for this.
 ```python
-figure = KY3F10.structure_plot(radius = 5)  
-figure.show()  
+if __name__ == "__main__":
+  figure = KY3F10.structure_plot(radius = 5)  
+  figure.show()  
 ```
 Which yields the following figure:
 <p align="center">
  <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/crystal.png">
 </p>
 
-
+Its worth noting here briefly, that due to the way the PyQT5 WebEngine/ App is being rendered using the multiprocessing library it is essential to include the `if __name__ == "__main__":` block. Unfortunately, until a different backend for rendering the plotly `.html` files that also supports `javascript` this has to stay.
 We can also specify a filter only to show ions we care about. For example, we may only care about the fluoride ions. 
 ```python
-filtered_ions = ['F']
+if __name__ == "__main__":
+  filtered_ions = ['F']
 
-figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
-figure.show() 
+  figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
+  figure.show() 
 ```
 This gives us a filtered plot:
 <p align="center">
@@ -193,8 +195,9 @@ print(coords.filtered_coords)
 As we can see, some of the yttrium ions have been replaced by samarium ions, as expected. 
 We can also plot this to visually see what is happening; the interaction class has similar plotting functionality. 
 ```python
-figure = crystal_interaction.doped_structure_plot(radius=10.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Y','Sm'])
-figure.show()
+if __name__ == "__main__":
+  figure = crystal_interaction.doped_structure_plot(radius=10.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+  figure.show()
 ```
 
 yeilding the following figure:
@@ -297,6 +300,7 @@ For this particular model, we must provide it with four additional parameters: a
 ```
 We can generate some synthetic data and plot it:
 ```python
+if __name__ == "__main__":
     # generate some random data
     time = np.arange(0,21,0.02) #1050 data points 0 to 21ms
     data_2pt5pct = general_energy_transfer(time, interaction_components2pt5pct, const_dict1)
@@ -352,6 +356,7 @@ resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311,
 Which is close to our given parameters and can be used to plot our final fitted results!
 
 ```python
+if __name__ == "__main__":
     fig = Plot()
     fig.transient(data1)
     fig.transient(data2)
