@@ -3,7 +3,7 @@ import numpy.linalg as LA
 from pymatgen.io.cif import CifParser
 import matplotlib.pyplot as plt
 import pandas as pd
-from . import helper_funcs 
+from . import pyet_utils
 import os
 from typing import Union, Optional, List
 
@@ -268,7 +268,7 @@ class Interaction:
             float: The average of r_i, which represents the simulated interaction.
             """
             process = 'singlecross'
-            cache_data = helper_funcs.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
+            cache_data = pyet_utils.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
             match cache_data: 
                 case None:
                     print('Simulator: File not found in cache, running simulation')
@@ -291,7 +291,7 @@ class Interaction:
                         r_i[i] = r_tmp
 
 
-                    helper_funcs.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
+                    pyet_utils.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
                 case _ :
     
                     r_i = cache_data        
@@ -381,7 +381,8 @@ if __name__ == "__main__":
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     #print(coords)
     #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'DQ')
     #print(interaction_components)
     #Interaction(KY3F10).distplot_summary(radius=20.0, concentration = 50.0 , dopant = 'Sm' , filter = ['Y','Sm'])
-    #helper_funcs.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
+    #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')

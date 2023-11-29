@@ -9,8 +9,10 @@ from timeit import default_timer as timer
 import scipy.optimize
 import os
 from typing import Union, Optional, List, Dict, Callable
-from . import helper_funcs 
-from .helper_funcs import Trace
+from .pyet_utils import Trace 
+from .plotting import Plot
+
+
 # Model functions for testing and general use
 def test_double_exp(time: np.ndarray ,dictionary: Dict) -> np.ndarray:
     """
@@ -147,7 +149,7 @@ class Optimiser:
 
 if __name__ == "__main__":
 # testing 
-    cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cache'))
+    cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
     with open(f'{cache_dir}/singlecross_10_2pt5_DQ_50000.json') as json_file:
         dict = json.load(json_file)
         interact1 = np.asarray(dict['r_components'])
@@ -178,26 +180,26 @@ if __name__ == "__main__":
     guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
 
-    start = timer()
-    res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
-    dt = timer() - start
-    print ("Unoptimised python implementation ran in %f s" % dt)
-    print(f'resulting fitted params:{res.x}')
-    resultdict = res.x
+    # start = timer()
+    # res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+    # dt = timer() - start
+    # print ("Unoptimised python implementation ran in %f s" % dt)
+    # print(f'resulting fitted params:{res.x}')
+    # resultdict = res.x
     
-    fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
-    fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
+    # fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
+    # fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
 
-    data1.time = data1.time
-    data2.time = data2.time
-    fig = helper_funcs.Plot()
-    fig.transient(data1)
-    fig.transient(data2)
-    fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
-    fig.transient(x,fit2, fit = True, name = 'fit 5%')
-    fig.show()
+    # data1.time = data1.time
+    # data2.time = data2.time
+    # fig = Plot()
+    # fig.transient(data1)
+    # fig.transient(data2)
+    # fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
+    # fig.transient(x,fit2, fit = True, name = 'fit 5%')
+    # fig.show()
 
-    fig2 = helper_funcs.Plot()
+    fig2 = Plot()
     fig2.transient(data1)
     fig2.transient(data2)
     fig2.show()
