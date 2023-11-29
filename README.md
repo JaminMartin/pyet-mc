@@ -36,7 +36,7 @@ Collection of tools for modelling the energy transfer processes in lanthanide-do
 
 Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
 # Road Map 
-- Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started. An example of this transition can be found [here](#fitting-experimental-data-to-energy-transfer-models). Structure figures are coming soon!
+- Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plottingss) & [here](#fitting-experimental-data-to-energy-transfer-models). Correct atom colours are coming soon!
 - Update structure figures to use Jmol colour palette.
 - Move compute-heavy / memory-intensive functions to Rust for better performance.
 - Add more interaction types e.g., cooperative energy transfer and other more complex energy transfer processes. 
@@ -64,7 +64,10 @@ path/to/my/package/ pip install .
 To test that this was successful, create a new Python file (wherever you would like to use pyet, not from within the pyet source code).
 Try to import pyet; assuming no error messages appear, pyet has been successfully installed in your virtual environment
 ```python
-import pyet 
+from pyet.structure import Structure, Interaction
+from pyet.fitting import Optimiser
+from pyet.pyet_utils import Trace
+from pyet.plotting import Plot
 ```
 # Usage 
 
@@ -103,11 +106,12 @@ Species = F, r = 2.386628 Angstrom
 ```
 We can plot this if we would like, but we will increase the radius for illustrative purposes. We can use the inbuilt plotting for this.
 ```python
- KY3F10.structure_plot(5)   
+figure = KY3F10.structure_plot(radius = 5)  
+figure.show()  
 ```
 Which yields the following figure:
 <p align="center">
-<img width="610" alt="plot using pyetmc library" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/afa0370c-1fe2-4855-942a-8009e06ffdca">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/crystal.png">
 </p>
 
 
@@ -115,13 +119,14 @@ We can also specify a filter only to show ions we care about. For example, we ma
 ```python
 filtered_ions = ['F']
 
-KY3F10.structure_plot(5, filter = filtered_ions)  
+figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
+figure.show() 
 ```
 This gives us a filtered plot:
 <p align="center">
-<img width="610" alt="filtered plot" src="https://github.com/JaminMartin/pyet-mc/assets/33270052/8c44b3c1-8451-4862-99ea-d331d8edc092">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/filtered_crystal.png">
 </p>
-In the future, the colours will be handled based on the ion, much like the materials project, and moved to plotly; the current plotting is purely a placeholder for functionality. This is a current work in progress.
+In the future, the colours will be handled based on the ion, much like the materials project, this is a current work in progress.
 ## Energy transfer models
 The energy transfer process can be modelled for a particular configuration of donor and acceptor ions with the following exponential function 
 $$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t},$$
@@ -185,6 +190,17 @@ print(coords.filtered_coords)
 20  5.861968   92.188550 -9.000000e+01       Y
 ```
 As we can see, some of the yttrium ions have been replaced by samarium ions, as expected. 
+We can also plot this to visually see what is happening; the interaction class has similar plotting functionality. 
+```python
+figure = crystal_interaction.doped_structure_plot(radius=10.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+figure.show()
+```
+
+yeilding the following figure:
+<p align="center">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/doped_crystal.png">
+</p>
+
 We can now calculate our interaction component for each random doping configuration. This is handled by the sim method, which currently is referred to as sim_single_cross as it is the only implemented method at the time of writing. However, it is possible to add your own by wrapping 'distance_method' described above for cooperative processes, for example. 
 
 ```python
@@ -207,9 +223,6 @@ Adding your own model should be relatively straight forward.
 In the above code, we call the: `.sim_single_cross` method. You can add a different interaction method simply by defining a new function that can inherit the properties of the `Interaction` class e.g. 
 
 ```python
-from pyet import Interaction
-
-
 def sim_cooperative_energy_transfer(self, arg1, arg2):
     # your code here
 
@@ -229,10 +242,10 @@ process_radius_concentration_interactiontype_iterations.json
 ```
 We can query and return the interaction components of the JSON file with the following code:
 ```python
-from pyet import helper_funcs as hf
+from pyet.pyet_utils import cache_reader, cache_clear, cache_list
 
-interaction_components2pt5pct = hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ')
-interaction_components5pct =  hf.cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ')
+interaction_components2pt5pct = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ')
+interaction_components5pct =  cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ')
 ```
 If what you have specified is not found in the cache, there will be a console log such as this:
 ```
@@ -247,7 +260,7 @@ Following a major update to pyet, it is also recommended that you clear the cach
 
 This can be done using:
 ```python
-hf.cache_clear()
+cache_clear()
 ```
 This will prompt you if you are sure you would like to delete the cache.
 ```
@@ -258,7 +271,7 @@ You can also specify a file of a given simulation configuration, as was done abo
 If you want to know the status of your cache, you can also use the cache list to get the details, including file names and sizes. Like cache_clear(), a simple command is all you need!
 
 ```python
-hf.cache_list()
+cache_list()
 ```
 ```
 #======# Cached Files #======#
@@ -268,6 +281,8 @@ Total cache size: 2.08 MB
 Run "cache_clear()" to clear the cache
 #============================#
 ```
+
+
 ## Fitting experimental data to energy transfer models
 Fitting experimental lifetime transients to determine energy transfer parameters is the primary purpose of this library, and so it will utilise all the previous components covered. 
 
@@ -291,7 +306,7 @@ We can generate some synthetic data and plot it:
     data_5pct = data_5pct + y_noise
 
     #Plotting
-    fig2 = hf.Plot()
+    fig2 = Plot()
     fig2.transient(data1)
     fig2.transient(data2)
     fig2.show()
@@ -336,7 +351,7 @@ resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311,
 Which is close to our given parameters and can be used to plot our final fitted results!
 
 ```python
-    fig = hf.Plot()
+    fig = Plot()
     fig.transient(data1)
     fig.transient(data2)
     fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
