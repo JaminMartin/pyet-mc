@@ -206,20 +206,20 @@ if __name__ == "__main__":
     figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='yttrium', marker={'size': 10})
     figure.show()
      
-    # x = [0,2,3,4,6,7,8,9,10]
-    # y = [11,12,13,14,15,16,17,18,19 ]
-    # x2 = [5,6,74,8,99,83,91,100]
-    # y2 = [11,12,13,14,15,16,17,18,19 ]
-    # # # Example usage
-    # x_range = [0,50]
-    # y_range = [0,1000]
-    # margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
-    # figure2= Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
-    # figure2.scatter_xy(x, y)
-    # figure2.show()
+    x = [0,2,3,4,6,7,8,9,10]
+    y = [11,12,13,14,15,16,17,18,19 ]
+    x2 = [5,6,74,8,99,83,91,100]
+    y2 = [11,12,13,14,15,16,17,18,19 ]
+    # # Example usage
+    x_range = [0,50]
+    y_range = [0,1000]
+    margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
+    figure2= Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
+    figure2.scatter_xy(x, y)
+    figure2.show()
 
 
-    # figure1 = Plot()
-    # figure1.scatter_xy(x, y)
-    # figure1.show()
+    figure1 = Plot()
+    figure1.scatter_xy(x, y)
+    figure1.show()
 
