@@ -36,7 +36,7 @@ Collection of tools for modelling the energy transfer processes in lanthanide-do
 
 Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
 # Road Map 
-- Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plottingss) & [here](#fitting-experimental-data-to-energy-transfer-models). Correct atom colours are coming soon!
+- Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plotting) & [here](#fitting-experimental-data-to-energy-transfer-models). Correct atom colours are coming soon!
 - Update structure figures to use Jmol colour palette.
 - Move compute-heavy / memory-intensive functions to Rust for better performance.
 - Add more interaction types e.g., cooperative energy transfer and other more complex energy transfer processes. 
@@ -126,14 +126,15 @@ This gives us a filtered plot:
 <p align="center">
  <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/filtered_crystal.png">
 </p>
+
+
 In the future, the colours will be handled based on the ion, much like the materials project, this is a current work in progress.
 ## Energy transfer models
 The energy transfer process can be modelled for a particular configuration of donor and acceptor ions with the following exponential function 
-$$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t},$$
 here $t$ is time, $\gamma_r$ is the radiative decay rate and $\gamma_{tr,j}$ is the energy transfer rate for this confuration. Assuming a single-step multipole-multipole interaction (currently, the only model implemented), $\gamma_{tr,j}$ may be modelled as a sum over the transfer rates to all acceptors $\gamma_{tr,j}$ takes the form: 
 
 $$\gamma_{tr,j} = C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s$$
-
+$I_j(t) = e^{-(\gamma_r + \gamma_{tr,j})t}$
 Here $R_i$ is the distance between donor and acceptor, $C_{cr}$ is the energy-transfer rate to an acceptor at $R_0$ the nearest-neighbour distance, and $s$ depends on the type of multipole-multipole interaction ($s$ = 6, 8, 10 for dipole-dipole, dipole-quadrupole and quadrupole-quadrupole interactions respectively). The term $\sum_i \left(\frac{R_0}{R_i}\right)^s$ forms the basis of our Monte Carlo simulation; we will refer to this as our interaction component. The lifetime for an ensemble of donors can be modelled by averaging over many possible configurations of donors and acceptors:
 
 $$I(t) =\frac{1}{n} \sum_{j=1}^n  e^{-(\gamma_{r} + \gamma_{tr,j})t}$$
