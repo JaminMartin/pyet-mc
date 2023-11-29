@@ -13,7 +13,8 @@ import os
 import sys
 import numpy as np
 from .pyet_utils import Trace
-
+import copy
+import time
 config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
 
 with open(config_file, "r") as f:
@@ -28,15 +29,19 @@ def run_app(file_path):
     app.exec_()
 
 
+
+
 class Plot:
-    def __init__(self, **layout_kwargs):
+    def __init__(self, path = None, **layout_kwargs):
         self.fig = go.Figure()
         self.plot_type = 'default'
-        self.default_layout = dict(config.get("default_layout", {}))  # Create a new dictionary
-        self.default_layout.update(layout_kwargs)
-        self.default_transient_layout = dict(config.get("transient_layout", {}))
-        self.default_transient_layout.update(layout_kwargs)
-        
+        self.default_layout = copy.deepcopy(config.get("default_layout", {}))
+        self.default_transient_layout = copy.deepcopy(config.get("transient_layout", {}))
+        self.default_scatter3d_layout = copy.deepcopy(config.get("structure_3d_layout", {}))
+
+        # Rest of your initialization code...
+
+
         # Update any specified keys in the default layout with the provided values
         for key, value in layout_kwargs.items():
             if key in self.default_layout:
@@ -44,40 +49,71 @@ class Plot:
             else:
                 self.default_layout[key] = value
         
-        for key, value in layout_kwargs.items():
             if key in self.default_transient_layout:
                 self.default_transient_layout[key].update(value)
             else:
                 self.default_transient_layout[key] = value
 
-    def scatter_xy(self, x, y, *args, **kwargs):
+            if key in self.default_scatter3d_layout:
+                self.default_scatter3d_layout[key].update(value)
+            else:
+                self.default_scatter3d_layout[key] = value
+      
+
+    def scatter_xy(self, x, y, *args, **plotting_kwargs):
         # Set default scatter trace options
         default_trace_options = {
             'mode': 'lines',
             }
-        trace_options = {**default_trace_options, **kwargs}
-        trace = go.Scatter(x=x, y=y, *args, **trace_options)
+        
+        for key, value in plotting_kwargs.items():
+            if key in default_trace_options:
+                default_trace_options[key].update(value)
+            else:
+                default_trace_options[key] = value
+       
+        trace = go.Scatter(x=x, y=y, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
 
-    def transient(self, x, y=None, fit=False, *args, **kwargs):
+    def transient(self, x, y=None, fit=False, *args, **plotting_kwargs):
         self.plot_type = 'transient'
         if fit:
             default_trace_options = {'mode': 'lines'}
         else:
             default_trace_options = {'mode': 'markers'}
 
-        trace_options = {**default_trace_options, **kwargs}
+        for key, value in plotting_kwargs.items():
+            if key in default_trace_options:
+                default_trace_options[key].update(value)
+            else:
+                default_trace_options[key] = value
 
         # Check if x is a Trace instance
         if isinstance(x, Trace):
-            trace = go.Scatter(x=x.time, y=x.trace, name=x.name, *args, **trace_options)
+            trace = go.Scatter(x=x.time, y=x.trace, name=x.name, *args, **plotting_kwargs)
 
         else:
-            trace = go.Scatter(x=x, y=y, *args, **trace_options)
+            trace = go.Scatter(x=x, y=y, *args, **plotting_kwargs)
          
         self.fig.add_trace(trace)
 
+    def structure_3d(self, x, y, z, *args, **plotting_kwargs):
+        self.plot_type = 'structure_3d'
+        default_trace_options = {
+            'mode': 'markers',
+            'marker': {
+                'size': 10
+            }
+        }
+        for key, value in plotting_kwargs.items():
+            if key in default_trace_options:
+                default_trace_options[key].update(value)
+            else:
+                default_trace_options[key] = value
+        
+        trace = go.Scatter3d(x=x, y=y, z=z, *args, **default_trace_options)
+        self.fig.add_trace(trace)
 
     def calculate_nice_round_number(self, value):
         # Find a nice round number or factor of value
@@ -123,10 +159,15 @@ class Plot:
         if self.plot_type == 'default':
             # Set default layout options
             self.fig.update_layout(**self.default_layout)
+
         elif self.plot_type == 'transient':
             self.update_layout_bounds()
             self.fig.update_layout(**self.default_transient_layout) 
-            self.fig.update_yaxes(type="log")   
+            self.fig.update_yaxes(type="log")  
+
+        elif self.plot_type == 'structure_3d':  
+            print('plotting 3d with no config')  
+            self.fig.update_layout(**self.default_scatter3d_layout)
         else:
             print('invalid plot type, defaulting to default')  
             self.fig.update_layout(**self.default_layout)
@@ -135,7 +176,7 @@ class Plot:
         # Use the system's temporary directory
         temp_dir = tempfile.gettempdir()
         print(f"Temporary directory for debugging: {temp_dir}")
-
+        
         # Use NamedTemporaryFile to create a temporary file in the system's temp directory
         with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
             self.temp_file_path = os.path.abspath(temp.name)
@@ -155,24 +196,30 @@ class Plot:
 
     #TODO add figure saving 
 
+        
 
 if __name__ == "__main__":
+    margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
+    figure = Plot(margin = margins)
     
-     
-    x = [0,2,3,4,6,7,8,9,10]
-    y = [11,12,13,14,15,16,17,18,19 ]
-    x2 = [5,6,74,8,99,83,91,100]
-    y2 = [11,12,13,14,15,16,17,18,19 ]
-    # Example usage
-    x_range = [0,50]
-    y_range = [0,100]
-    margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
-    figure = Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
-    print(f"Figure 1 Plot Type: {figure.plot_type}")
-    figure.scatter_xy(x, y)
+    figure.structure_3d([0,1,2],[0,5,2],[0,1,5])
+    figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='yttrium', marker={'size': 10})
     figure.show()
+     
+    # x = [0,2,3,4,6,7,8,9,10]
+    # y = [11,12,13,14,15,16,17,18,19 ]
+    # x2 = [5,6,74,8,99,83,91,100]
+    # y2 = [11,12,13,14,15,16,17,18,19 ]
+    # # # Example usage
+    # x_range = [0,50]
+    # y_range = [0,1000]
+    # margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
+    # figure2= Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
+    # figure2.scatter_xy(x, y)
+    # figure2.show()
 
-    figure2 = Plot()
-    print(f"Figure 2 Plot Type: {figure2.plot_type}")
-    figure2.scatter_xy(x2, y2)
-    figure2.show()
+
+    # figure1 = Plot()
+    # figure1.scatter_xy(x, y)
+    # figure1.show()
+

@@ -6,7 +6,7 @@ import pandas as pd
 from . import pyet_utils
 import os
 from typing import Union, Optional, List
-
+from .plotting import Plot
 class Structure:
     '''
     A class for handling the structural info of a host crystal. A central ion, e.g. a Ytrrium ion must be specified for the associated methods to work. Once this ion has been specified the nearest neigbour ions can be calculated. This can either return cartesian or spherical polar coordinates for further calculations or plotting. There is also a simple function for printing off this information for a quick analyis. Lastly this class provides plotting functionality directly for visualisation purposes. 
@@ -157,13 +157,8 @@ class Structure:
         for key in DataFrameDict.keys():
             DataFrameDict[key] = coords_xyz[:][coords_xyz.species == key]
         
-        fig = plt.figure()
-        ax = fig.add_subplot(projection='3d') 
-        ax.scatter(self.origin[0] ,self.origin[1] ,self.origin[2], label=f'central {self.centre_ion_species} ion')
-        ax.set_xlabel('X (Angstrom)')
-        ax.set_ylabel('Y (Angstrom)')
-        ax.set_zlabel('Z (Angstrom)')
-
+        fig = Plot()
+        fig.structure_3d(np.array(self.origin[0],self.origin[0]) ,np.array(self.origin[1],self.origin[1]) ,np.array(self.origin[2],self.origin[2]), name=f'central {self.centre_ion_species} ion')
         if filter is not None:
             if not isinstance(filter, list):
                 raise TypeError('Filter must be a list of strings.')
@@ -176,19 +171,14 @@ class Structure:
         if filter == None:
             for i in range(len(UniqueNames)):
                 temp = DataFrameDict[UniqueNames[i]]
-                ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
-            ax.legend()  
-            plt.show(block=blocking)  # Ensure plt.show() is called without block parameter
-            self.fig = plt.gcf()     
+                fig.structure_3d(temp.x, temp.y, temp.z, name=UniqueNames[i])    
         else:
          
             for i in range(len(filter)):
                 temp = DataFrameDict[filter[i]] 
-                ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
-            ax.legend()  
-            plt.show(block=blocking)  # Ensure plt.show() is called without block parameter
-            self.fig = plt.gcf()
-
+                fig.structure_3d(temp.x, temp.y, temp.z, name=filter[i])   
+        
+        return fig
 
 
    
@@ -301,7 +291,7 @@ class Interaction:
          #TODO add exchange interation and cooperative process as an example
         
 
-        def distplot_summary(self, radius: float, concentration: float, dopant: str = 'acceptor', filter: Optional[List[str]] = None) -> Union[None, Exception]:
+        def doped_structure_plot(self, radius: float, concentration: float, dopant: str = 'acceptor', filter: Optional[List[str]] = None) -> Union[None, Exception]:
             #TODO clean up plotting & formatting to produce thesis quality pictures & add saving option.
             #TODO port plotting to plotly
             """
@@ -336,31 +326,22 @@ class Interaction:
             for key in DataFrameDict.keys():
                 DataFrameDict[key] = result[:][result.species == key]
             
-            fig = plt.figure()
-            ax = fig.add_subplot(projection='3d') 
-            ax.scatter(self.structure.origin[0] ,self.structure.origin[1] ,self.structure.origin[2], label=f'central {self.structure.centre_ion_species} ion')
-            ax.set_xlabel('X (Angstrom)')
-            ax.set_ylabel('Y (Angstrom)')
-            ax.set_zlabel('Z (Angstrom)')
+            fig = Plot()
+            fig.structure_3d(np.array(self.structure.origin[0],self.structure.origin[0]) ,np.array(self.structure.origin[1],self.structure.origin[1]) ,np.array(self.structure.origin[2],self.structure.origin[2]), name=f'central {self.structure.centre_ion_species} ion')
             if filter == None:
                 for i in range(len(UniqueNames)):
                     temp = DataFrameDict[UniqueNames[i]]
-                    ax.scatter(temp.x, temp.y, temp.z, label=UniqueNames[i])
-                ax.legend()  
-                self.fig = plt.gcf()  
-                plt.show(block=False)       
+                    fig.structure_3d(temp.x, temp.y, temp.z, name=UniqueNames[i])  
+     
             else:
                 try:
                     for i in range(len(filter)):
                         temp = DataFrameDict[filter[i]] 
-                        ax.scatter(temp.x, temp.y, temp.z, label=filter[i])   
-                    ax.legend()  
-                    self.fig = plt.gcf()  
-                    plt.show(block=False)   
+                        fig.structure_3d(temp.x, temp.y, temp.z, name=filter[i]) 
                 except:
                     print('Failed to plot. Filter must be in type "list of strings"')
                     pass
-      
+            return fig
 
 if __name__ == "__main__":
     # cif file from https://materialsproject.org
@@ -371,18 +352,20 @@ if __name__ == "__main__":
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
     filtered_ions = ['F','K']
-    #KY3F10.structure_plot(5, filter = filtered_ions)   
+    figure = KY3F10.structure_plot(5, filter = filtered_ions)  
 
-    #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
-    #print(rslt_df)
+    figure.show()
+    # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
+    # #print(rslt_df)
 
     crystal_interaction = Interaction(KY3F10)
 
-    #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
-    #print(coords)
-    #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'DQ')
-    #print(interaction_components)
-    #Interaction(KY3F10).distplot_summary(radius=20.0, concentration = 50.0 , dopant = 'Sm' , filter = ['Y','Sm'])
-    #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
+    coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
+    # #print(coords)
+    # #print(crystal_interaction.filtered_coords)
+    # interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
+    # interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'DQ')
+    # #print(interaction_components)
+    figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+    figure2.show()
+    # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
