@@ -21,7 +21,7 @@ class Trace:
     time (np.ndarray): The x-coordinates (time points) of the data points.
     radial_data (np.ndarray): The radial data associated with the trace, this would be pre-calculated based on the concentration of the sample.
     """
-    def __init__(self, ydata: np.ndarray, xdata: np.ndarray, fname: str, radial_data: np.ndarray, parser = False):
+    def __init__(self, ydata: np.ndarray, xdata: np.ndarray, fname: str, radial_data: np.ndarray, weighting: int = 1, parser = False):
         """
         The constructor for the Trace class.
 
@@ -32,6 +32,7 @@ class Trace:
         radial_data (np.ndarray): The radial data associated with the trace, this would be pre-calculated based on the concentration of the sample.
         parser (bool, optional): A flag indicating whether to parse the trace data. Defaults to False.
         """
+        self.weight = weighting
         self.trace = ydata
         self.name = fname
         self.time = xdata
@@ -44,7 +45,7 @@ class Trace:
 
 def cache_writer(r, **params):
 
-    file_name = f'{params["process"]}_{params["radius"]}_{params["concentration"]}_{params["interaction_type"]}_{params["iterations"]}'
+    file_name = f'{params["process"]}_{params["radius"]}_{params["concentration"]}_{params["interaction_type"]}_{params["iterations"]}_intrinsic_{params["intrinsic"]}'
     file_name = file_name.replace('.', 'pt')
     temp = {}
     temp['r_components'] = r.tolist()
@@ -57,7 +58,7 @@ def cache_writer(r, **params):
 def cache_reader(**params):
     directory = cache_dir
 
-    vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"])])
+    vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"]),str(params["intrinsic"])])
     for i in range(len(vmat)):
         vmat[i] = vmat[i].replace('.', 'pt')
     data = None
@@ -100,7 +101,7 @@ def cache_clear(**params):
                 # invalid input
                 print('Invalid input. Please enter "Y" or "N".')            
     else:
-        vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"])])
+        vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"]),str(params["intrinsic"])])
         for i in range(len(vmat)):
             vmat[i] = vmat[i].replace('.', 'pt')
         vmat_str = '_'.join(vmat)    
