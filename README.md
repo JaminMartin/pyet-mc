@@ -36,15 +36,15 @@ Collection of tools for modelling the energy transfer processes in lanthanide-do
 
 Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
 # Road Map 
-- Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plotting) & [here](#fitting-experimental-data-to-energy-transfer-models). Correct atom colours are coming soon!
-- Update structure figures to use Jmol colour palette.
+- ~~Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plotting) & [here](#fitting-experimental-data-to-energy-transfer-models).~~ ✅ 
+- Update structure figures to use Jmol colour palette. Correct atom colours are coming soon!.
 - Move compute-heavy / memory-intensive functions to Rust for better performance.
 - Add more interaction types e.g., cooperative energy transfer and other more complex energy transfer processes. 
 - Add geometric correction factors and shield factors for various crystal structures and ions.
 - Add alternative to Monte Carlo methods (performance vs accuracy tests required).
 - Move docs to MDbook for continuous integration.
 - Optional open-source database where results can be stored, retrieved, and rated based on data quality and fit, much like the ICCD crystallography database. 
-- Add more tests. 
+- Add more tests, this will be important as the project grows and other users want to add features. 
 # Installation
 Currently, pyet is not on the PyPI package repository; this will be the case until this project is more stable. It is still a work in progress. However, if you do wish to use pyet in its current form, it is as simple as the following:
 
