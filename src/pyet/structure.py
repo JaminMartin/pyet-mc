@@ -61,11 +61,22 @@ class Structure:
                 self.site = self.struct.sites[self.ion_index] #22 ky3f10 8 K2YF5 10 LiYF4 4 NaYF
                 self.centre_ion_species = self.site.species_string  
                 self.origin = self.site.coords
+                print(f'central ion is {self.site}')
+                self.get_R0
                 break
             
             else:
                 pass    
+    def get_R0(self) -> None: 
+        # # Get the radial distance of the closest ion of the same species within a hard coded 50 angstroms
+        nn_info = self.nearest_neighbours_spherical_coords(50)
+        same_species = nn_info.query('species == @self.centre_ion_species')
+        closest_index = same_species['r'].idxmin()
         
+        self.r0 = same_species.loc[closest_index, 'r']
+        print(f'with a nearest neighbour {self.centre_ion_species} at {self.r0} angstroms')
+      
+
     def nearest_neighbours_info(self, radius: float) -> None: 
         """
         Prints the species and radial distance of the neighbors within a specified radius of the central ion.
@@ -244,7 +255,7 @@ class Interaction:
             distances = distances['r'].to_numpy()
             return distances
         
-        def sim_single_cross(self, radius: float, concentration: float, iterations: int, interaction_type: Optional[str] = None) -> Union[float, Exception]:
+        def sim_single_cross(self, radius: float, concentration: float, iterations: int, interaction_type: Optional[str] = None, intrinsic: bool = False) -> Union[float, Exception]:
             """
             Simulates a single cross-relaxation interaction within a given radius.
 
@@ -258,7 +269,7 @@ class Interaction:
             float: The average of r_i, which represents the simulated interaction.
             """
             process = 'singlecross'
-            cache_data = pyet_utils.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
+            cache_data = pyet_utils.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type, intrinsic = intrinsic)
             match cache_data: 
                 case None:
                     print('Simulator: File not found in cache, running simulation')
@@ -276,12 +287,16 @@ class Interaction:
 
                     for i in range(len(r_i)):
                         distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
-                        tmp = np.ones(len(distances)) 
+                        if intrinsic == True:
+                            tmp = np.ones(len(distances)) 
+                        else:
+                            tmp = np.full(len(distances), self.structure.r0) 
+
                         r_tmp = np.sum( np.power((tmp / distances),s))
                         r_i[i] = r_tmp
 
 
-                    pyet_utils.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type)
+                    pyet_utils.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type, intrinsic = intrinsic)
                 case _ :
     
                     r_i = cache_data        
@@ -351,21 +366,22 @@ if __name__ == "__main__":
     cif_file = os.path.join(cif_dir, 'KY3F10_mp-2943_conventional_standard.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
-    filtered_ions = ['F','K']
-    figure = KY3F10.structure_plot(5, filter = filtered_ions)  
+    KY3F10.get_R0()
+    # filtered_ions = ['F','K']
+    # figure = KY3F10.structure_plot(5, filter = filtered_ions)  
 
-    figure.show()
-    # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
-    # #print(rslt_df)
+    # figure.show()
+    # # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
+    # # #print(rslt_df)
 
     crystal_interaction = Interaction(KY3F10)
 
-    coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
-    # #print(coords)
-    # #print(crystal_interaction.filtered_coords)
-    # interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
-    # interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50000, interaction_type= 'DQ')
-    # #print(interaction_components)
-    figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' , filter = ['Y','Sm'])
-    figure2.show()
-    # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
+    #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
+    # # #print(coords)
+    # # #print(crystal_interaction.filtered_coords)
+    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
+    # # #print(interaction_components)
+    # figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+    # figure2.show()
+    # # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
