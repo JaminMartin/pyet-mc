@@ -9,7 +9,7 @@ from timeit import default_timer as timer
 import scipy.optimize
 import os
 from typing import Union, Optional, List, Dict, Callable
-from .pyet_utils import Trace 
+from .pyet_utils import Trace
 from .plotting import Plot
 
 
@@ -66,15 +66,30 @@ class Optimiser:
     variables (list): A list of variables for each trace.
     model (function): The model function used to describe the energy transfer process. Defaults to 'general_energy_transfer'.
     """ 
-    def __init__(self, traces: List[Trace], variables: List[str], model: Union[str, Callable[...,np.ndarray]] = 'default'):
+    def __init__(self, traces: List[Trace], variables: List[str], auto_weights: bool = True,  model: Union[str, Callable[...,np.ndarray]] = 'default'):
       self.traces = traces #list of numpy array containing experimental data
       self.variables = variables #list of variables for each trace
+      if auto_weights:
+          self.adjust_weights()
       if model == 'default':
           self.model = general_energy_transfer
       else:
           self.model = model    
 
 
+    def adjust_weights(self):
+        """
+        Adjusts the weights of the traces based on their lengths.
+        """
+        # Get the length of the longest trace
+        max_length = max(len(trace.time) for trace in self.traces)
+      
+        # Adjust the weights of the traces to correct for differences in lenght. 
+        for trace in self.traces:
+           
+            length_based_weight = max_length / len(trace.time)
+            trace.weight *= length_based_weight
+            print(f'the weights of the {trace.name} trace has been adjusted to {trace.weight}')
 
     def fit(self, guess: Dict,  *args, **kwargs) -> Dict:
         """
@@ -134,7 +149,7 @@ class Optimiser:
             #print(temp_dict)
 
             #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
-            ch += np.sum(((self.model(self.traces[j].time, self.traces[j].radial_data, temp_dict) - self.traces[j].trace)**2))
+            ch += self.traces[j].weight * np.sum(((self.model(self.traces[j].time, self.traces[j].radial_data, temp_dict) - self.traces[j].trace)**2))
             
         #print(ch)
         return ch
@@ -150,34 +165,37 @@ class Optimiser:
 if __name__ == "__main__":
 # testing 
     cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
-    with open(f'{cache_dir}/singlecross_10_2pt5_DQ_50000.json') as json_file:
+    with open(f'{cache_dir}/singlecross_20_2pt5_DQ_50000_intrinsic_False.json') as json_file:
         dict = json.load(json_file)
         interact1 = np.asarray(dict['r_components'])
-    with open(f'{cache_dir}/singlecross_10_5_DQ_50000.json') as json_file:
+    with open(f'{cache_dir}/singlecross_20_5_DQ_50000_intrinsic_False.json') as json_file:
         dict = json.load(json_file)
         interact2 = np.asarray(dict['r_components'])    
-    const_dict1  = {'a': 1 , 'b': 3e7, 'c' : 0.144, 'd':0}
-    const_dict2  = {'a': 1 , 'b': 3e7, 'c' : 0.144, 'd': 0}
+    const_dict1  = {'a': 1 , 'b': 490, 'c' : 0.144, 'd':0}
+    const_dict2  = {'a': 1 , 'b': 490, 'c' : 0.144, 'd': 0}
     start = timer()
     #res = dict_opt(chi, guess, tol = 1e-12)
-    x = np.arange(0,21,0.02) 
+    x = np.arange(0,21,0.02)
+    x2 = np.arange(0,21,0.02)
     print(len(x))
+    print(len(x2))
     y1 = general_energy_transfer(x, interact1, const_dict1)
-    y2 = general_energy_transfer(x, interact2, const_dict2)
+    y2 = general_energy_transfer(x2, interact2, const_dict2)
     rng = np.random.default_rng()
     y_noise = 0.01 * rng.normal(size=x.size)
+    y2_noise = 0.01 * rng.normal(size=x2.size)
     ydata1 = y1 + y_noise
-    ydata2 = y2 + y_noise
+    ydata2 = y2 + y2_noise
     dt = timer() - start
     print ("Datageneration ran in %f s" % dt)   
 
 
     data1 = Trace(ydata1, x,  '2.5%', interact1)
-    data2 = Trace(ydata2, x, '5%', interact2)
+    data2 = Trace(ydata2, x2, '5%', interact2)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
-    guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
+    guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
 
     start = timer()
