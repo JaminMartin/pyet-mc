@@ -58,7 +58,7 @@ def cache_writer(r, **params):
 def cache_reader(**params):
     directory = cache_dir
 
-    vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"]),str(params["intrinsic"])])
+    vmat = ([params["process"],str(params["radius"]),str(params["concentration"]),str(params["interaction_type"]),str(params["iterations"]),"intrinsic", str(params["intrinsic"])])
     for i in range(len(vmat)):
         vmat[i] = vmat[i].replace('.', 'pt')
     data = None
@@ -67,6 +67,8 @@ def cache_reader(**params):
             tempTuple = os.path.splitext(filename)
             filename = tempTuple[0]
             temp = filename.split("_")
+    
+        
             if vmat == temp:
                 with open(f'{directory}/{filename}.json') as json_file:
                     dict = json.load(json_file)
@@ -135,4 +137,4 @@ def cache_list():
 if __name__ == "__main__":
     
     cache_list()
-     
+    cache_reader(process = 'singlecross', radius = 20, concentration = 5, iterations = 50000, interaction_type = "DQ", intrinsic = False) 
