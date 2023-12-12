@@ -14,21 +14,33 @@ import sys
 import numpy as np
 from .pyet_utils import Trace
 import copy
-import time
+from typing import Union
+
 config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
 
 with open(config_file, "r") as f:
     config = toml.load(f)
 
 
-def run_app(file_path):
+def run_app(file_path: str) -> None:
+    """
+    Run a Qt application to display a web page from a local file.
+
+    This function creates a QApplication and a QWebEngineView, loads the web page from the specified local file into the QWebEngineView, shows the QWebEngineView, and then starts the QApplication event loop.
+
+    Parameters:
+        file_path (str): The path to the local file to display in the QWebEngineView.
+
+    Returns:
+        None
+    """
     app = QApplication(sys.argv)
     web = QWebEngineView()
     web.load(QUrl.fromLocalFile(file_path))
     web.show()
     app.exec_()
 
-def load_local_config(local_config_path):
+def load_local_config(local_config_path: str) -> None:
     """
     Load a local configuration file and overwrite the default configuration.
 
@@ -44,7 +56,39 @@ def load_local_config(local_config_path):
 
 
 class Plot:
+    """
+    A class used to represent a Plot.
+
+    This class creates a plot figure and sets default layouts for different types of plots. 
+    It also updates these default layouts with any provided layout keyword arguments.
+
+    Attributes:
+        fig (Figure): The plot figure.
+        plot_type (str): The type of the plot. Default is 'default'.
+        default_layout (dict): The default layout for the plot.
+        default_transient_layout (dict): The default layout for a transient plot.
+        default_scatter3d_layout (dict): The default layout for a 3D scatter plot.
+        layout (dict): The layout keyword arguments provided when initializing the class.
+
+    Methods:
+        __init__(self, **layout_kwargs): Initializes the Plot class and updates the default layouts with any provided layout keyword arguments.
+        scatter_xy(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs): Creates a scatter plot with the given x and y data.
+        transient(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list, None] = None, fit: bool =False, *args, **plotting_kwargs): Creates a transient plot with the given x and y data.
+        structure_3d(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], z: Union[np.ndarray, list], *args, **plotting_kwargs): Creates a 3D scatter plot with the given x, y, and z data.
+        calculate_nice_round_number(self, value: Union[float, int]): Calculates a nice round number that is a factor of the given value.
+        update_layout_bounds(self): Updates the layout bounds of the figure.
+        show(self): Displays the figure based on the plot type.
+        save(self, path: str, name: str): Saves the figure to a specified location.
+        __del__(self): Cleans up the temporary file created for the plot.
+        cleanup_temp_file(self): Removes the temporary file created for the plot if it exists.
+    """
     def __init__(self, **layout_kwargs):
+        """
+        Initializes the Plot class and updates the default layouts with any provided layout keyword arguments.
+
+        Parameters:
+            **layout_kwargs: Arbitrary keyword arguments to update the default layouts.
+        """
         self.fig = go.Figure()
         self.plot_type = 'default'
         self.default_layout = copy.deepcopy(config.get("default_layout", {}))
@@ -72,7 +116,23 @@ class Plot:
                 self.default_scatter3d_layout[key] = value
       
 
-    def scatter_xy(self, x, y, *args, **plotting_kwargs):
+    def scatter_xy(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs) -> None:
+        """
+        Create a scatter plot with the given x and y data.
+
+        The function sets default trace options for a scatter plot and then updates these options with any provided in plotting_kwargs.
+
+        A scatter trace is created with the x and y data and the trace options, and this trace is added to the figure.
+
+        Parameters:
+            x (Union[np.ndarray, list]): The x data for the scatter plot.
+            y (Union[np.ndarray, list]): The y data for the scatter plot.
+            *args: Variable length argument list.
+            **plotting_kwargs: Arbitrary keyword arguments to update the default trace options.
+
+        Returns:
+            None
+        """
         # Set default scatter trace options
         default_trace_options = {
             'mode': 'lines',
@@ -88,7 +148,27 @@ class Plot:
         self.fig.add_trace(trace)
 
 
-    def transient(self, x, y=None, fit=False, *args, **plotting_kwargs):
+    def transient(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list, None] = None, fit: bool =False, *args, **plotting_kwargs) -> None:
+        """
+        Create a transient plot with the given x and y data.
+
+        The function sets the plot type to 'transient' and defines default trace options based on the fit parameter. 
+        It then updates these options with any provided in plotting_kwargs.
+
+        If x is an instance of Trace, a scatter trace is created with the time and trace data from x and the trace options.
+        Otherwise, a scatter trace is created with the x and y data and the trace options. 
+        This trace is then added to the figure.
+
+        Parameters:
+            x (Union[np.ndarray, list]): The x data for the scatter plot, or a Trace instance.
+            y (Union[np.ndarray, list, None]): The y data for the scatter plot. Ignored if x is a Trace instance.
+            fit (bool): If True, the trace mode is set to 'lines'. Otherwise, it's set to 'markers'.
+            *args: Variable length argument list.
+            **plotting_kwargs: Arbitrary keyword arguments to update the default trace options.
+
+        Returns:
+            None
+        """
         self.plot_type = 'transient'
         if fit:
             default_trace_options = {'mode': 'lines'}
@@ -109,7 +189,27 @@ class Plot:
             trace = go.Scatter(x=x, y=y, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
-    def structure_3d(self, x, y, z, *args, **plotting_kwargs):
+    def structure_3d(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], z: Union[np.ndarray, list], *args, **plotting_kwargs) -> None:
+
+        """
+        Create a 3D scatter plot with the given x, y, and z data.
+
+        The function sets the plot type to 'structure_3d' and defines default trace options. 
+        It then updates these options with any provided in plotting_kwargs.
+
+        A 3D scatter trace is created with the x, y, and z data and the trace options, 
+        and this trace is added to the figure.
+
+        Parameters:
+            x (Union[np.ndarray, list]): The x data for the scatter plot.
+            y (Union[np.ndarray, list]): The y data for the scatter plot.
+            z (Union[np.ndarray, list]): The z data for the scatter plot.
+            *args: Variable length argument list.
+            *plotting_kwargs: Keyword arguments to update the default trace options.
+
+        Returns:
+            None
+        """
         self.plot_type = 'structure_3d'
         default_trace_options = {
             'mode': 'markers',
@@ -126,8 +226,21 @@ class Plot:
         trace = go.Scatter3d(x=x, y=y, z=z, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
-    def calculate_nice_round_number(self, value):
-        # Find a nice round number or factor of value
+    def calculate_nice_round_number(self, value: Union[float, int]) -> Union[float,int]:
+        """
+        Calculate a nice round number that is a factor of the given value.
+
+        This function iterates over a list of nice round numbers. If the given value divided by a nice round number is less than or equal to 5, 
+        that nice round number is returned.
+
+        If no suitable nice round number is found, the function returns a fallback value of 1.
+
+        Parameters:
+            value (Union[float, int]): The value for which to find a nice round number.
+
+        Returns:
+            Union[float, int]: A nice round number that is a factor of the given value, or 1 if no suitable number is found.
+        """
         nice_round_numbers = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]  # You can extend this list with more nice round numbers
         for nice_number in nice_round_numbers:
             if value / nice_number <= 5:  # Adjust the threshold as needed
@@ -136,7 +249,20 @@ class Plot:
         # If no suitable nice round number is found, return a fallback value
         return 1
     
-    def update_layout_bounds(self):
+    def update_layout_bounds(self) -> None:
+        """
+        Update the layout bounds of the figure.
+
+        This function iterates over the data in the figure. If the x and y data are not empty or None, 
+        it updates the x and y-axis bounds. 
+
+        If the 'xaxis' or 'yaxis' range and 'xaxis' dtick are not set in the layout, 
+        it updates them in the default and transient layouts.
+
+        Returns:
+            None
+        """
+
         x_min, x_max = float('inf'), float('-inf')
         y_min, y_max = float('inf'), float('-inf')
 
@@ -167,6 +293,18 @@ class Plot:
 
 
     def show(self):
+        """
+        Display the figure based on the plot type.
+
+        If the plot type is 'default' or 'transient', the layout bounds are updated before displaying only if they are not explicitly over written in the config.toml or passed to Plot() when itinitalising the class. 
+        If the plot type is 'structure_3d', the 3D scatter layout is used.
+        If the plot type is not recognized, it defaults to 'default'.
+
+        The figure is saved as a temporary HTML file in the system's temporary directory, and a new QT5 webegine process is started to display it.
+
+        Returns:
+            None
+        """
         if self.plot_type == 'default':
             # Set default layout options
             self.update_layout_bounds()
@@ -198,6 +336,21 @@ class Plot:
             self.process = Process(target=run_app, args=(self.temp_file_path,))
             self.process.start()
 
+    def save(self, path: str, name: str) -> None:
+        """
+        Save the figure to a specified location.
+
+        Parameters:
+            path (str): The directory where the figure should be saved.
+            name (str): The name of the file (including extension e.g. .svg) to save the figure as.
+
+        Returns:
+        None
+        """
+        directory_withname = os.path.join(path, name)
+        self.fig.write_image(directory_withname)
+
+
     #First layer temp file clean up (as these can be quite large) system level clean up handles any python process / garbage collection failure at reboot (rarely needed)
     def __del__(self):
         self.cleanup_temp_file()
@@ -206,8 +359,7 @@ class Plot:
         if hasattr(self, 'temp_file_path') and os.path.exists(self.temp_file_path):
             os.remove(self.temp_file_path)
 
-    #TODO add figure saving 
-
+    
         
 
 if __name__ == "__main__":
@@ -219,19 +371,21 @@ if __name__ == "__main__":
     # figure.show()
     margins = {'l': 30, 'r': 0, 't': 30, 'b': 30} 
     x = [0,2,3,4,6,7,8,9,10]
-    y = [11,12,13,14,15,16,17,18,19 ]
+    y = [11,12,13,14,15,16,17,18,19]
     x2 = [5,6,74,8,99,83,91,100]
-    y2 = [11,12,13,14,15,16,17,18,19 ]
+    y2 = [11,12,13,14,15,16,17,18,19]
     # # Example usage
     x_range = [0,50]
     y_range = [0,1000]
     margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
     figure2= Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
-    figure2.scatter_xy(x, y)
+    figure2.scatter_xy(x, y, name = 'an example')
     figure2.show()
 
-    #load_local_config('/Users/jamin/Documents/PYET/pyet-mc/local_plotting_config.toml')
+    load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
     figure1 = Plot()
-    figure1.scatter_xy(x, y)
+    figure1.scatter_xy(x, y, name = 'an example')
     figure1.show()
-
+    path = '/Users/jamin/Documents/'
+    name = 'temp2.svg'
+    figure1.save(path, name)
