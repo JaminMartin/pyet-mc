@@ -367,10 +367,10 @@ if __name__ == "__main__":
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
     KY3F10.get_R0()
-    # filtered_ions = ['F','K']
-    # figure = KY3F10.structure_plot(5, filter = filtered_ions)  
+    filtered_ions = ['F']
+    figure = KY3F10.structure_plot(5, filter = filtered_ions)  
 
-    # figure.show()
+    figure.show()
     # # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     # # #print(rslt_df)
 
@@ -382,6 +382,6 @@ if __name__ == "__main__":
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
     # # #print(interaction_components)
-    # figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' , filter = ['Y','Sm'])
-    # figure2.show()
+    figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' )
+    figure2.show()
     # # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
