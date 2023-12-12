@@ -223,9 +223,9 @@ class Interaction:
             """
             try:
                 self.structure = structure
-                print(f' Central ion is {self.structure.centre_ion_species}')
+                print(f'Structure loaded, the central ion is {self.structure.centre_ion_species}')
             except:
-                print('Either structure or central ion is not specified')  
+                print('Either structure or central ion has not been correctly specified')  
        
 
         
@@ -374,13 +374,13 @@ if __name__ == "__main__":
     # # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     # # #print(rslt_df)
 
-    crystal_interaction = Interaction(KY3F10)
+    #crystal_interaction = Interaction(KY3F10)
 
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     # # #print(coords)
     # # #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
-    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
+    #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
+    #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
     # # #print(interaction_components)
     # figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' , filter = ['Y','Sm'])
     # figure2.show()
