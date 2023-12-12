@@ -40,7 +40,7 @@ class Structure:
         except:
             print('Invalid or no CIF file provided')
           
-    def centre_ion(self,ion: str) -> None:
+    def centre_ion(self, ion: str) -> None:
         """
         Identifies the index of a specified ion in the structure.
 
@@ -150,7 +150,7 @@ class Structure:
         nearest_neigbours = pd.concat([coordinate_df, Species_info],axis=1)
         return nearest_neigbours
     
-    def structure_plot(self, radius: float, filter: Optional[List[str]] = None, blocking: Optional[bool] = True) -> Union[None, Exception]:
+    def structure_plot(self, radius: float, filter: Optional[List[str]] = None) -> Union[None, Exception]:
         """
         Renders a 3D plot of a given radius around the central ion. A filter can be provided to only plot certain species.
 
@@ -307,8 +307,7 @@ class Interaction:
         
 
         def doped_structure_plot(self, radius: float, concentration: float, dopant: str = 'acceptor', filter: Optional[List[str]] = None) -> Union[None, Exception]:
-            #TODO clean up plotting & formatting to produce thesis quality pictures & add saving option.
-            #TODO port plotting to plotly
+
             """
             Generates a 3D scatter plot of the structure, with the central ion and its neighbors within a given radius.
 
