@@ -1,3 +1,4 @@
+
 <h1 align="center">PYET-MC</h1>
 <p align="center">
   <img width = "400" height = "400"  alt="pyet_logo" src="./images/pyet_logov1.svg">
@@ -27,6 +28,9 @@
     - [A note on caching](#a-note-on-caching)
     - [Adding your own energy transfer model](#adding-your-own-energy-transfer-model)
   - [Fitting experimental data to energy transfer models](#fitting-experimental-data-to-energy-transfer-models)
+    - [general fitting](#general-fitting)
+    - [weighted fitting examples](#weighted-fitting)
+  - [Plotting](#plotting)
   - [Troubleshooting](#troubleshooting)
 - [Referencing this project](#referencing-this-project)  
 - [License](#license)
@@ -34,7 +38,7 @@
 # Introduction
 Collection of tools for modelling the energy transfer processes in lanthanide-doped materials. 
 
-Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library.
+Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library. This library is based off the scripts initially written for studying multi-polar interactions between samarium ions in KY<sub>3</sub>F<sub>10</sub> [[1](#1)]
 # Road Map 
 - ~~Migrate a lot of the plotting functionality to plotly and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plotting) & [here](#fitting-experimental-data-to-energy-transfer-models).~~ ✅ 
 - Update structure figures to use Jmol colour palette. Correct atom colours are coming soon!.
@@ -66,7 +70,7 @@ Try to import pyet; assuming no error messages appear, pyet has been successfull
 ```python
 from pyet.structure import Structure, Interaction
 from pyet.fitting import Optimiser
-from pyet.pyet_utils import Trace
+from pyet.pyet_utils import Trace, cache_reader, cache_list, cache_clear
 from pyet.plotting import Plot
 ```
 # Usage 
@@ -75,7 +79,7 @@ from pyet.plotting import Plot
 Firstly, a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide .cif data. It is highly recommended as it provides additional functionality, such as XRD patterns. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
 We can create our structure with the following code. However, this may differ if you are using the materials project API. 
 ```python
- KY3F10 = Structure(cif_file= 'KY3F10_mp-2943_conventional_standard.cif')
+KY3F10 = Structure(cif_file= 'KY3F10_mp-2943_conventional_standard.cif')
 ```
 We then need to specify a central ion, to which all subsequent information will be calculated in relation to. 
 ```python
@@ -83,13 +87,15 @@ KY3F10.centre_ion('Y')
 ```
 This will set the central ion to be a Ytrrium ion and yield the following output:
 ```
-Central ion is Y
+central ion is [-5.857692   -5.857692   -2.81691722] Y
+with a nearest neighbour Y at 3.9837225383938777 angstroms
 ```
+This gives us the basic information about the host material. 
 Now we can request some information! We can now query what ions and how far away they are from that central ion within a given radius. 
 This can be done with the following:
 
 ```python
- KY3F10.nearest_neighbours_info(3.2)
+KY3F10.nearest_neighbours_info(3.2)
 ``` 
 Output:
 ```
@@ -119,7 +125,7 @@ Its worth noting here briefly, that due to the way the PyQT5 WebEngine/ App is b
 We can also specify a filter only to show ions we care about. For example, we may only care about the fluoride ions. 
 ```python
 if __name__ == "__main__":
-  filtered_ions = ['F']
+  filtered_ions = ['F, K']
 
   figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
   figure.show() 
@@ -130,7 +136,7 @@ This gives us a filtered plot:
 </p>
 
 
-In the future, the colours will be handled based on the ion, much like the materials project, this is a current work in progress.
+In the future, the colours will be handled based on the ion, much like the materials project, this is a current work in progress. For more general details on how to change these plots please read the documentation regarding configuring plots in pyet-mc [here](#plotting).
 ## Energy transfer models
 The energy transfer process can be modelled for a particular configuration of donor and acceptor ions with the following exponential function 
 here $t$ is time, $\gamma_r$ is the radiative decay rate and $\gamma_{tr,j}$ is the energy transfer rate for this confuration. Assuming a single-step multipole-multipole interaction (currently, the only model implemented), $\gamma_{tr,j}$ may be modelled as a sum over the transfer rates to all acceptors $\gamma_{tr,j}$ takes the form: 
@@ -216,18 +222,22 @@ We will need more iterations than just 20 for fitting, closer to 50,0000. If we 
 file found in cache, returning interaction components
 ```
 This is because I have already run this command, which has been cached. See the notes on caching [here](#a-note-on-caching).
-The sim returns a Numpy array of interaction components that matches the number of iterations and will be utilised in our fitting process next!
+The sim returns a Numpy array of interaction components that matches the number of iterations and will be utilised in our fitting process next! 
 
 We can then generate another set of interaction components for a 5% doped sample simply by changing the concentration
 ```python
 interaction_components5pct = crystal_interaction.sim_single_cross(radius=10, concentration = 5, interaction_type='DQ', iterations=50000)
 ```
+The crystal interaction simulation can also also accept the boolean flag `intrinsic = True`, this uses a modified formulation of the interaction components in the form $$\gamma_{tr,j} = C_{cr} \sum_i \left(\frac{1}{R_i}\right)^s.$$
+
+This gives us the energy transfer rate ($C_{cr}$) or average energy transfer rate ($\gamma_{av}$) in terms of a dopant ion 1 &#8491; from the donor ion. The relevance of this is for work regarding an intrinstic energy rate. It is set to false by default as it is not as relevant at this stage; however, in future it may be of interest. 
+
 ### Adding your own interaction model
 Adding your own model should be relatively straight forward. 
 In the above code, we call the: `.sim_single_cross` method. You can add a different interaction method simply by defining a new function that can inherit the properties of the `Interaction` class e.g. 
 
 ```python
-def sim_cooperative_energy_transfer(self, arg1, arg2):
+def sim_cooperative_energy_transfer(self, arg1, arg2, argn):
     # your code here
 
 crystal_interaction = Interaction(KY3F10) # as shown before 
@@ -242,25 +252,29 @@ As these calculations can be quite time-consuming for large iterations, and for 
 When first used, pyet will create a cache directory. All interaction simulations will cache their interaction components along with info regarding the simulation conditions in JSON format. The generated JSON file is named in the following convention:
 
 ```
-process_radius_concentration_interactiontype_iterations.json
+process_radius_concentration_interactiontype_iterations_intrinsic.json
+```
+Resulting in a file name: 
+```
+singlecross_20_2pt5_DQ_50000_intrinsic_False
 ```
 We can query and return the interaction components of the JSON file with the following code:
 ```python
 from pyet.pyet_utils import cache_reader, cache_clear, cache_list
 
-interaction_components2pt5pct = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ')
-interaction_components5pct =  cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ')
+interaction_components2pt5pct = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False)
+interaction_components5pct =  cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False)
 ```
 If what you have specified is not found in the cache, there will be a console log such as this:
 ```
 File not found, check your inputs or consider running a simulation with these parameters
 ```
-This will also return a None type, which must be handled accordingly, such as using a Python match statement. This will be shown in the following section. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
+This will also return a None type, which must be handled accordingly, such as using a Python match statement. However, most likely you won't run into this as the `Interaction..sim_single_cross()` method implements this before it runs anyway. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
 
 ```
 file found in cache, returning interaction components
 ```
-Following a major update to pyet, it is also recommended that you clear the cache in the event a bug is discovered in the existing code. This will be highlighted in any release notes.
+Following a major update to pyet-mc, it is also recommended that you clear the cache in the event a bug is discovered in the existing code. This will be highlighted in any release notes.
 
 This can be done using:
 ```python
@@ -288,23 +302,29 @@ Run "cache_clear()" to clear the cache
 
 
 ## Fitting experimental data to energy transfer models
-Fitting experimental lifetime transients to determine energy transfer parameters is the primary purpose of this library, and so it will utilise all the previous components covered. 
+Fitting experimental lifetime transients to determine energy transfer parameters is the primary purpose of this library, and so it will utilise all the previous components covered. Its core function is to allow for the simultanous fitting for multiple concentrations of crystals therefore tightly constraining the energy transfer and radiative decay rates.
 
+### General fitting
 Recalling our two dipole-quadrupole datasets previously for 2.5% and 5% doping, respectively, If you do not have these generated interaction components, please refer to [modelling energy transfer processes](#modelling-energy-transfer-processes). We can use them to generate some artificial data given some additional parameters. 
 For this particular model, we must provide it with four additional parameters: an amplitude, cross-relaxation rate ($C_{cr}$), a radiative decay rate, and horizontal offset. 
 
 ```python
-    #specify additional constants (the time based constants are in ms^-1)
-    const_dict1  = {'amplitude': 1 , 'energy_transfer': 3e7, 'radiative_decay' : 0.144, 'offset':0}
-    const_dict2  = {'amplitude': 1 , 'energy_transfer': 3e7, 'radiative_decay' : 0.144, 'offset': 0}
+#specify additional constants (the time based constants are in ms^-1)
+const_dict1  = {'amplitude': 1 , 'energy_transfer': 500, 'radiative_decay' : 0.144, 'offset':0}
+const_dict2  = {'amplitude': 1 , 'energy_transfer': 500, 'radiative_decay' : 0.144, 'offset': 0}
 ```
-We can generate some synthetic data and plot it:
+Note the units used here, the energy transfer and radiative rates are given in  $\text{ms}^{-1}$, it is more common to have these in $\text{s}^{-1}$, however here we are using $\text{ms}^{-1}$ for the purpose of generating data with a nice time scale.
+Now we can generate some synthetic data and plot it:
+
 ```python
 if __name__ == "__main__":
+    from pyet.fitting import general_energy_transfer
     # generate some random data
     time = np.arange(0,21,0.02) #1050 data points 0 to 21ms
+    #Generate some random data based on our provided constants and time basis
     data_2pt5pct = general_energy_transfer(time, interaction_components2pt5pct, const_dict1)
     data_5pct = general_energy_transfer(time, interaction_components5pct, const_dict2)
+    #Add some noise to make it more realistic
     rng = np.random.default_rng()
     noise = 0.01 * rng.normal(size=x.size)
     data_2pt5pct = data_2pt5pct + y_noise
@@ -316,50 +336,58 @@ if __name__ == "__main__":
     fig2.transient(data2)
     fig2.show()
 ```
-gives the following result: 
+
+
+which gives the following result: 
 <p align="center">
 <img width="700" alt="image" src="./images/generated_data.png">
 </p>
-as we would expect!
+
+as we would expect! To see more details on how plotting and the `Plot.transient()` method works please see the [plotting](#plotting) documentation.
 
 We can attempt to fit the parameters initially used to generate this data. Pyet provides a wrapper around the scipy.optimise library to simultaneously fit multiple data traces that _should_ have the same physical parameters, e.g. our radiative cross-relaxation rates, while allowing our offset and amplitude to vary independently. 
 
 We must first specify our independent and dependent parameters. We can achieve this by giving our variables either different (independent variables) or the same name (dependent variables)
 ```python
-    params2pt5pct = ['amp1', 'cr', 'rad', 'offset1']
-    params5pct = ['amp2', 'cr', 'rad', 'offset2']
+params2pt5pct = ['amp1', 'cr', 'rad', 'offset1']
+params5pct = ['amp2', 'cr', 'rad', 'offset2']
 ```
-We then construct a trace object that takes our experimental data, a label, and our interaction components 
+We then construct a trace object that takes our experimental data (e.g. signal, time), a label, and our interaction components 
 ```python
-    trace2pt5pct = Trace(params2pt5pct, time,  '2.5%', interaction_components2pt5pct)
-    trace5pct = Trace(params5pct, time, '5%', interaction_components5pct)
+    trace2pt5pct = Trace(data_2pt5pct, time,  '2.5%', interaction_components2pt5pct)
+    trace5pct = Trace(data_5pct, time, '5%', interaction_components5pct)
 ```
 These objects and our list of variables can be passed to the optimiser for fitting. 
 ```python
- opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
+opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
-We choose the default model, which is our energy transfer model discussed above. Note: This model can be supplemented with your own energy transfer model if it differs from the default model. 
+We choose the default model, which is our energy transfer model discussed above, and is the same model we used to generate the synthesic data. Note: This model can be supplemented with your own energy transfer model if it differs from the default model. 
 We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
-guess = {'amp1': 1, 'amp2': 1, 'cr': 2e7,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
+guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 ```
 As you can see, we only need to specify the unique set of parameters, in this case, six rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may only be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components are off. 
 
-Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the scipy.optimise methods and any other keywords, e.g. bounds or tolerance. 
+Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the `scipy.optimise` methods and any other keywords, e.g. bounds or tolerance. In future, I hope to simplify this to be able to use `scipy.optimise.least_squares` and the `scipy.optimise` global fitting methods to add more options for the fitting process.
 ```python
 res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
 ```
 This will return a dictionary of fitted parameters:
 ```
-resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311, 'cr': 30167580.555275, 'rad': 0.146633387615, 'offset1': 0.0013088082858218686, 'offset2': 0.00020609427517915668}
+resulting fitted params:{'amp1': 0.9969421233991949, 'amp2': 0.9974422375924311, 'cr': 497.555275, 'rad': 0.146633387615, 'offset1': 0.0013088082858218686, 'offset2': 0.00020609427517915668}
 ```
-Which is close to our given parameters and can be used to plot our final fitted results!
+Which is close to our given parameters and can be used to plot our final fitted results! There will also be some additional outputs regarding weightings, which is discussed [here](#weighted-fitting).
 
 ```python
 if __name__ == "__main__":
     fig = Plot()
     fig.transient(data1)
     fig.transient(data2)
+    #generate the data to show the fitted results 
+    rdict = res.x
+    
+    fit1 = general_energy_transfer(x, interact1, {'a': rdict['amp1'], 'b': rdict['cr'], 'c': rdict['rad'],'d': rdict['offset1']})
+    fit2 = general_energy_transfer(x, interact2, {'a': rdict['amp2'], 'b': rdict['cr'], 'c': rdict['rad'], 'd': rdict['offset2']})
     fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
     fig.transient(x,fit2, fit = True, name = 'fit 5%')
     fig.show()
@@ -368,6 +396,62 @@ Note, the `transient()` method can take either a `Trace` or `x, y` data. the opt
 <p align="center">
  <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/generated_data_fited.png">
 </p>
+
+### Weighted fitting
+There is also the ability to have the fitting process weight each trace differently, as well as adjust the weigthing of all traces when their length is not even. Take for example, the case where we have two traces of different length. We can generate this as before with some slight modifications.
+
+```python
+if __name__ == "__main__":
+    from pyet.fitting import general_energy_transfer
+    # generate some random data
+    time_1050 = np.arange(0,21,0.02) #1050 data points 0 to 21ms
+    time_525 = np.arange(0,21,0.04) #525 data points 0 to 21ms
+    #Generate some random data based on our provided constants and time basis
+    data_2pt5pct = general_energy_transfer(time_1050, interaction_components2pt5pct, const_dict1)
+    data_5pct = general_energy_transfer(time_525, interaction_components5pct, const_dict2)
+    #Add some noise to make it more realistic
+    rng = np.random.default_rng()
+    noise_1050 = 0.01 * rng.normal(size=time_1050.size)
+    noise_525 = 0.01 * rng.normal(size=time_525.size)
+    data_2pt5pct = data_2pt5pct + y_noise
+    data_5pct = data_5pct + y_noise
+```
+This is much the same as before but now we have two datasets of different lengths. If we try to fit this by trying to minimise the Residual Sum of Squares (RSS) (which this library uses) the fit would be intrinsicly biased to the dataset of longer length. We could instead use the Mean Squared Error (MSE) to account for this, but MSE is subject to biasing from outlier data. Instead, we add an appropriate weighting to the smaller datasets to that their contribution is proportional to that of the longer dataset. This method requires the assumption all data sets have a similar variance, which is fair for these kinds of measurements with good signal quality and high numbers of averages. This gives us a Weighted Residual Sum of Squares (WRSS) implementation. This re-weighting of data is implemented as a default method in the fitting optimiser class. So if we re-ran the fit with this new dataset we would see this output during the fit:
+
+```
+the weights of the 2.5% trace has been adjusted to 1.0
+the weights of the 5% trace has been adjusted to 2.0
+['amp1', 'amp2', 'cr', 'rad', 'offset1', 'offset2']
+Guess with initial params:{'amp1': 1, 'amp2': 1, 'cr': 100, 'rad': 0.5, 'offset1': 0, 'offset2': 0}
+Started fitting...
+```
+This aims to compensate for the discrepancy in the number of data points. However it can be turned off if it is not a desired feature simply by changing the instantiation of the optimiser to have `auto_weighting` set to `False`. 
+```python
+opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default', auto_weights = False)
+```
+
+There is also the ability to set a per-trace weighting to each `Trace` so that it intentionally biases the fitting process to try to either fit more or less to that data set. This is useful in the case where we have less than ideal data that we dont want to influence the fit or in the case we have ideal data that we want to fit more heavily to. To add a weighting factor to a trace it is as simple as declaring that when we create our `Trace` objects. Lets imagine the case where we want to weight our smaller dataset further for some contrived reason. We can simply add a weighting to that `Trace`. Note that by default the weighting is set to one. 
+```python
+```python
+trace2pt5pct = Trace(data_2pt5pct, time,  '2.5%', interaction_components2pt5pct)
+trace5pct = Trace(data_5pct, time, '5%', interaction_components5pct, weighting = 5)
+```
+
+This would yield the following when fitting:
+
+```
+the weights of the 2.5% trace have been adjusted to 1.0
+the weights of the 5% trace have been adjusted to 10.0
+['amp1', 'amp2', 'cr', 'rad', 'offset1', 'offset2']
+Guess with initial params:{'amp1': 1, 'amp2': 1, 'cr': 100, 'rad': 0.5, 'offset1': 0, 'offset2': 0}
+Started fitting..
+```
+As you can see, the weighting has actually been adjusted to 10; this is due to the automatic re-weighting ensuring the weighting we provide is a weighting for _equal_ datasets. If you don't want to use the automatic re-weighting but restain your weighting of `5` you can simply turn off automatic re-weighting as discussed.
+
+There is no right or wrong way to implement these weights, and should be addressed on a case-by-case basis, as they can heavily influence your fitted parameters.
+
+## Plotting
+
 
 # Troubleshooting
 - pyet is using too much memory:
@@ -382,3 +466,6 @@ Note, the `transient()` method can take either a `Trace` or `x, y` data. the opt
 To reference this project, you can use the citation tool in the About info of this repository. Details can also be found in the .cff file in the source code. 
 # License
 The project is licensed under the GNU GENERAL PUBLIC LICENSE.
+# References
+<a id="1">[1]</a> 
+J. L. B. Martin , M. F. Reid, and J-P. R. Wells. "Dipole–Quadrupole interactions between Sm<sup>3+</sup> ions in KY<sub>3</sub>F<sub>10</sub> nanocrystals." _Journal of Alloys and Compounds_ (2023):168394.
