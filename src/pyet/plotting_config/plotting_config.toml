@@ -13,19 +13,24 @@
     color = 'black'
 
   [default_layout.xaxis]
-    title = 'test'
+    title = 'Wavenumber (cm<sup>-1</sup>)'
     exponentformat = 'none'
     showgrid = false
     showline = true
     tickmode = 'linear'
     ticks = 'outside'
-    dtick = 50
     showticklabels = true
     linewidth = 4
     linecolor = 'black'
-    ticklen = 7.5
+    ticklen = 15
     tickwidth = 4
     tickcolor = 'black'
+
+    [default_layout.xaxis.minor]
+      ticks = 'outside'
+      ticklen = 7
+      showgrid = false
+
 
     [default_layout.xaxis.tickfont]
       family = 'Times new roman, monospace'
