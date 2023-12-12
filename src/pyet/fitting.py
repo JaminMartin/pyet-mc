@@ -89,7 +89,7 @@ class Optimiser:
            
             length_based_weight = max_length / len(trace.time)
             trace.weight *= length_based_weight
-            print(f'the weights of the {trace.name} trace has been adjusted to {trace.weight}')
+            print(f'the weights of the {trace.name} trace have been adjusted to {trace.weight}')
 
     def fit(self, guess: Dict,  *args, **kwargs) -> Dict:
         """
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     start = timer()
     #res = dict_opt(chi, guess, tol = 1e-12)
     x = np.arange(0,21,0.02)
-    x2 = np.arange(0,21,0.02)
+    x2 = np.arange(0,21,0.04)
     print(len(x))
     print(len(x2))
     y1 = general_energy_transfer(x, interact1, const_dict1)
@@ -190,11 +190,11 @@ if __name__ == "__main__":
     print ("Datageneration ran in %f s" % dt)   
 
 
-    data1 = Trace(ydata1, x,  '2.5%', interact1)
-    data2 = Trace(ydata2, x2, '5%', interact2)
+    data1 = Trace(ydata1, x,  '2.5%', interact1, weighting= 1)
+    data2 = Trace(ydata2, x2, '5%', interact2, weighting = 5)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
-    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default')
+    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default', auto_weights=True)
     guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
 
