@@ -276,7 +276,7 @@ If what you have specified is not found in the cache, there will be a console lo
 ```
 File not found, check your inputs or consider running a simulation with these parameters
 ```
-This will also return a None type, which must be handled accordingly, such as using a Python match statement. However, most likely you won't run into this as the `Interaction..sim_single_cross()` method implements this before it runs anyway. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
+This will also return a None type, which must be handled accordingly, such as using a Python match statement. However, most likely you won't run into this as the `Interaction.sim_single_cross()` method implements this before it runs anyway. If the query does return, it will return a Numpy array of our interaction components. In that case, the following is also displayed:
 
 ```
 file found in cache, returning interaction components
