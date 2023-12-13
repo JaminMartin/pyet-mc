@@ -31,6 +31,13 @@
     - [general fitting](#general-fitting)
     - [weighted fitting examples](#weighted-fitting)
   - [Plotting](#plotting)
+    - [Types of plots](#plot-types)
+      - [Spectra plots](#spectra-plots)
+      - [Transient plots](#transient-plots)
+      - [Structure plots](#structure-plots)
+    - [Configuring plots](#configuring-plots)
+   
+    - [Saving plots](#saving-plots)
   - [Troubleshooting](#troubleshooting)
 - [Referencing this project](#referencing-this-project)  
 - [License](#license)
@@ -44,8 +51,8 @@ Contains functions for visualising crystal structure around a central donor ion,
 - Update structure figures to use Jmol colour palette. Correct atom colours are coming soon!.
 - Move compute-heavy / memory-intensive functions to Rust for better performance.
 - Add more interaction types e.g., cooperative energy transfer and other more complex energy transfer processes. 
-- Add geometric correction factors and shield factors for various crystal structures and ions.
-- Add alternative to Monte Carlo methods (performance vs accuracy tests required).
+- Add geometric correction factors and shield factors for various crystal structures and ions [[2](#2)]. 
+- Add alternative to Monte Carlo methods e.g. the shell model(performance vs accuracy tests required). If successful the shell model could improve performance greatly [[3](#3),[4](#4)].
 - Move docs to MDbook for continuous integration.
 - Optional open-source database where results can be stored, retrieved, and rated based on data quality and fit, much like the ICCD crystallography database. 
 - Add more tests, this will be important as the project grows and other users want to add features. 
@@ -432,7 +439,6 @@ opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'd
 
 There is also the ability to set a per-trace weighting to each `Trace` so that it intentionally biases the fitting process to try to either fit more or less to that data set. This is useful in the case where we have less than ideal data that we dont want to influence the fit or in the case we have ideal data that we want to fit more heavily to. To add a weighting factor to a trace it is as simple as declaring that when we create our `Trace` objects. Lets imagine the case where we want to weight our smaller dataset further for some contrived reason. We can simply add a weighting to that `Trace`. Note that by default the weighting is set to one. 
 ```python
-```python
 trace2pt5pct = Trace(data_2pt5pct, time,  '2.5%', interaction_components2pt5pct)
 trace5pct = Trace(data_5pct, time, '5%', interaction_components5pct, weighting = 5)
 ```
@@ -451,8 +457,77 @@ As you can see, the weighting has actually been adjusted to 10; this is due to t
 There is no right or wrong way to implement these weights, and should be addressed on a case-by-case basis, as they can heavily influence your fitted parameters.
 
 ## Plotting
+The pyet-mc library comes with a built-in plotting library that 1. Provides a matplotlib style plotting wrapper for Plotly. It achieves this by rendering Plotlys `html + js` figures in a `Qt5 webengine` in a separate Python process. 
+It also provides sensible defaults for plotting the spectra, lifetimes and crystal structures that may be of use to people not taking advantage of the fitting functionality of this library. Lastly, it features a unique plotting configuration method to make your code more readable at more readily checked between peers without clutter associated with plotting configuration.
+### Plot types
+Currently there are three implemented plotting types. They are `spectra`, `transient` and `structure_3d` which are wrappers for Plotly's `go.Scatter()` and `go.Scatter3d` respectively. Where `transient` is specifically used for plotting lifetime data on a logscale. 
+#### Spectra plots
+A spectra plot is a simple x,y plot of spectroscopic data with sensible defaults. It will for example, automatically find an appropriate major and minor tick spacing. It defaults to using wavenumbers as the x axis as that is what we commonly use in our research group. This can be easily overridden, however (see [configuring plots](#configuring-plots)) the goal is to be able to produce fast plots of spectra with sensible defaults that can be stylized to your tastes after. 
+We can create a spectra plot simply with this code:
+```python
+from pyet.plotting import Plot
+from pyet.pyet_utils import random_spectra
+if __name__ == "__main__":
+    wavelengths = np.arange(400,450, 0.1) #generate some values between 400 and 450 nm
+    wavenumbers, signal = random_spectra(wavelengths, wavenumbers=True)
+    figure = Plot()
+    figure.spectra(x, y, name = 'an example') #give the data a name for the legend
+    figure.show()
+```
+
+which gives us the following figure:
+
+<p align="center">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/random_spectra_example.png">
+</p>
+
+#### Transient plots
+The figures plotted using the `transient` plot type have been shown extensively in the section on [fitting](#fitting-experimental-data-to-energy-transfer-models) however it is worth discussing the purpose and limitations of this plot type.
+
+The goal of this plot type is to quickly plot transients on an appropriate log scale for easy interpretation. It does however have its limitations. Currently in order to display the `y-axis` ticks and minor ticks correctly it assumes your data (or more likely your fit) is normalised to 1. It then plots ~3 orders of magnitude on the `y-axis` and the `x-axis` limits are set from zero to the maximum value of your data. The `x-axis` label default is milliseconds however, as was the case for the spectra plot this can be easily [reconfigured](#configuring-plots) to an appropriate time base.
+
+The `transient` plot type is designed to handel either `x,y` data as might be returned from the fitting process for example or it can take a `Trace`. This was to minimise code / data duplication. If you have defined a `Trace` for your data and given it a name, you can pass this in directly without having to worry about providng any `y` values. 
+#### Structure plots
+### Configuring plots
+The general layout of the `plotting_congfig.toml` file:
+```toml
+[spectra_layout]
+  title_text = ""
+  showlegend = true
+  title = ''
+  margin = { l = 50, r = 50, t = 20, b = 70 }
+  paper_bgcolor = "white"
+
+  [spectra_layout.font]
+    family = 'Times New Roman, monospace'
+    size = 20
+    color = 'black'
+
+  [spectra_layout.xaxis]
+    title = 'Wavenumber (cm<sup>-1</sup>)'
+    exponentformat = 'none'
+    showgrid = false
+    showline = true
+    tickmode = 'linear'
+    ticks = 'outside'
+    showticklabels = true
+    linewidth = 4
+    linecolor = 'black'
+    ticklen = 15
+    tickwidth = 4
+    tickcolor = 'black'
+```
 
 
+### Saving plots 
+Under the hood, pyet-mc's plotting library leverages plotly's saving method, therefore it is very simple to save a figure.
+We provide a save path and file name with the appropriate file extension (e.g. `.svg`, `.pdf` for a full list consult the plotly documentation [here](https://plotly.com/python/static-image-export/))
+```python
+path = '/path/to/store/'
+name = 'file.svg'
+figure.save(path, name)
+```
+If any errors arise from the plotting, it is again best to consult the Plotly documentation regarding [saving figures](https://plotly.com/python/static-image-export/), as it may require installing the `kaleido` package seperately from the 
 # Troubleshooting
 - pyet is using too much memory:
   - this is a known issue. Numpy does not seem to free up its arrays fast enough, so it can consume a lot of memory. For example, a 50,000 iteration interaction component and 15,000 time points will consume 60GB of memory. This is why this library does not use pre-allocation, as it is too easy to accidentally run out of memory and use swap memory, slowing things down further. I have a Rust implementation that does not suffer from this issue due to better memory management; This will be part of future releases.
@@ -468,4 +543,18 @@ To reference this project, you can use the citation tool in the About info of th
 The project is licensed under the GNU GENERAL PUBLIC LICENSE.
 # References
 <a id="1">[1]</a> 
-J. L. B. Martin , M. F. Reid, and J-P. R. Wells. "Dipole–Quadrupole interactions between Sm<sup>3+</sup> ions in KY<sub>3</sub>F<sub>10</sub> nanocrystals." _Journal of Alloys and Compounds_ (2023):168394.
+J.L.B. Martin, M.F. Reid, and J-P.R. Wells. Dipole–Quadrupole interactions between Sm<sup>3+</sup> ions in KY<sub>3</sub>F<sub>10</sub> nanocrystals. _Journal of Alloys and Compounds_ (2023).
+
+<a id="2">[2]</a> 
+ T. Luxbacher, H.P. Fritzer, J.P. Riehl, C.D. Flint. The angular dependence of the multipole–multipole interaction for energy transfer. _Theoretical Chemistry Accounts_ (1999).
+
+<a id="3">[3]</a> 
+ T. Luxbacher, H.P. Fritzer, C.D. Flint.  Competitive cross-relaxation and energy transfer within the shell model: The case of Cs<sub>2</sub>NaSm<sub>x</sub>Eu<sub>y</sub>Y<sub>1-x-y</sub>Cl<sub>6</sub>. _Journal of Luminescence_ (1997).
+
+
+<a id="4">[4]</a> 
+ T. Luxbacher, H.P. Fritzer, C.D. Flint. Competitive cross-relaxation and energy transfer in Cs<sub>2</sub>NaSm<sub>x</sub>Eu<subv>v</sub>Gd<sub>1-x-v</sub>Cl<sub>6</sub>. _Tunable Solid State Lasers_ (1997).
+
+
+
+<a id="5">[5]</a> 
