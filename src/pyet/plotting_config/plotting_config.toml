@@ -1,18 +1,18 @@
 # config.toml
 
-[default_layout]
+[spectra_layout]
   title_text = ""
   showlegend = true
   title = ''
   margin = { l = 50, r = 50, t = 20, b = 70 }
   paper_bgcolor = "white"
 
-  [default_layout.font]
+  [spectra_layout.font]
     family = 'Times New Roman, monospace'
     size = 20
     color = 'black'
 
-  [default_layout.xaxis]
+  [spectra_layout.xaxis]
     title = 'Wavenumber (cm<sup>-1</sup>)'
     exponentformat = 'none'
     showgrid = false
@@ -26,23 +26,23 @@
     tickwidth = 4
     tickcolor = 'black'
 
-    [default_layout.xaxis.minor]
+    [spectra_layout.xaxis.minor]
       ticks = 'outside'
       ticklen = 7
       showgrid = false
 
 
-    [default_layout.xaxis.tickfont]
+    [spectra_layout.xaxis.tickfont]
       family = 'Times new roman, monospace'
       size = 20
       color = 'black'
 
-    [default_layout.xaxis.titlefont]
+    [spectra_layout.xaxis.titlefont]
       family = 'Times new roman, monospace'
       size = 20
       color = 'black'
 
-  [default_layout.yaxis]
+  [spectra_layout.yaxis]
     title = 'Intensity (arb. units.)'
     exponentformat = 'none'
     showgrid = false
@@ -57,7 +57,7 @@
     linewidth = 4
     linecolor = 'black'
 
-    [default_layout.yaxis.titlefont]
+    [spectra_layout.yaxis.titlefont]
       family = 'Times new roman, monospace'
       size = 20
       color = 'black'
