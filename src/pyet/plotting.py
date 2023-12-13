@@ -138,12 +138,14 @@ class Plot:
             'mode': 'lines',
             'line': {
         'color': 'black',  
-        'width': 3  
-    }}
+        'width': 3 }}
         
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
-                default_trace_options[key].update(value)
+                if isinstance(default_trace_options[key], dict):
+                    default_trace_options[key].update(value)
+                else:
+                    default_trace_options[key] = value
             else:
                 default_trace_options[key] = value
        
@@ -180,7 +182,10 @@ class Plot:
 
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
-                default_trace_options[key].update(value)
+                if isinstance(default_trace_options[key], dict):
+                    default_trace_options[key].update(value)
+                else:
+                    default_trace_options[key] = value
             else:
                 default_trace_options[key] = value
 
@@ -222,7 +227,10 @@ class Plot:
         }
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
-                default_trace_options[key].update(value)
+                if isinstance(default_trace_options[key], dict):
+                    default_trace_options[key].update(value)
+                else:
+                    default_trace_options[key] = value
             else:
                 default_trace_options[key] = value
         
@@ -370,12 +378,12 @@ class Plot:
         
 
 if __name__ == "__main__":
-    margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
-    figure = Plot(margin = margins)
+    #margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
+    # figure = Plot()
     
-    figure.structure_3d([0,1,2],[0,5,2],[0,1,5])
-    figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='yttrium', marker={'size': 10})
-    figure.show()
+    # figure.structure_3d([0,1,2],[0,5,2],[0,1,5], name = 'Si')
+    # figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='Y')
+    # figure.show()
     # margins = {'l': 30, 'r': 0, 't': 30, 'b': 30} 
     # x = [0,2,3,4,6,7,8,9,10]
     # y = [11,12,13,14,15,16,17,18,19]
@@ -389,12 +397,14 @@ if __name__ == "__main__":
     # figure2.spectra(x, y, name = 'an example')
     # figure2.show()
 
-    load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
+    #load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
     wavelengths = np.arange(400,450, 0.1) #generate some values between 400 and 450 nm
     wavenumbers, signal = random_spectra(wavelengths, wavenumbers=True)
-    figure1 = Plot()
-    figure1.spectra(wavenumbers, signal, name = 'an example') #give the data a name for the legend
+    x_range = [23000,23500]
+    ticks = 50
+    figure1 = Plot(xaxis={'range': x_range,'dtick': 100,})
+    figure1.spectra(wavenumbers, signal, name='an example', mode='markers', marker={'color': 'red'}) 
     figure1.show()
     path = '/Users/jamin/Documents/'
     name = 'temp2.svg'
-    figure1.save(path, name)
+    #figure1.save(path, name)
