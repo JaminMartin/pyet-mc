@@ -107,7 +107,7 @@ class Optimiser:
         print(keys)
         print(f'Guess with initial params:{guess}')
         print('Started fitting...')
-        fn = self.chi
+        fn = self.wrss
         self.result = scipy.optimize.minimize(
             
             lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
@@ -125,20 +125,20 @@ class Optimiser:
         return self.result
 
             
-    def chi(self,dictionary):
+    def wrss(self,dictionary):
         """
-        The chi method calculates the chi-squared value for the current set of parameters.
+        The wrss method calculates the weighted reduced sum of squares value for the current set of parameters.
 
         Parameters:
         dictionary (dict): A dictionary containing the current set of parameters.
 
         Returns:
-        ch (float): The calculated chi-squared value.
+        rs (float): The calculated weighted reduced sum of squares value.
         """
 
         total_traces = len(self.traces)
 
-        ch = 0
+        rs = 0
         
         
         for j in range(total_traces):
@@ -149,18 +149,16 @@ class Optimiser:
             #print(temp_dict)
 
             #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
-            ch += self.traces[j].weight * np.sum(((self.model(self.traces[j].time, self.traces[j].radial_data, temp_dict) - self.traces[j].trace)**2))
+            rs += self.traces[j].weight * np.sum(((self.model(self.traces[j].time, self.traces[j].radial_data, temp_dict) - self.traces[j].trace)**2))
             
         #print(ch)
-        return ch
+        return rs
 
 
 
 
                 
 
-             
-#TODO add plot rendering & output logging to fitting
 
 if __name__ == "__main__":
 # testing 
@@ -190,8 +188,8 @@ if __name__ == "__main__":
     print ("Datageneration ran in %f s" % dt)   
 
 
-    data1 = Trace(ydata1, x,  '2.5%', interact1, weighting= 1)
-    data2 = Trace(ydata2, x2, '5%', interact2, weighting = 5)
+    data1 = Trace(ydata1, x,  '2.5%', interact1, weighting= 10)
+    data2 = Trace(ydata2, x2, '5%', interact2)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default', auto_weights=True)
