@@ -12,7 +12,7 @@ import pkg_resources
 import os
 import sys
 import numpy as np
-from .pyet_utils import Trace
+from .pyet_utils import Trace , random_spectra
 import copy
 from typing import Union
 
@@ -65,14 +65,14 @@ class Plot:
     Attributes:
         fig (Figure): The plot figure.
         plot_type (str): The type of the plot. Default is 'default'.
-        default_layout (dict): The default layout for the plot.
+        default_spectra_layout (dict): The default layout for the plot.
         default_transient_layout (dict): The default layout for a transient plot.
-        default_scatter3d_layout (dict): The default layout for a 3D scatter plot.
+        default_structure3d_layout (dict): The default layout for a 3D scatter plot.
         layout (dict): The layout keyword arguments provided when initializing the class.
 
     Methods:
         __init__(self, **layout_kwargs): Initializes the Plot class and updates the default layouts with any provided layout keyword arguments.
-        scatter_xy(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs): Creates a scatter plot with the given x and y data.
+        spectra(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs): Creates a scatter plot with the given x and y data.
         transient(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list, None] = None, fit: bool =False, *args, **plotting_kwargs): Creates a transient plot with the given x and y data.
         structure_3d(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], z: Union[np.ndarray, list], *args, **plotting_kwargs): Creates a 3D scatter plot with the given x, y, and z data.
         calculate_nice_round_number(self, value: Union[float, int]): Calculates a nice round number that is a factor of the given value.
@@ -91,32 +91,32 @@ class Plot:
         """
         self.fig = go.Figure()
         self.plot_type = 'default'
-        self.default_layout = copy.deepcopy(config.get("default_layout", {}))
+        self.default_spectra_layout = copy.deepcopy(config.get("spectra_layout", {}))
         self.default_transient_layout = copy.deepcopy(config.get("transient_layout", {}))
-        self.default_scatter3d_layout = copy.deepcopy(config.get("structure_3d_layout", {}))
-
+        self.default_structure3d_layout = copy.deepcopy(config.get("structure_3d_layout", {}))
+            
         self.layout = layout_kwargs
 
 
         # Update any specified keys in the default layout with the provided values
         for key, value in layout_kwargs.items():
-            if key in self.default_layout:
-                self.default_layout[key].update(value)
+            if key in self.default_spectra_layout:
+                self.default_spectra_layout[key].update(value)
             else:
-                self.default_layout[key] = value
+                self.default_spectra_layout[key] = value
         
             if key in self.default_transient_layout:
                 self.default_transient_layout[key].update(value)
             else:
                 self.default_transient_layout[key] = value
 
-            if key in self.default_scatter3d_layout:
-                self.default_scatter3d_layout[key].update(value)
+            if key in self.default_structure3d_layout:
+                self.default_structure3d_layout[key].update(value)
             else:
-                self.default_scatter3d_layout[key] = value
+                self.default_structure3d_layout[key] = value
       
 
-    def scatter_xy(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs) -> None:
+    def spectra(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs) -> None:
         """
         Create a scatter plot with the given x and y data.
 
@@ -136,7 +136,10 @@ class Plot:
         # Set default scatter trace options
         default_trace_options = {
             'mode': 'lines',
-            }
+            'line': {
+        'color': 'black',  
+        'width': 3  
+    }}
         
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
@@ -265,7 +268,7 @@ class Plot:
 
         x_min, x_max = float('inf'), float('-inf')
         y_min, y_max = float('inf'), float('-inf')
-
+        z_min, z_max = float('inf'), float('-inf')
         for trace in self.fig.data:
             # Check if x is not empty or None
             if trace.x is not None and len(trace.x) > 0:
@@ -282,14 +285,18 @@ class Plot:
                 # Only update the layout bounds if they are not set in layout_kwargs
             if 'xaxis' not in self.layout or 'range' not in self.layout['xaxis']:
                 self.default_transient_layout['xaxis']['range'] = [0, x_max]
-                self.default_layout['xaxis']['range'] = [x_min, x_max]
+                self.default_spectra_layout['xaxis']['range'] = [x_min, x_max]
+                #self.default_structure3d_layout['scene']['xaxis']['range'] = [x_min-10, x_max+10]
             if 'yaxis' not in self.layout or 'range' not in self.layout['yaxis']:
                 self.default_transient_layout['yaxis']['range'] = [np.log(0.1), np.log(1)]
+                #self.default_structure3d_layout['scene']['yaxis']['range'] = [y_min-10, y_max+10]
+            #if 'zaxis' not in self.layout or 'range' not in self.layout['zaxis']:
+                #self.default_structure3d_layout['scene']['zaxis']['range'] = [z_min-10, z_max+10]
             if 'xaxis' not in self.layout or 'dtick' not in self.layout['xaxis']:
                 x_range = x_max - x_min
                 dtick = self.calculate_nice_round_number(x_range)
                 self.default_transient_layout['xaxis']['dtick'] = dtick
-                self.default_layout['xaxis']['dtick'] = dtick    
+                self.default_spectra_layout['xaxis']['dtick'] = dtick    
 
 
     def show(self):
@@ -308,7 +315,7 @@ class Plot:
         if self.plot_type == 'default':
             # Set default layout options
             self.update_layout_bounds()
-            self.fig.update_layout(**self.default_layout)
+            self.fig.update_layout(**self.default_spectra_layout)
 
         elif self.plot_type == 'transient':
             self.update_layout_bounds()
@@ -316,11 +323,11 @@ class Plot:
             self.fig.update_yaxes(type="log")  
 
         elif self.plot_type == 'structure_3d':  
-
-            self.fig.update_layout(**self.default_scatter3d_layout)
+            #self.update_layout_bounds()
+            self.fig.update_layout(**self.default_structure3d_layout)
         else:
             print('invalid plot type, defaulting to default')  
-            self.fig.update_layout(**self.default_layout)
+            self.fig.update_layout(**self.default_spectra_layout)
 
     
         # Use the system's temporary directory
@@ -363,28 +370,30 @@ class Plot:
         
 
 if __name__ == "__main__":
-    # margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
-    # figure = Plot(margin = margins)
+    margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
+    figure = Plot(margin = margins)
     
-    # figure.structure_3d([0,1,2],[0,5,2],[0,1,5])
-    # figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='yttrium', marker={'size': 10})
-    # figure.show()
-    margins = {'l': 30, 'r': 0, 't': 30, 'b': 30} 
-    x = [0,2,3,4,6,7,8,9,10]
-    y = [11,12,13,14,15,16,17,18,19]
-    x2 = [5,6,74,8,99,83,91,100]
-    y2 = [11,12,13,14,15,16,17,18,19]
-    # # Example usage
-    x_range = [0,50]
-    y_range = [0,1000]
-    margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
-    figure2= Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
-    figure2.scatter_xy(x, y, name = 'an example')
-    figure2.show()
+    figure.structure_3d([0,1,2],[0,5,2],[0,1,5])
+    figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='yttrium', marker={'size': 10})
+    figure.show()
+    # margins = {'l': 30, 'r': 0, 't': 30, 'b': 30} 
+    # x = [0,2,3,4,6,7,8,9,10]
+    # y = [11,12,13,14,15,16,17,18,19]
+    # x2 = [5,6,74,8,99,83,91,100]
+    # y2 = [11,12,13,14,15,16,17,18,19]
+    # # # Example usage
+    # x_range = [0,50]
+    # y_range = [0,1000]
+    # margins = {'l': 100, 'r': 100, 't': 100, 'b': 100}
+    # figure2= Plot(xaxis={'range': x_range, 'dtick': 50}, yaxis={'range': y_range}, margin=margins)
+    # figure2.spectra(x, y, name = 'an example')
+    # figure2.show()
 
     load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
+    wavelengths = np.arange(400,450, 0.1) #generate some values between 400 and 450 nm
+    wavenumbers, signal = random_spectra(wavelengths, wavenumbers=True)
     figure1 = Plot()
-    figure1.scatter_xy(x, y, name = 'an example')
+    figure1.spectra(wavenumbers, signal, name = 'an example') #give the data a name for the legend
     figure1.show()
     path = '/Users/jamin/Documents/'
     name = 'temp2.svg'
