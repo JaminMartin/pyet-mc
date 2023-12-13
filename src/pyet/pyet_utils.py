@@ -3,7 +3,8 @@ import sys
 import json
 import numpy as np
 import glob
-
+import random as rd
+import scipy.stats as stats
 cache_dir_path = os.path.join(os.path.dirname(__file__), 'cache')
 
 if not os.path.exists(cache_dir_path):
@@ -133,6 +134,32 @@ def cache_list():
     print('#============================#')
 
 
+
+def Gamma2sigma(Gamma: float) -> float:
+    '''Function to convert FWHM (Gamma) to standard deviation (sigma) for stats.norm'''
+    return Gamma * np.sqrt(2) / ( np.sqrt(2 * np.log(2)) * 2 )
+
+def random_spectra(wavelength: np.ndarray, wavenumbers: bool = False) -> np.ndarray: 
+    
+    #generates a random spectra (optimised for nm) for the scaned wavelength range. Generates 5 peaks, though they may not be resolved
+
+    sigma1 = Gamma2sigma(rd.uniform(0.1, 5)) 
+    sigma2 = Gamma2sigma(rd.uniform(0.1, 5)) 
+    sigma3 = Gamma2sigma(rd.uniform(0.1, 5)) 
+    sigma4 = Gamma2sigma(rd.uniform(0.1, 5)) 
+    sigma5 = Gamma2sigma(rd.uniform(0.1, 5)) 
+
+
+    LINE1 = stats.norm.pdf(wavelength,rd.uniform(np.min(wavelength)+10,np.max(wavelength)-10), sigma1) * 1000
+    LINE2 = stats.norm.pdf(wavelength,rd.uniform(np.min(wavelength)+10,np.max(wavelength)-10), sigma2) * 1000 
+    LINE3 = stats.norm.pdf(wavelength,rd.uniform(np.min(wavelength)+10,np.max(wavelength)-10), sigma3) * 1000
+    LINE4 = stats.norm.pdf(wavelength,rd.uniform(np.min(wavelength)+10,np.max(wavelength)-10), sigma4) * 1000 
+    LINE5 = stats.norm.pdf(wavelength,rd.uniform(np.min(wavelength)+10,np.max(wavelength)-10), sigma5) * 1000
+    LINE_TOT = LINE1 + LINE2 + LINE3 + LINE4 + LINE5
+
+    if wavenumbers:
+       wavelength = (1 / wavelength) * 10_000_000
+    return wavelength, LINE_TOT
 
 if __name__ == "__main__":
     
