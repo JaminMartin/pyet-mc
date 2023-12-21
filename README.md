@@ -132,7 +132,7 @@ It's worth noting here briefly that due to the way the PyQT5 WebEngine/ App is b
 We can also specify a filter only to show ions we care about. For example, we may only care about the fluoride ions. 
 ```python
 if __name__ == "__main__":
-  filtered_ions = ['F, K']
+  filtered_ions = ['F', 'K']
 
   figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
   figure.show() 
