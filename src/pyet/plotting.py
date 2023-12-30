@@ -15,8 +15,11 @@ import numpy as np
 from .pyet_utils import Trace , random_spectra
 import copy
 from typing import Union
+import pandas as pd
 
 config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
+jmol_file = pkg_resources.resource_filename(__name__, 'plotting_config/ion_colours.csv')
+jmol_data = pd.read_csv(jmol_file)
 
 with open(config_file, "r") as f:
     config = toml.load(f)
@@ -39,6 +42,14 @@ def run_app(file_path: str) -> None:
     web.load(QUrl.fromLocalFile(file_path))
     web.show()
     app.exec_()
+
+def get_colours(ion:str) -> Union[str,None]:
+    
+    colour = jmol_data.loc[jmol_data['Ion'] == ion, 'Colour']
+    if not colour.empty:
+        return colour.values[0]
+    else:
+        return None
 
 def load_local_config(local_config_path: str) -> None:
     """
@@ -397,7 +408,7 @@ if __name__ == "__main__":
     # figure2.spectra(x, y, name = 'an example')
     # figure2.show()
 
-    #load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
+    load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
     wavelengths = np.arange(400,450, 0.1) #generate some values between 400 and 450 nm
     wavenumbers, signal = random_spectra(wavelengths, wavenumbers=True)
     x_range = [23000,23500]

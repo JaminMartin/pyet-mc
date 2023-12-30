@@ -6,7 +6,7 @@ import pandas as pd
 from . import pyet_utils
 import os
 from typing import Union, Optional, List
-from .plotting import Plot
+from .plotting import Plot, get_colours
 class Structure:
     '''
     A class for handling the structural info of a host crystal. A central ion, e.g. a Ytrrium ion must be specified for the associated methods to work. Once this ion has been specified the nearest neigbour ions can be calculated. This can either return cartesian or spherical polar coordinates for further calculations or plotting. There is also a simple function for printing off this information for a quick analyis. Lastly this class provides plotting functionality directly for visualisation purposes. 
@@ -169,7 +169,7 @@ class Structure:
             DataFrameDict[key] = coords_xyz[:][coords_xyz.species == key]
         
         fig = Plot()
-        fig.structure_3d(np.array(self.origin[0],self.origin[0]) ,np.array(self.origin[1],self.origin[1]) ,np.array(self.origin[2],self.origin[2]), name=f'central {self.centre_ion_species} ion')
+        fig.structure_3d(np.array(self.origin[0],self.origin[0]) ,np.array(self.origin[1],self.origin[1]) ,np.array(self.origin[2],self.origin[2]), name=f'central {self.centre_ion_species} ion', marker={'color': 'black'})
         if filter is not None:
             if not isinstance(filter, list):
                 raise TypeError('Filter must be a list of strings.')
@@ -182,12 +182,14 @@ class Structure:
         if filter == None:
             for i in range(len(UniqueNames)):
                 temp = DataFrameDict[UniqueNames[i]]
-                fig.structure_3d(temp.x, temp.y, temp.z, name=UniqueNames[i])    
+                colour = get_colours(UniqueNames[i])
+                fig.structure_3d(temp.x, temp.y, temp.z, name=UniqueNames[i], marker={'color': colour})    
         else:
          
             for i in range(len(filter)):
                 temp = DataFrameDict[filter[i]] 
-                fig.structure_3d(temp.x, temp.y, temp.z, name=filter[i])   
+                colour = get_colours(filter[i])
+                fig.structure_3d(temp.x, temp.y, temp.z, name=filter[i], marker={'color': colour})   
         
         return fig
 
@@ -341,17 +343,19 @@ class Interaction:
                 DataFrameDict[key] = result[:][result.species == key]
             
             fig = Plot()
-            fig.structure_3d(np.array(self.structure.origin[0],self.structure.origin[0]) ,np.array(self.structure.origin[1],self.structure.origin[1]) ,np.array(self.structure.origin[2],self.structure.origin[2]), name=f'central {self.structure.centre_ion_species} ion')
+            fig.structure_3d(np.array(self.structure.origin[0],self.structure.origin[0]) ,np.array(self.structure.origin[1],self.structure.origin[1]) ,np.array(self.structure.origin[2],self.structure.origin[2]), name=f'central {dopant} ion',  marker={'color':'black'})
             if filter == None:
                 for i in range(len(UniqueNames)):
                     temp = DataFrameDict[UniqueNames[i]]
-                    fig.structure_3d(temp.x, temp.y, temp.z, name=UniqueNames[i])  
+                    colour = get_colours(UniqueNames[i])
+                    fig.structure_3d(temp.x, temp.y, temp.z, name=UniqueNames[i], marker={'color': colour})  
      
             else:
                 try:
                     for i in range(len(filter)):
                         temp = DataFrameDict[filter[i]] 
-                        fig.structure_3d(temp.x, temp.y, temp.z, name=filter[i]) 
+                        colour = get_colours(filter[i])
+                        fig.structure_3d(temp.x, temp.y, temp.z, name=filter[i], marker={'color': colour}) 
                 except:
                     print('Failed to plot. Filter must be in type "list of strings"')
                     pass
@@ -365,21 +369,22 @@ if __name__ == "__main__":
     cif_file = os.path.join(cif_dir, 'KY3F10_mp-2943_conventional_standard.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y')
-    #filtered_ions = ['F']
-    #figure = KY3F10.structure_plot(5, filter = filtered_ions)  
+    filtered_ions = ['K', 'F']
+    figure = KY3F10.structure_plot(5,filtered_ions)  
 
-    #figure.show()
+    figure.show()
     # # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     # # #print(rslt_df)
 
-    crystal_interaction = Interaction(KY3F10)
+    #crystal_interaction = Interaction(KY3F10)
 
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     # # #print(coords)
     # # #print(crystal_interaction.filtered_coords)
-    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=10, interaction_type= 'DQ')
+    #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=10, interaction_type= 'DQ', intrinsic=True)
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
     # # #print(interaction_components)
-    #figure2 = Interaction(KY3F10).doped_structure_plot(radius=10.0, concentration = 20.0 , dopant = 'Sm' )
-    #figure2.show()
+    filtered_ions = ['Sm', 'Y']
+    figure2 = Interaction(KY3F10).doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Sm', 'Y'])
+    figure2.show()
     # # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')

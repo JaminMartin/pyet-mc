@@ -48,7 +48,7 @@ Collection of tools for modelling the energy transfer processes in lanthanide-do
 Contains functions for visualising crystal structure around a central donor ion, subroutines for nearest neighbour probabilities and monte-carlo based multi-objective fitting for energy transfer rates. This package aims to streamline the fitting process while providing useful tools to obtain quick structural information. The core function of this library is the ability to simultaneously fit lifetime data for various concentrations to tie down energy transfer rates more accurately. This allows one to decouple certain dataset features, such as signal offset/amplitude, from physical parameters, such as radiative and energy transfer rates. This is all handled by a relatively straightforward API wrapping the Scipy Optimise library. This library is based on the scripts initially written for studying multi-polar interactions between samarium ions in KY<sub>3</sub>F<sub>10</sub> [[1](#1)]
 # Road Map 
 - ~~Migrate a lot of the plotting functionality to `Plotly` and wrap it in a matplotlib-like GUI. This work has started, an example of this transition can be found [here](#generating-a-structure--plotting) & [here](#fitting-experimental-data-to-energy-transfer-models).~~ ✅ 
-- Update structure figures to use Jmol colour palette. Correct atom colours are coming soon!
+- ~~Update structure figures to use Jmol colour palette. Correct atom colours are coming soon!~~
 - Move compute-heavy / memory-intensive functions to Rust for better performance.
 - Add more interaction types, e.g., cooperative energy transfer and other more complex energy transfer processes. 
 - Add geometric correction factors and shield factors for various crystal structures and ions [[2](#2)]. 
@@ -125,7 +125,7 @@ if __name__ == "__main__":
 ```
 Which yields the following figure:
 <p align="center">
- <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/crystal.png">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/crystal_jmol.png">
 </p>
 
 It's worth noting here briefly that due to the way the PyQT5 WebEngine/ App is being rendered using the multiprocessing library, it is essential to include the `if __name__ == "__main__":` block. Unfortunately, until a different backend for rendering the `Plotly` `.html` files that also support `javascript` this has to stay.
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 ```
 This gives us a filtered plot:
 <p align="center">
- <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/filtered_crystal.png">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/filtered_crystal_jmol.png">
 </p>
 
 
@@ -209,13 +209,13 @@ As we can see, some of the yttrium ions have been replaced by samarium ions, as 
 We can also plot this to see what is happening visually; the interaction class has similar plotting functionality. 
 ```python
 if __name__ == "__main__":
-  figure = crystal_interaction.doped_structure_plot(radius=10.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+  figure = crystal_interaction.doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Y','Sm'])
   figure.show()
 ```
 
 yielding the following figure:
 <p align="center">
- <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/doped_crystal.png">
+ <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/crystal_doped_jmol.png">
 </p>
 
 We can now calculate our interaction component for each random doping configuration. This is handled by the sim method, which currently is referred to as sim_single_cross as it is the only implemented method at the time of writing. However, it is possible to add your own by wrapping 'distance_method' described above for cooperative processes, for example. 
