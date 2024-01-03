@@ -26,7 +26,7 @@
   - [Energy transfer models](#energy-transfer-models)
     - [Modelling energy transfer processes](#modelling-energy-transfer-processes)
     - [A note on caching](#a-note-on-caching)
-    - [Adding your own energy transfer model](#adding-your-own-energy-transfer-model)
+    - [Adding your own interaction model](#adding-your-own-interaction-model)
   - [Fitting experimental data to energy transfer models](#fitting-experimental-data-to-energy-transfer-models)
     - [general fitting](#general-fitting)
     - [weighted fitting examples](#weighted-fitting)
