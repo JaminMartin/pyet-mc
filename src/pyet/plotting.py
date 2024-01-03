@@ -16,6 +16,7 @@ from .pyet_utils import Trace , random_spectra
 import copy
 from typing import Union
 import pandas as pd
+import re
 
 config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
 jmol_file = pkg_resources.resource_filename(__name__, 'plotting_config/ion_colours.csv')
@@ -44,6 +45,8 @@ def run_app(file_path: str) -> None:
     app.exec_()
 
 def get_colours(ion:str) -> Union[str,None]:
+    # Remove the charge and any numbers from the ion string
+    ion = re.sub(r'[0-9\+|-].*', '', ion)
     
     colour = jmol_data.loc[jmol_data['Ion'] == ion, 'Colour']
     if not colour.empty:
