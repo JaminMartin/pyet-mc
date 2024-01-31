@@ -1,8 +1,5 @@
 import plotly.graph_objs as go
 import plotly.offline
-from PyQt5.QtCore import QUrl
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QApplication
 import plotly.io as pio
 from multiprocessing import Process
 import tempfile
@@ -17,34 +14,39 @@ import copy
 from typing import Union
 import pandas as pd
 import re
+import webview
 
+# Load configuration and ion colours data
 config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
 jmol_file = pkg_resources.resource_filename(__name__, 'plotting_config/ion_colours.csv')
 jmol_data = pd.read_csv(jmol_file)
-
+# Load the configuration file
 with open(config_file, "r") as f:
     config = toml.load(f)
 
 
-def run_app(file_path: str) -> None:
+def run_webview(temp_file_path: str) -> None:
     """
-    Run a Qt application to display a web page from a local file.
+    Create and start a webview window.
 
-    This function creates a QApplication and a QWebEngineView, loads the web page from the specified local file into the QWebEngineView, shows the QWebEngineView, and then starts the QApplication event loop.
+    Args:
+        temp_file_path (str): The path to the temporary file to be displayed in the webview window.
+    """
+    window = webview.create_window('pyet-mc viewer', temp_file_path)
+    webview.start()
+    
+def get_colours(ion:str) -> Union[str,None]:
+    """
+    Get the colour associated with a given ion.
 
-    Parameters:
-        file_path (str): The path to the local file to display in the QWebEngineView.
+    The ion string is cleaned by removing any numbers and charges (+ or -) before looking up the colour.
+
+    Args:
+        ion (str): The ion to get the colour for.
 
     Returns:
-        None
+        str: The colour associated with the ion, if found. Otherwise, None.
     """
-    app = QApplication(sys.argv)
-    web = QWebEngineView()
-    web.load(QUrl.fromLocalFile(file_path))
-    web.show()
-    app.exec_()
-
-def get_colours(ion:str) -> Union[str,None]:
     # Remove the charge and any numbers from the ion string
     ion = re.sub(r'[0-9\+|-].*', '', ion)
     
@@ -360,10 +362,8 @@ class Plot:
         with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
             self.temp_file_path = os.path.abspath(temp.name)
             plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=False)
-
-            # Start the process using self.temp_file_path
-            self.process = Process(target=run_app, args=(self.temp_file_path,))
-            self.process.start()
+            p = Process(target=run_webview, args=(self.temp_file_path,))
+            p.start()
 
     def save(self, path: str, name: str) -> None:
         """
