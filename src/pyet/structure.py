@@ -36,7 +36,7 @@ class Structure:
         """
         try:
             self.cif = CifParser(cif_file)
-            self.struct = self.cif.get_structures()[0]
+            self.struct = self.cif.parse_structures()[0]
         except:
             print('Invalid or no CIF file provided')
           
@@ -322,18 +322,20 @@ class Interaction:
             Returns:
             None. The function directly plots the 3D structure using matplotlib.
             """
+
+            
             concentration = concentration / 100
             coords = self.structure.nearest_neighbours_coords(radius)
             filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])]
          
-            coords = coords.drop(coords.index[coords['species'] == 'Y'])
+            coords = coords.drop(coords.index[coords['species'] == self.structure.centre_ion_species])
            
             for i in filtered_coords.index:
         
                 if np.random.rand() < concentration:
                     filtered_coords.loc[i, 'species'] = dopant
            
-
+         
             frames = [coords, filtered_coords]
 
             result = pd.concat(frames)
@@ -366,13 +368,15 @@ if __name__ == "__main__":
 
     # Get the absolute path of the ciffiles directory
     cif_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cif_files'))
-    cif_file = os.path.join(cif_dir, 'KY3F10_mp-2943_conventional_standard.cif')
+    cif_file = os.path.join(cif_dir, 'KY3F10.cif')
     KY3F10 = Structure(cif_file= cif_file)
-    KY3F10.centre_ion('Y')
-    filtered_ions = ['K', 'F']
-    figure = KY3F10.structure_plot(5,filtered_ions)  
-
+    KY3F10.centre_ion('Y3+')
+    filtered_ions = ['K+', 'F-']
+    figure = KY3F10.structure_plot(7, filter=filtered_ions)  
+    
     figure.show()
+    KY3F10.nearest_neighbours_info(6)
+
     # # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     # # #print(rslt_df)
 
@@ -384,7 +388,8 @@ if __name__ == "__main__":
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=10, interaction_type= 'DQ', intrinsic=True)
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
     # # #print(interaction_components)
-    filtered_ions = ['Sm', 'Y']
-    figure2 = Interaction(KY3F10).doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Sm', 'Y'])
+    filtered_ions = ['Sm3+','Y3+']
+    figure2 = Interaction(KY3F10).doped_structure_plot(radius=7, concentration = 25.0 , dopant = 'Sm3+', filter = filtered_ions)
     figure2.show()
     # # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
+
