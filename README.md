@@ -84,18 +84,18 @@ from pyet.plotting import Plot
 
 ## Generating a structure & plotting
 Firstly, a .cif file must be provided. How you provide this .cif file is up to you! We will take a .cif file from the materials project website for this example. However, they also provide a convenient API that can also be used to provide .cif data. It is highly recommended as it provides additional functionality, such as XRD patterns. Information on how to access this API can be found here https://next-gen.materialsproject.org/api. 
-We can create our structure with the following code. However, this may differ if you are using the materials project API. 
+We can create our structure with the following code. However, this may differ if you are using the materials project API. It is also important to ensure your .cif file is using the conventional standard. 
 ```python
-KY3F10 = Structure(cif_file= 'KY3F10_mp-2943_conventional_standard.cif')
+KY3F10 = Structure(cif_file= 'KY3F10.cif')
 ```
-We then need to specify a central ion, to which all subsequent information will be calculated in relation to. 
+We then need to specify a central ion, to which all subsequent information will be calculated in relation to. It is important to note, we must specify the charge of the ion as well.
 ```python
-KY3F10.centre_ion('Y')
+KY3F10.centre_ion('Y3+')
 ```
 This will set the central ion to be a Ytrrium ion and yield the following output:
 ```
-central ion is [-5.857692   -5.857692   -2.81691722] Y
-with a nearest neighbour Y at 3.9837225383938777 angstroms
+central ion is [-5.857692   -5.857692   -2.81691722] Y3+
+with a nearest neighbour Y3+ at 3.914906764969714 angstroms
 ```
 This gives us the basic information about the host material. 
 Now we can request some information! We can now query what ions and how far away they are from that central ion within a given radius. 
@@ -106,7 +106,7 @@ KY3F10.nearest_neighbours_info(3.2)
 ``` 
 Output:
 ```
-Nearest neighbours within radius 3.2 Angstroms of a Y ion:
+Nearest neighbours within radius 3.2 Angstroms of a Y3+ ion:
 Species = F, r = 2.386628 Angstrom
 Species = F, r = 2.227665 Angstrom
 Species = F, r = 2.386628 Angstrom
@@ -128,11 +128,11 @@ Which yields the following figure:
  <img width="700" alt="example lifetime and energy transfer fitting plot" src="./images/crystal_jmol.png">
 </p>
 
-It's worth noting here briefly that due to the way the PyQT5 WebEngine/ App is being rendered using the multiprocessing library, it is essential to include the `if __name__ == "__main__":` block. Unfortunately, until a different backend for rendering the `Plotly` `.html` files that also support `javascript` this has to stay.
+It's worth noting here briefly that due to the way the `PyWebEngine` App is being rendered using the multiprocessing library, it is essential to include the `if __name__ == "__main__":` block. Unfortunately, until a different backend for rendering the `Plotly` `.html` files that also supports `javascript` this has to stay.
 We can also specify a filter only to show ions we care about. For example, we may only care about the fluoride ions. 
 ```python
 if __name__ == "__main__":
-  filtered_ions = ['F', 'K']
+  filtered_ions = ['F-', 'K+'] #again, note we must specify the charge!
 
   figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
   figure.show() 
@@ -143,7 +143,7 @@ This gives us a filtered plot:
 </p>
 
 
-In the future, the colours will be handled based on the ion, much like the materials project; this is a current work in progress. For more general details on changing these plots, please read the documentation regarding configuring plots in pyet-mc [here](#plotting).
+For more general details on changing these plots, please read the documentation regarding configuring plots in pyet-mc [here](#plotting).
 ## Energy transfer models
 The energy transfer process can be modelled for a particular configuration of donor and acceptor ions with the following exponential function 
 here $t$ is time, $\gamma_r$ is the radiative decay rate, and $\gamma_{tr,j}$ is the energy transfer rate for this configuration. Assuming a single-step multipole-multipole interaction (currently, the only model implemented), $\gamma_{tr,j}$ may be modelled as a sum over the transfer rates to all acceptors $\gamma_{tr,j}$ takes the form: 
@@ -169,7 +169,7 @@ crystal_interaction = Interaction(KY3F10)
 ```
 
 ```python
-coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
+coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm3+')
 ```
 This returns a list of radial distances in angstroms of the dopant samarium ions about the central samarium donor ion.
 ```
@@ -183,33 +183,33 @@ print(coords.filtered_coords)
 ```
 ```
            r       theta           phi species
-0   7.175924  115.071364 -1.156825e+02       Y
-1   7.175924  115.071364 -1.543175e+02       Y
-2   8.284027   90.000000 -1.350000e+02       Y
-3   7.175924   66.886668 -1.525658e+02       Y
-4   7.175924   66.886668 -1.174342e+02       Y
-5   9.192125  109.317471 -1.800000e+02       Y
-6   5.861968   92.188550 -1.800000e+02       Y
-7   9.333688  162.434187 -1.800000e+02       Y
-8   8.284027  135.000000  1.800000e+02      Sm
-9   7.175924  115.071364  1.156825e+02      Sm
-10  7.175924  115.071364  1.543175e+02       Y
-11  4.300305  135.000000 -1.800000e+02       Y
-12  3.983723   45.000000 -1.800000e+02       Y
-13  7.175924   66.886668  1.525658e+02      Sm
-14  9.333688   72.434187 -1.800000e+02      Sm
-15  8.284027   45.000000 -1.800000e+02       Y
-16  9.192125   19.317471 -1.800000e+02       Y
-17  8.284027   90.000000  1.350000e+02       Y
-18  7.175924   66.886668  1.174342e+02       Y
-19  9.192125  109.317471 -9.000000e+01       Y
-20  5.861968   92.188550 -9.000000e+01       Y
+0   7.175924  115.071364 -1.156825e+02       Y3+
+1   7.175924  115.071364 -1.543175e+02       Y3+
+2   8.284027   90.000000 -1.350000e+02       Y3+
+3   7.175924   66.886668 -1.525658e+02       Y3+
+4   7.175924   66.886668 -1.174342e+02       Y3+
+5   9.192125  109.317471 -1.800000e+02       Y3+
+6   5.861968   92.188550 -1.800000e+02       Y3+
+7   9.333688  162.434187 -1.800000e+02       Y3+
+8   8.284027  135.000000  1.800000e+02      Sm3+
+9   7.175924  115.071364  1.156825e+02      Sm3+
+10  7.175924  115.071364  1.543175e+02       Y3+
+11  4.300305  135.000000 -1.800000e+02       Y3+
+12  3.983723   45.000000 -1.800000e+02       Y3+
+13  7.175924   66.886668  1.525658e+02      Sm3+
+14  9.333688   72.434187 -1.800000e+02      Sm3+
+15  8.284027   45.000000 -1.800000e+02       Y3+
+16  9.192125   19.317471 -1.800000e+02       Y3+
+17  8.284027   90.000000  1.350000e+02       Y3+
+18  7.175924   66.886668  1.174342e+02       Y3+
+19  9.192125  109.317471 -9.000000e+01       Y3+
+20  5.861968   92.188550 -9.000000e+01       Y3+
 ```
 As we can see, some of the yttrium ions have been replaced by samarium ions, as expected. 
 We can also plot this to see what is happening visually; the interaction class has similar plotting functionality. 
 ```python
 if __name__ == "__main__":
-  figure = crystal_interaction.doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm' , filter = ['Y','Sm'])
+  figure = crystal_interaction.doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm3+' , filter = ['Y3+','Sm3+'])
   figure.show()
 ```
 
