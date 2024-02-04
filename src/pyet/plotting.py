@@ -323,7 +323,7 @@ class Plot:
                 self.default_spectra_layout['xaxis']['dtick'] = dtick    
 
 
-    def show(self):
+    def show(self, browser = False):
         """
         Display the figure based on the plot type.
 
@@ -359,11 +359,18 @@ class Plot:
         #print(f"Temporary directory for debugging: {temp_dir}")
         
         # Use NamedTemporaryFile to create a temporary file in the system's temp directory
-        with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
-            self.temp_file_path = os.path.abspath(temp.name)
-            plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=False)
-            p = Process(target=run_webview, args=(self.temp_file_path,))
-            p.start()
+        if sys.platform == 'linux' or browser:
+            print('Plotting in browser:')
+            with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
+                self.temp_file_path = os.path.abspath(temp.name)
+                plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=True)
+
+        else:
+            with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
+                self.temp_file_path = os.path.abspath(temp.name)
+                plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=False)
+                p = Process(target=run_webview, args=(self.temp_file_path,))
+                p.start()
 
     def save(self, path: str, name: str) -> None:
         """
