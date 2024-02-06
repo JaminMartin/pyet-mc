@@ -15,6 +15,7 @@ from typing import Union
 import pandas as pd
 import re
 import webview
+import glob 
 
 # Load configuration and ion colours data
 config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
@@ -361,12 +362,12 @@ class Plot:
         # Use NamedTemporaryFile to create a temporary file in the system's temp directory
         if sys.platform == 'linux' or browser:
             print('Plotting in browser:')
-            with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
+            with tempfile.NamedTemporaryFile(suffix="_pyet.html", dir=temp_dir, delete=False) as temp:
                 self.temp_file_path = os.path.abspath(temp.name)
                 plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=True)
 
         else:
-            with tempfile.NamedTemporaryFile(suffix=".html", dir=temp_dir, delete=False) as temp:
+            with tempfile.NamedTemporaryFile(suffix="_pyet.html", dir=temp_dir, delete=False) as temp:
                 self.temp_file_path = os.path.abspath(temp.name)
                 plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=False)
                 p = Process(target=run_webview, args=(self.temp_file_path,))
@@ -392,8 +393,14 @@ class Plot:
         self.cleanup_temp_file()
 
     def cleanup_temp_file(self):
-        if hasattr(self, 'temp_file_path') and os.path.exists(self.temp_file_path):
-            os.remove(self.temp_file_path)
+        # Get a list of all _pyet.html files in the temp directory
+        temp_files = glob.glob(os.path.join(tempfile.gettempdir(), "*_pyet.html"))
+        # Sort files by creation time
+        temp_files.sort(key=os.path.getctime)
+        # Delete all but the most recent 5 files
+        for temp_file in temp_files[:-5]:
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
 
     
         
@@ -418,7 +425,7 @@ if __name__ == "__main__":
     # figure2.spectra(x, y, name = 'an example')
     # figure2.show()
 
-    load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
+    # load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
     wavelengths = np.arange(400,450, 0.1) #generate some values between 400 and 450 nm
     wavenumbers, signal = random_spectra(wavelengths, wavenumbers=True)
     x_range = [23000,23500]
@@ -426,6 +433,6 @@ if __name__ == "__main__":
     figure1 = Plot(xaxis={'range': x_range,'dtick': 100,})
     figure1.spectra(wavenumbers, signal, name='an example', mode='markers', marker={'color': 'red'}) 
     figure1.show()
-    path = '/Users/jamin/Documents/'
-    name = 'temp2.svg'
+    #path = '/Users/jamin/Documents/'
+    #name = 'temp2.svg'
     #figure1.save(path, name)
