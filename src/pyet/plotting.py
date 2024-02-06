@@ -395,10 +395,10 @@ class Plot:
     def cleanup_temp_file(self):
         # Get a list of all _pyet.html files in the temp directory
         temp_files = glob.glob(os.path.join(tempfile.gettempdir(), "*_pyet.html"))
-        # Sort files by creation time
         temp_files.sort(key=os.path.getctime)
-        # Delete all but the most recent 5 files
-        for temp_file in temp_files[:-5]:
+        # Delete all but the most recent 20 files
+        #a reasonable number of plotting tabs openned while not using too much storage space on system /tmp folder. This is in place as windows doesnt always empty its temp folder.
+        for temp_file in temp_files[:-20]:  
             if os.path.exists(temp_file):
                 os.remove(temp_file)
 
