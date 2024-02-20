@@ -91,7 +91,7 @@ class Optimiser:
             trace.weight *= length_based_weight
             print(f'the weights of the {trace.name} trace have been adjusted to {trace.weight}')
 
-    def fit(self, guess: Dict,  *args, **kwargs) -> Dict:
+    def fit(self, guess: Dict, bounds: Dict = {}, solver = 'minimize', *args, **kwargs) -> Dict:
         """
         The fit method performs the fitting process using the provided initial guess and optional arguments.
         Note this is a decoupled/decoupled fit if multiple traces are provided. It will aim to fit all traces parameters (that are the same) simultanously
@@ -103,28 +103,85 @@ class Optimiser:
         Returns:
         result (OptimizeResult): The result of the optimization process.
         """
+        bounds = list(bounds.values())
         keys = list(guess.keys())
         print(keys)
         print(f'Guess with initial params:{guess}')
         print('Started fitting...')
         fn = self.wrss
-        self.result = scipy.optimize.minimize(
+        match solver:
+            case 'minimize':
+                self.result = scipy.optimize.minimize(
+                    
+                    lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
+                    [guess[k] for k in keys], # unwrap the initial dictionary
+                    
+                    
+                    *args, # pass position arguments
+                    **kwargs # pass named arguments
+                )
+                # wrap the solution in a dictionary
+                try:
+                    self.result.x = {k:v for k,v in zip(keys, self.result.x)}
+                except:
+                    pass
+                return self.result
+            case 'basinhopping':
+                self.result = scipy.optimize.basinhopping(
+                    
+                    lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
+                    [guess[k] for k in keys], # unwrap the initial dictionary
+                    
+                    
+                    *args, # pass position arguments
+                    **kwargs # pass named arguments
+                )
+                # wrap the solution in a dictionary
+                try:
+                    self.result.x = {k:v for k,v in zip(keys, self.result.x)}
+                except:
+                    pass
+                return self.result
             
-            lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
-            [guess[k] for k in keys], # unwrap the initial dictionary
+            case 'differential_evolution':
+                self.result = scipy.optimize.differential_evolution(
+                    
+                    lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
+                    bounds,
+                    x0 = [guess[k] for k in keys], # unwrap the initial dictionary
+                    
+                    *args, # pass position arguments
+                    **kwargs # pass named arguments
+                )
+                # wrap the solution in a dictionary
+                try:
+                    self.result.x = {k:v for k,v in zip(keys, self.result.x)}
+                except:
+                    pass
+                return self.result
             
-            
-            *args, # pass position arguments
-            **kwargs # pass named arguments
-        )
-        # wrap the solution in a dictionary
-        try:
-            self.result.x = {k:v for k,v in zip(keys, self.result.x)}
-        except:
-            pass
-        return self.result
+            case 'dual_annealing':
 
-            
+                self.result = scipy.optimize.dual_annealing(
+                    
+                    lambda x: fn({k:v for k,v in zip(keys, x)}), # wrap the argument in a dict
+                    bounds,
+                    x0 = [guess[k] for k in keys], # unwrap the initial dictionary
+                    
+                    *args, # pass position arguments
+                    **kwargs # pass named arguments
+                )
+                # wrap the solution in a dictionary
+                try:
+                    self.result.x = {k:v for k,v in zip(keys, self.result.x)}
+                except:
+                    pass
+                return self.result
+            case _:
+                print('not a supported case')
+
+
+                        
     def wrss(self,dictionary):
         """
         The wrss method calculates the weighted reduced sum of squares value for the current set of parameters.
@@ -163,10 +220,10 @@ class Optimiser:
 if __name__ == "__main__":
 # testing 
     cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
-    with open(f'{cache_dir}/singlecross_20_2pt5_DQ_50000_intrinsic_False.json') as json_file:
+    with open(f'{cache_dir}/singlecross_20_2pt5_DQ_1000_intrinsic_False.json') as json_file:
         dict = json.load(json_file)
         interact1 = np.asarray(dict['r_components'])
-    with open(f'{cache_dir}/singlecross_20_5_DQ_50000_intrinsic_False.json') as json_file:
+    with open(f'{cache_dir}/singlecross_20_5_DQ_1000_intrinsic_False.json') as json_file:
         dict = json.load(json_file)
         interact2 = np.asarray(dict['r_components'])    
     const_dict1  = {'a': 1 , 'b': 490, 'c' : 0.144, 'd':0}
@@ -192,12 +249,13 @@ if __name__ == "__main__":
     data2 = Trace(ydata2, x2, '5%', interact2)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
+    bounds = {'amp1': (0,100),'amp2':(0,100),'cr':(0,1000000),'rad':(0,1000000),'offset1':(-10000,10000),'offset2':(-10000,10000)}
     opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default', auto_weights=True)
     guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
-
+    
     start = timer()
-    res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
+    res = opti.fit(guess, solver  = 'minimize', method = 'Nelder-Mead')
     dt = timer() - start
     print ("Unoptimised python implementation ran in %f s" % dt)
     print(f'resulting fitted params:{res.x}')
@@ -214,8 +272,3 @@ if __name__ == "__main__":
     fig.transient(x,fit1, fit=True, name = 'fit 2.5%')
     fig.transient(x,fit2, fit = True, name = 'fit 5%')
     fig.show()
-
-    fig2 = Plot()
-    fig2.transient(data1)
-    fig2.transient(data2)
-    fig2.show()

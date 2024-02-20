@@ -374,22 +374,22 @@ if __name__ == "__main__":
     filtered_ions = ['K+', 'F-']
     figure = KY3F10.structure_plot(7, filter=filtered_ions)  
     
-    figure.show()
+    #figure.show()
     KY3F10.nearest_neighbours_info(6)
 
     # # #rslt_df = coords_xyz.loc[coords_xyz['species'].isin(options)].reset_index(drop=True)
     # # #print(rslt_df)
 
-    #crystal_interaction = Interaction(KY3F10)
+    crystal_interaction = Interaction(KY3F10)
 
     #coords = crystal_interaction.distance_sim(radius=10, concentration = 15, dopant='Sm')
     # # #print(coords)
     # # #print(crystal_interaction.filtered_coords)
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=10, interaction_type= 'DQ', intrinsic=True)
-    #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=50000, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=1000, interaction_type= 'DQ')
     # # #print(interaction_components)
-    filtered_ions = ['Sm3+','Y3+']
-    figure2 = Interaction(KY3F10).doped_structure_plot(radius=7, concentration = 25.0 , dopant = 'Sm3+', filter = filtered_ions)
-    figure2.show()
+    #filtered_ions = ['Sm3+','Y3+']
+    #figure2 = Interaction(KY3F10).doped_structure_plot(radius=7, concentration = 25.0 , dopant = 'Sm3+', filter = filtered_ions)
+    #figure2.show()
     # # #pyet_utils.cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'QQ')
 
