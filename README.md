@@ -76,7 +76,7 @@ To test that this was successful, create a new Python file (wherever you would l
 Try to import pyet; assuming no error messages appear, pyet has been successfully installed in your virtual environment
 ```python
 from pyet.structure import Structure, Interaction
-from pyet.fitting import Optimiser
+from pyet.fitting import Optimiser, general_energy_transfer
 from pyet.pyet_utils import Trace, cache_reader, cache_list, cache_clear
 from pyet.plotting import Plot
 ```
@@ -120,8 +120,8 @@ Species = F, r = 2.386628 Angstrom
 We can plot this if we like, but we will increase the radius for illustrative purposes. We can use the inbuilt plotting for this.
 ```python
 if __name__ == "__main__":
-  figure = KY3F10.structure_plot(radius = 5)  
-  figure.show()  
+    fig1 = KY3F10.structure_plot(radius = 5)  
+    fig1.show() 
 ```
 Which yields the following figure:
 <p align="center">
@@ -134,8 +134,8 @@ We can also specify a filter only to show ions we care about. For example, we ma
 if __name__ == "__main__":
   filtered_ions = ['F-', 'K+'] #again, note we must specify the charge!
 
-  figure = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
-  figure.show() 
+    fig2 = KY3F10.structure_plot(radius = 5, filter = filtered_ions)  
+    fig2.show() 
 ```
 This gives us a filtered plot:
 <p align="center">
@@ -209,8 +209,8 @@ As we can see, some of the yttrium ions have been replaced by samarium ions, as 
 We can also plot this to see what is happening visually; the interaction class has similar plotting functionality. 
 ```python
 if __name__ == "__main__":
-  figure = crystal_interaction.doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm3+' , filter = ['Y3+','Sm3+'])
-  figure.show()
+    fig3 = crystal_interaction.doped_structure_plot(radius=7.0, concentration = 15.0 , dopant = 'Sm3+' , filter = ['Y3+','Sm3+'])
+    fig3.show()
 ```
 
 yielding the following figure:
@@ -325,7 +325,6 @@ Now we can generate some synthetic data and plot it:
 
 ```python
 if __name__ == "__main__":
-    from pyet.fitting import general_energy_transfer
     # generate some random data
     time = np.arange(0,21,0.02) #1050 data points 0 to 21ms
     #Generate some random data based on our provided constants and time basis
@@ -333,15 +332,16 @@ if __name__ == "__main__":
     data_5pct = general_energy_transfer(time, interaction_components5pct, const_dict2)
     #Add some noise to make it more realistic
     rng = np.random.default_rng()
-    noise = 0.01 * rng.normal(size=x.size)
-    data_2pt5pct = data_2pt5pct + y_noise
-    data_5pct = data_5pct + y_noise
+    noise = 0.01 * rng.normal(size=time.size)
+    data_2pt5pct = data_2pt5pct + noise
+    data_5pct = data_5pct + noise
 
     #Plotting
-    fig2 = Plot()
-    fig2.transient(data_2pt5pct)
-    fig2.transient(data_5pct)
-    fig2.show()
+    fig4 = Plot()
+    fig4.transient(time, data_2pt5pct)
+    fig4.transient(time, data_5pct)
+    fig4.show()
+
 ```
 
 
@@ -387,17 +387,17 @@ Which is close to our given parameters and can be used to plot our final fitted 
 
 ```python
 if __name__ == "__main__":
-    fig = Plot()
-    fig.transient(data_2pt5pct)
-    fig.transient(data_5pct)
+    fig5 = Plot()
+    fig5.transient(trace2pt5pct)
+    fig5.transient(trace5pct)
     #generate the data to show the fitted results 
-    rdict = res.x
+    rdict = res.x #the dictionary within the result of the optimiser
     
-    fit1 = general_energy_transfer(x, interact1, {'a': rdict['amp1'], 'b': rdict['cr'], 'c': rdict['rad'],'d': rdict['offset1']})
-    fit2 = general_energy_transfer(x, interact2, {'a': rdict['amp2'], 'b': rdict['cr'], 'c': rdict['rad'], 'd': rdict['offset2']})
-    fig.transient(time,fit1, fit=True, name = 'fit 2.5%')
-    fig.transient(time,fit2, fit = True, name = 'fit 5%')
-    fig.show()
+    fit1 = general_energy_transfer(time, interaction_components2pt5pct, {'a': rdict['amp1'], 'b': rdict['cr'], 'c': rdict['rad'],'d': rdict['offset1']})
+    fit2 = general_energy_transfer(time, interaction_components5pct, {'a': rdict['amp2'], 'b': rdict['cr'], 'c': rdict['rad'], 'd': rdict['offset2']})
+    fig5.transient(time,fit1, fit=True, name = 'fit 2.5%')
+    fig5.transient(time,fit2, fit = True, name = 'fit 5%')
+    fig5.show()
 ```
 Note the `transient()` method can take either a `Trace` or `x, y` data. the option `fit = True` will display the data in line mode rather than markers. 
 <p align="center">
