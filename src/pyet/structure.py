@@ -34,6 +34,7 @@ class Structure:
         Raises:
         Exception: If the CIF file is invalid or not provided.
         """
+        self.filename = os.path.basename(cif_file)
         try:
             self.cif = CifParser(cif_file)
             self.struct = self.cif.parse_structures()[0]
@@ -271,7 +272,7 @@ class Interaction:
             float: The average of r_i, which represents the simulated interaction.
             """
             process = 'singlecross'
-            cache_data = pyet_utils.cache_reader(process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type, intrinsic = intrinsic)
+            cache_data = pyet_utils.cache_reader(sourcefile= self.structure.filename, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type, intrinsic = intrinsic)
             match cache_data: 
                 case None:
                     print('Simulator: File not found in cache, running simulation')
@@ -298,7 +299,7 @@ class Interaction:
                         r_i[i] = r_tmp
 
 
-                    pyet_utils.cache_writer(r_i, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type, intrinsic = intrinsic)
+                    pyet_utils.cache_writer(r_i, sourcefile= self.structure.filename, process = process, radius = radius, concentration = concentration, iterations = iterations, interaction_type = interaction_type, intrinsic = intrinsic)
                 case _ :
     
                     r_i = cache_data        
@@ -368,7 +369,7 @@ if __name__ == "__main__":
 
     # Get the absolute path of the ciffiles directory
     cif_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cif_files'))
-    cif_file = os.path.join(cif_dir, 'KY3F10.cif')
+    cif_file = os.path.join(cif_dir, 'KY3F10_copy.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y3+')
     filtered_ions = ['K+', 'F-']
@@ -386,7 +387,7 @@ if __name__ == "__main__":
     # # #print(coords)
     # # #print(crystal_interaction.filtered_coords)
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=10, interaction_type= 'DQ', intrinsic=True)
-    interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 5, iterations=1000, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50, interaction_type= 'DQ')
     # # #print(interaction_components)
     #filtered_ions = ['Sm3+','Y3+']
     #figure2 = Interaction(KY3F10).doped_structure_plot(radius=7, concentration = 25.0 , dopant = 'Sm3+', filter = filtered_ions)
