@@ -375,7 +375,8 @@ guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2'
 ```
 As you can see, we only need to specify the unique set of parameters, in this case, six rather than eight total parameters. This will force the fitting to use the same cross-relaxation and radiative rates for both traces. This is what we would expect to be the case physically. The concentration dependence is handled by our interaction components. In a real experimental situation, you may only be able to have these parameters coupled if there is uncertainty in your actual concentrations. If your cross-relaxation parameters vary greatly, this is a good indication your concentrations used to calculate the interaction components are off. 
 
-Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the `scipy.optimise` methods and any other keywords, e.g. bounds or tolerance. In future, I hope to simplify this to be able to use `scipy.optimise.least_squares` and the `scipy.optimise` global fitting methods to add more options for the fitting process.
+Regardless, we can finally attempt to fit the data. We tell our optimiser to fit and give it one of the `scipy.optimise` methods and any other keywords, e.g. bounds or tolerance. The methods available all of those provided by `scipy.optimise` as well as `dual-annealing`, `basinhoping` and `differential evolution`. Details of their use can be found here [here](#solvers)
+
 ```python
 res = opti.fit(guess, method = 'Nelder-Mead', tol = 1e-13)
 ```
@@ -457,6 +458,8 @@ As you can see, the weighting has actually been adjusted to 10; this is due to t
 
 There is no right or wrong way to implement these weights and should be addressed on a case-by-case basis, as they can heavily influence your fitted parameters.
 
+### Solvers
+TODO!
 ## Plotting
 The pyet-mc library comes with a built-in plotting library that 1. Provides a matplotlib style plotting wrapper for `Plotly`. It achieves this by rendering `Plotly`'s `html + js` figures in a `Qt5 WebEngine` in a separate Python process. 
 It also provides sensible defaults for plotting the spectra, lifetimes and crystal structures that may be of use to people not taking advantage of the fitting functionality of this library. Lastly, it features a unique plotting configuration method to make your code more readable at more readily checked between peers without clutter associated with plotting configuration.
