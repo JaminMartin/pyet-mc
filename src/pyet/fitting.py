@@ -13,6 +13,13 @@ from .pyet_utils import Trace
 from .plotting import Plot
 
 
+try:
+    from pyet_rs import general_energy_transfer_para
+    use_rust_library = True
+
+except ImportError:
+    use_rust_library = False
+
 # Model functions for testing and general use
 def test_double_exp(time: np.ndarray ,dictionary: Dict) -> np.ndarray:
     """
@@ -73,6 +80,8 @@ class Optimiser:
           self.adjust_weights()
       if model == 'default':
           self.model = general_energy_transfer
+      elif model == 'rs':
+          self.model = general_energy_transfer_para    
       else:
           self.model = model    
 
@@ -197,20 +206,34 @@ class Optimiser:
 
         rs = 0
         
-        
-        for j in range(total_traces):
-            keys = self.variables[j]
-            
-            #print(keys)
-            temp_dict = {key: dictionary[key] for key in keys}
-            #print(temp_dict)
+        if self.model != general_energy_transfer_para:
+            for j in range(total_traces):
+                keys = self.variables[j]
+                
+                #print(keys)
+                temp_dict = {key: dictionary[key] for key in keys}
+                #print(temp_dict)
 
-            #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
-            rs += self.traces[j].weight * np.sum(((self.model(self.traces[j].time, self.traces[j].radial_data, temp_dict) - self.traces[j].trace)**2))
-            
-        #print(ch)
+                #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
+                rs += self.traces[j].weight * np.sum(((self.model(self.traces[j].time, self.traces[j].radial_data, temp_dict) - self.traces[j].trace)**2))
+                
+            #print(ch)
+        else:
+            for j in range(total_traces):
+                keys = self.variables[j]
+                
+                #print(keys)
+                temp_dict = {key: dictionary[key] for key in keys}
+                #print(temp_dict)
+                time_rs = self.traces[j].time.tolist()
+                radial_rs = self.traces[j].radial_data.tolist()
+                #temp_dict2 ={k:v for k,v in zip(keys, result.x)}
+                values = list(map(float, temp_dict.values()))
+
+                rs += self.traces[j].weight * np.sum((self.model(time_rs, radial_rs, values[0], values[1], values[2], values[3]) - self.traces[j].trace)**2)
+
+                    
         return rs
-
 
 
 
@@ -220,10 +243,10 @@ class Optimiser:
 if __name__ == "__main__":
 # testing 
     cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
-    with open(f'{cache_dir}/singlecross_20_2pt5_DQ_1000_intrinsic_False.json') as json_file:
+    with open(f'{cache_dir}/singlecross_10_2pt5_DQ_50000_intrinsic_False_20240420214008.json') as json_file:
         dict = json.load(json_file)
         interact1 = np.asarray(dict['r_components'])
-    with open(f'{cache_dir}/singlecross_20_5_DQ_1000_intrinsic_False.json') as json_file:
+    with open(f'{cache_dir}/singlecross_10_5_DQ_50000_intrinsic_False_20240420213951.json') as json_file:
         dict = json.load(json_file)
         interact2 = np.asarray(dict['r_components'])    
     const_dict1  = {'a': 1 , 'b': 490, 'c' : 0.144, 'd':0}
@@ -231,7 +254,7 @@ if __name__ == "__main__":
     start = timer()
     #res = dict_opt(chi, guess, tol = 1e-12)
     x = np.arange(0,21,0.02)
-    x2 = np.arange(0,21,0.04)
+    x2 = np.arange(0,21,0.02)
     print(len(x))
     print(len(x2))
     y1 = general_energy_transfer(x, interact1, const_dict1)
@@ -250,7 +273,7 @@ if __name__ == "__main__":
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     bounds = {'amp1': (0,100),'amp2':(0,100),'cr':(0,1000000),'rad':(0,1000000),'offset1':(-10000,10000),'offset2':(-10000,10000)}
-    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default', auto_weights=True)
+    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'rs', auto_weights=True)
     guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
     
