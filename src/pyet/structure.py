@@ -232,7 +232,7 @@ class Interaction:
        
 
         
-        def distance_sim(self, radius: float, concentration: float, dopant: Optional[str] = 'acceptor') -> np.ndarray:
+        def distance_sim(self, radius: float) -> None:
             """
             Simulates and returns the distances to a specified (but randomly created based on concentration) dopant within a given radius to the central ion.
 
@@ -244,18 +244,25 @@ class Interaction:
             Returns:
             numpy.ndarray: An array of distances to the dopant.
             """
-            concentration = concentration / 100
+
             
             coords = self.structure.nearest_neighbours_spherical_coords(radius)
             self.filtered_coords = coords.loc[coords['species'].isin([self.structure.centre_ion_species])].reset_index(drop=True)
             
        
-            for i in self.filtered_coords.index:
-                if np.random.rand() < concentration:
-                    self.filtered_coords.loc[i, 'species'] = dopant
-            
-            distances = self.filtered_coords.loc[self.filtered_coords['species'].isin([dopant])].reset_index(drop=True)
-            distances = distances['r'].to_numpy()
+        def doper(self, concentration: float, dopant: Optional[str] = 'acceptor'):
+            original_filtered_coords = self.filtered_coords.copy()
+            concentration = concentration / 100
+
+            # Use vectorized operation to update 'species'
+            mask = np.random.rand(len(self.filtered_coords)) < concentration
+            self.filtered_coords.loc[mask, 'species'] = dopant
+
+            distances = self.filtered_coords.loc[self.filtered_coords['species'] == dopant, 'r'].values
+
+            # Reset filtered_coords
+            self.filtered_coords = original_filtered_coords
+
             return distances
         
         def sim_single_cross(self, radius: float, concentration: float, iterations: int, interaction_type: Optional[str] = None, intrinsic: bool = False) -> Union[float, Exception]:
@@ -287,9 +294,9 @@ class Interaction:
                             raise ValueError("Please specify interaction type")  
                         
                     r_i = np.zeros(iterations)
-
+                    self.distance_sim(radius)
                     for i in range(len(r_i)):
-                        distances = self.distance_sim(radius, concentration, dopant = 'acceptor') 
+                        distances = self.doper(concentration, dopant = 'acceptor') 
                         if intrinsic == True:
                             tmp = np.ones(len(distances)) 
                         else:
@@ -369,7 +376,7 @@ if __name__ == "__main__":
 
     # Get the absolute path of the ciffiles directory
     cif_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'cif_files'))
-    cif_file = os.path.join(cif_dir, 'KY3F10_copy.cif')
+    cif_file = os.path.join(cif_dir, 'KY3F10.cif')
     KY3F10 = Structure(cif_file= cif_file)
     KY3F10.centre_ion('Y3+')
     filtered_ions = ['K+', 'F-']
@@ -387,7 +394,7 @@ if __name__ == "__main__":
     # # #print(coords)
     # # #print(crystal_interaction.filtered_coords)
     #interaction_components = crystal_interaction.sim_single_cross(radius=20, concentration = 2.5, iterations=10, interaction_type= 'DQ', intrinsic=True)
-    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 5, iterations=50, interaction_type= 'DQ')
+    interaction_components = crystal_interaction.sim_single_cross(radius=10, concentration = 2.5, iterations=50000, interaction_type= 'DQ')
     # # #print(interaction_components)
     #filtered_ions = ['Sm3+','Y3+']
     #figure2 = Interaction(KY3F10).doped_structure_plot(radius=7, concentration = 25.0 , dopant = 'Sm3+', filter = filtered_ions)
