@@ -1,8 +1,7 @@
 from pyet.structure import Structure, Interaction
-from pyet.fitting import Optimiser
+from pyet.fitting import Optimiser, general_energy_transfer
 from pyet.pyet_utils import Trace, cache_reader, cache_list, cache_clear
 from pyet.plotting import Plot
-from pyet.fitting import general_energy_transfer
 import numpy as np 
 
 
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     fig5.transient(trace5pct)
     #generate the data to show the fitted results 
     rdict = res.x #the dictionary within the result of the optimiser
-    
+    print(f'resulting fitted params:{res.x}')
     fit1 = general_energy_transfer(time, interaction_components2pt5pct, {'a': rdict['amp1'], 'b': rdict['cr'], 'c': rdict['rad'],'d': rdict['offset1']})
     fit2 = general_energy_transfer(time, interaction_components5pct, {'a': rdict['amp2'], 'b': rdict['cr'], 'c': rdict['rad'], 'd': rdict['offset2']})
     fig5.transient(time,fit1, fit=True, name = 'fit 2.5%')
