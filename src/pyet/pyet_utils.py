@@ -45,24 +45,25 @@ class Trace:
         if parser:
             match parser:
                 case 'parse_10':
-                    self.trace = self.parse_10(self.trace)
-                    self.time = self.parse_10(self.time)
-
+                    indices = self.parse_10(np.arange(len(self.trace)))
                 case 'parse_100':
-                    self.trace = self.parse_100(self.trace)
-                    self.time = self.parse_100(self.time)    
+                    indices = self.parse_100(np.arange(len(self.trace)))
+                case 'parse_log':
+                    indices = self.parse_log(np.arange(len(self.trace)), 500)
                 case _ :
                     print("In correct parsing function these are the currently available parsing functions\n 'parse_10'\n 'parse_100' \n")    
-
+            self.trace = self.trace[indices]
+            self.time = self.time[indices]
 
     def parse_10(self, data):
-        temp_tr = data[0::10].copy()
-        return temp_tr
-    
-    def parse_100(self, data):
-        temp_tr = data[0::100].copy()
-        return temp_tr
+        return data[0::10]
 
+    def parse_100(self, data):
+        return data[0::100]
+
+    def parse_log(self, data, num_samples):
+        max_index = len(data) - 1
+        return np.unique(np.logspace(0, np.log10(max_index), num_samples, dtype=int))
 
 
 def cache_writer(r: np.ndarray, sourcefile: str,  **params) -> None:
