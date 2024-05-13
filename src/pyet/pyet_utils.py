@@ -42,11 +42,20 @@ class Trace:
         self.name = fname
         self.time = xdata
         self.radial_data = radial_data
-        if parser == True:
-            self.trace = self.parse(self.trace)
+        if parser:
+            match parser:
+                case 'parse_10':
+                    self.trace = self.parse_10(self.trace)
+                    self.time = self.parse_10(self.time)
+                case _ :
+                    print("In correct parsing function these are the currently available parsing functions\n 'parse_10'\n")    
 
-        def parse(self, trace):
-            print('not yet implemented')  
+
+    def parse_10(self, data):
+        temp_tr = data[0::10].copy()
+        return temp_tr
+
+
 
 def cache_writer(r: np.ndarray, sourcefile: str,  **params) -> None:
     """
