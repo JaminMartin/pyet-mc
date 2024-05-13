@@ -47,12 +47,20 @@ class Trace:
                 case 'parse_10':
                     self.trace = self.parse_10(self.trace)
                     self.time = self.parse_10(self.time)
+
+                case 'parse_100':
+                    self.trace = self.parse_100(self.trace)
+                    self.time = self.parse_100(self.time)    
                 case _ :
-                    print("In correct parsing function these are the currently available parsing functions\n 'parse_10'\n")    
+                    print("In correct parsing function these are the currently available parsing functions\n 'parse_10'\n 'parse_100' \n")    
 
 
     def parse_10(self, data):
         temp_tr = data[0::10].copy()
+        return temp_tr
+    
+    def parse_100(self, data):
+        temp_tr = data[0::100].copy()
         return temp_tr
 
 
