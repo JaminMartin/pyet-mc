@@ -11,7 +11,7 @@ import os
 from typing import Union, Optional, List, Dict, Callable
 from .pyet_utils import Trace
 from .plotting import Plot
-
+import warnings
 
 try:
     from pyet_rs import general_energy_transfer_para
@@ -19,6 +19,8 @@ try:
 
 except ImportError:
     use_rust_library = False
+    general_energy_transfer_para = None
+    warnings.warn("Failed to import 'general_energy_transfer_para' from 'pyet_rs'. The performance-optimized version of the function will not be used.")
 
 # Model functions for testing and general use
 def test_double_exp(time: np.ndarray ,dictionary: Dict) -> np.ndarray:
