@@ -269,7 +269,7 @@ class Plot:
         Returns:
             Union[float, int]: A nice round number that is a factor of the given value, or 1 if no suitable number is found.
         """
-        nice_round_numbers = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]  # You can extend this list with more nice round numbers
+        nice_round_numbers = [i * 10**j for j in range(-8, 8) for i in [1, 2, 5]]
         for nice_number in nice_round_numbers:
             if value / nice_number <= 5:  # Adjust the threshold as needed
                 return nice_number
@@ -311,12 +311,7 @@ class Plot:
             if 'xaxis' not in self.layout or 'range' not in self.layout['xaxis']:
                 self.default_transient_layout['xaxis']['range'] = [0, x_max]
                 self.default_spectra_layout['xaxis']['range'] = [x_min, x_max]
-                #self.default_structure3d_layout['scene']['xaxis']['range'] = [x_min-10, x_max+10]
-            if 'yaxis' not in self.layout or 'range' not in self.layout['yaxis']:
-                self.default_transient_layout['yaxis']['range'] = [np.log(0.1), np.log(1)]
-                #self.default_structure3d_layout['scene']['yaxis']['range'] = [y_min-10, y_max+10]
-            #if 'zaxis' not in self.layout or 'range' not in self.layout['zaxis']:
-                #self.default_structure3d_layout['scene']['zaxis']['range'] = [z_min-10, z_max+10]
+
             if 'xaxis' not in self.layout or 'dtick' not in self.layout['xaxis']:
                 x_range = x_max - x_min
                 dtick = self.calculate_nice_round_number(x_range)
