@@ -1,0 +1,41 @@
+[build-system]
+requires = [
+    "setuptools>=60",
+    "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyet"
+dependencies = [
+    "matplotlib==3.7.2",
+    "numpy==1.25.1",
+    "pandas==2.0.3",
+    "plotly==5.15.0",
+    "pymatgen==2024.1.27",
+    "scipy==1.11.1",
+    "toml==0.10.2",
+    "pywebview==4.4.1",
+    "kaleido == 0.2.1",
+]
+requires-python = ">=3.11"
+authors = [
+    {name = "Jamin Martin", email = "jamin.martin@pg.canterbury.ac.nz"},
+  
+]
+maintainers = [ 
+    {name = "Jamin Martin", email = "jamin.martin@pg.canterbury.ac.nz"}
+]
+description = "Python package for calculating energy transfer rates between lanthanide ions"
+readme = "README.md"
+license = {file = "LICENSE"}
+
+version = "0.1"
+
+
+
+
+[project.urls]
+Homepage = "https://github.com/JaminMartin/pyet-mc"
+Documentation = "https://github.com/JaminMartin/pyet-mc"
+Repository = "https://github.com/JaminMartin/pyet-mc"
+
