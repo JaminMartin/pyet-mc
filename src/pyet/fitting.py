@@ -211,11 +211,11 @@ class Optimiser:
 
     def uncertainties(self) -> dict:
         max_iterations = 1000
-        original_wrss = self.result.fun
+        original_wrss = self.result.fun.copy()
         self.uncertainty = {}
         print("calculating uncertainites...")
         for k , v in self.result.x.items():
-            res_for_uncertainty = self.result.x
+            res_for_uncertainty = self.result.x.copy()
             binary_init = 5
             new_val = v + (v * binary_init)
             res_for_uncertainty[k] = new_val
