@@ -202,9 +202,48 @@ class Optimiser:
                 print('not a supported case')
 
         temp_res['results'] = self.result 
-        #print(f'The resulting summary dict: {temp_res}') 
-        fit_logger(temp_res)      
-        return self.result        
+        #print(f'The resulting summary dict: {temp_res}')   
+        self.uncertainties()     
+        temp_res['uncertainties'] =  self.uncertainty
+        fit_logger(temp_res)
+        return self.result  
+
+
+    def uncertainties(self) -> dict:
+        max_iterations = 1000
+        original_wrss = self.result.fun
+        self.uncertainty = {}
+        print("calculating uncertainites...")
+        for k , v in self.result.x.items():
+            res_for_uncertainty = self.result.x
+            binary_init = 5
+            new_val = v + (v * binary_init)
+            res_for_uncertainty[k] = new_val
+            iterations = 0
+            new_wrss = self.wrss(res_for_uncertainty)
+            relative_change  = abs(new_wrss - original_wrss) / original_wrss
+           
+            while not (0.04 < relative_change < 0.05) and iterations < max_iterations:
+              
+                if relative_change > 0.05:
+                   
+                   binary_init = binary_init * 0.5
+                elif relative_change < 0.04:
+                   
+                    binary_init = binary_init * 1.5
+        
+                new_val = v + (v * binary_init)
+                res_for_uncertainty[k] = new_val 
+                new_wrss = self.wrss(res_for_uncertainty)
+                relative_change  = abs(new_wrss - original_wrss) / original_wrss
+                iterations += 1
+
+            self.uncertainty[k] = v * binary_init
+        return    
+
+
+
+
 
 
                         
@@ -260,18 +299,18 @@ class Optimiser:
 if __name__ == "__main__":
 # testing 
     cache_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cache'))
-    with open(f'{cache_dir}/singlecross_10_2pt5_DQ_50000_intrinsic_False_20240513141046.json') as json_file:
+    with open(f'{cache_dir}/singlecross_10_2pt5_DQ_50000_intrinsic_False_20240519115427.json') as json_file:
         dict = json.load(json_file)
         interact1 = np.asarray(dict['r_components'])
-    with open(f'{cache_dir}/singlecross_10_5_DQ_50000_intrinsic_False_20240520101703.json') as json_file:
+    with open(f'{cache_dir}/singlecross_10_5_DQ_50000_intrinsic_False_20240519115504.json') as json_file:
         dict = json.load(json_file)
         interact2 = np.asarray(dict['r_components'])    
     const_dict1  = {'a': 1 , 'b': 490, 'c' : 0.144, 'd':0}
     const_dict2  = {'a': 1 , 'b': 490, 'c' : 0.144, 'd': 0}
     start = timer()
     #res = dict_opt(chi, guess, tol = 1e-12)
-    x = np.arange(0,21,2)
-    x2 = np.arange(0,21,2)
+    x = np.arange(0,21,0.02)
+    x2 = np.arange(0,21,0.02)
     print(len(x))
     print(len(x2))
     y1 = general_energy_transfer(x, interact1, const_dict1)
@@ -285,22 +324,21 @@ if __name__ == "__main__":
     print ("Datageneration ran in %f s" % dt)   
 
 
-    data1 = Trace(ydata1, x,  '2.5%', interact1, weighting= 10)
+    data1 = Trace(ydata1, x,  '2.5%', interact1)
     data2 = Trace(ydata2, x2, '5%', interact2)
     y1dep = ['amp1', 'cr', 'rad', 'offset1']
     y2dep = ['amp2', 'cr', 'rad', 'offset2']
     bounds = {'amp1': (0,100),'amp2':(0,100),'cr':(0,1000000),'rad':(0,1000000),'offset1':(-10000,10000),'offset2':(-10000,10000)}
-    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'default', auto_weights=True)
+    opti = Optimiser([data1,data2],[y1dep,y2dep], model = 'rs', auto_weights=False)
     guess = {'amp1': 1, 'amp2': 1, 'cr': 400,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
     
     start = timer()
-    res = opti.fit(guess, solver  = 'minimize', method = 'Nelder-Mead')
+    res = opti.fit(guess, solver  = 'minimize', method = 'Nelder-Mead', tol = 1e-16)
     dt = timer() - start
     print ("Unoptimised python implementation ran in %f s" % dt)
     print(f'resulting fitted params:{res.x}')
     resultdict = res.x
-    print(res)
     fit1 = general_energy_transfer(x, interact1, {'a': resultdict['amp1'], 'b': resultdict['cr'], 'c': resultdict['rad'],'d': resultdict['offset1']})
     fit2 = general_energy_transfer(x, interact2, {'a': resultdict['amp2'], 'b': resultdict['cr'], 'c': resultdict['rad'], 'd': resultdict['offset2']})
 

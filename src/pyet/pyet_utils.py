@@ -317,7 +317,11 @@ def fit_logger(result: dict) -> None:
     out += 'Fit Sucsessful?:' +  str(result['results']['success']) + "\n"
     out += result['results']['message'] + "\n" + "\n"
     out += 'Number of iterations:' +  str(result['results']['nfev']) + "\n"
-    out += 'Fitted parameters:' + "\n" + '\n'.join(f"{k}: {v}" for k, v in result['results']['x'].items()) + "\n"
+    out += 'Fitted parameters:\n'
+    for k in result['results']['x']:
+        fitted_value = result['results']['x'][k]
+        uncertainty_value = result['uncertainties'][k]
+        out += f"{k}: {fitted_value} ± {uncertainty_value}\n\n"
     out += 'WRSS:' +  str(result['results']['fun']) + "\n"
     
 
