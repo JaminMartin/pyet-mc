@@ -1,13 +1,13 @@
 import os
 import sys
 import json
-
+import datetime
 import numpy as np
 import numpy.typing as npt
 import glob
 import random as rd
 import scipy.stats as stats
-from datetime import datetime
+
 from typing import Optional
 cache_dir_path = os.path.join(os.path.dirname(__file__), 'cache')
 
@@ -42,14 +42,18 @@ class Trace:
         self.name = fname
         self.time = xdata
         self.radial_data = radial_data
+        self.parser = "None"
         if parser:
             match parser:
                 case 'parse_10':
                     indices = self.parse_10(np.arange(len(self.trace)))
+                    self.parser = 'parse_10'
                 case 'parse_100':
                     indices = self.parse_100(np.arange(len(self.trace)))
+                    self.parser = 'parse_100'
                 case 'parse_log':
                     indices = self.parse_log(np.arange(len(self.trace)), 500)
+                    self.parser = 'parse_log'
                 case _ :
                     print("In correct parsing function these are the currently available parsing functions\n 'parse_10'\n 'parse_100' \n")    
             self.trace = self.trace[indices]
@@ -278,6 +282,91 @@ def random_spectra(wavelength: np.ndarray, wavenumbers: bool = False) -> np.ndar
     if wavenumbers:
        wavelength = (1 / wavelength) * 10_000_000
     return wavelength, LINE_TOT
+
+def fit_logger(result: dict) -> None:
+    '''
+    Sets up the data to be logged regarding the experiment, 'out' is the string to append to (with \n for a new line) 
+    that will be written. Can add more things as we find the need. 
+
+    Example: 
+    --------
+        >>> out += 'some data to add\n
+
+    The save portion will try save to the specified directory, if it cant - it will attempt to dump it into the current working directory    
+    '''
+    data_path = os.path.abspath(os.getcwd())
+   
+    name = "0-fitlog" +'.pyet'
+    name = name_checker((data_path + '/' + name))
+
+    out ='%============================================%PYET fitting log%============================================%\n\n\n'
+
+            
+    out +='Date Start: '+ result['Initialised time'] + '\n'
+    out +='Date Completed: '+ str(datetime.datetime.now()) + '\n'
+    out += '\n\n'
+    out += '%============================================%Fitting Configuration%============================================%\n\n\n'
+    out += 'Solver parameters:' + "\n" + 'Solver: ' + str(result['solver']) + "\n" + 'Additional args:' + str(result['args'])  + "\n" + 'Additional kwargs:' + str(result['kwargs'])  + "\n\n"
+    out += 'Number of free parameters: ' + str(len(result['guess'].keys())) + "\n\n"
+    out += 'Free parameters:' + "\n" + '\n'.join(f"{k}" for k in result['guess'].keys()) + "\n\n"
+    out += 'Initial guess:' + "\n" + '\n'.join(f"{k}: {v}" for k, v in result['guess'].items()) + "\n\n"
+    out += 'Parameter bounds:' + "\n" + '\n'.join(f"{k}: {v}" for k, v in result['bounds'].items()) + "\n\n"
+    out += 'Trace parameters:' + "\n" + '\n'.join(f"{k}: {v}" for k, v in result['Trace_info'].items()) + "\n\n"
+
+    out += '%============================================%Fitting Result%============================================%\n\n\n'
+    out += 'Fit Sucsessful?:' +  str(result['results']['success']) + "\n"
+    out += result['results']['message'] + "\n" + "\n"
+    out += 'Number of iterations:' +  str(result['results']['nfev']) + "\n"
+    out += 'Fitted parameters:\n'
+    for k in result['results']['x']:
+        fitted_value = result['results']['x'][k]
+        uncertainty_value = result['uncertainties'][k]
+        out += f"{k}: {fitted_value} ± {uncertainty_value}\n\n"
+    out += 'WRSS:' +  str(result['results']['fun']) + "\n"
+    
+
+    try:
+        tfile = open(data_path  + '/' + name, 'a')
+        tfile.write(out)
+        tfile.close()
+    except IOError as e:
+        print('Directory doesnt exist!!')
+        print('Saving to current working directory instead')
+        pass
+        try:
+            data_path = os.path.abspath(os.getcwd())
+            name = name_checker(data_path   + '/' + name)
+            tfile = open(data_path  + '/' + name, 'a')
+            tfile.write(out)
+            tfile.close()
+        except IOError as e:
+            print(e) 
+            print('Files failed to save')
+            pass
+
+
+
+def name_checker(fname_path):
+    """
+    Get the path to a filename which does not exist by incrementing path.
+    """
+    directory, filename = os.path.split(fname_path)
+    if not os.path.exists(fname_path):
+    
+        return filename
+
+    filename, file_extension = os.path.splitext(filename)
+    prefix, name = filename.split('-', 1)
+    i = int(prefix) if prefix.isdigit() else 0
+
+    new_fname = "{}-{}{}".format(i, name, file_extension)
+
+    while os.path.exists(os.path.join(directory, new_fname)):
+
+        i += 1
+        new_fname = "{}-{}{}".format(i, name, file_extension)
+    return os.path.join(new_fname)
+
 
 if __name__ == "__main__":
     
