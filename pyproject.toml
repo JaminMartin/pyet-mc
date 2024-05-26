@@ -1,8 +1,6 @@
 [build-system]
-requires = [
-    "setuptools>=60",
-    "setuptools-scm>=8.0"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
 
 [project]
 name = "pyet"
@@ -17,7 +15,13 @@ dependencies = [
     "pywebview==4.4.1",
     "kaleido == 0.2.1",
 ]
+
 requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
 authors = [
     {name = "Jamin Martin", email = "jamin.martin@pg.canterbury.ac.nz"},
   
@@ -31,11 +35,11 @@ license = {file = "LICENSE"}
 
 version = "0.1"
 
-
-
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "pyet._pyet"
 
 [project.urls]
 Homepage = "https://github.com/JaminMartin/pyet-mc"
 Documentation = "https://github.com/JaminMartin/pyet-mc"
 Repository = "https://github.com/JaminMartin/pyet-mc"
-

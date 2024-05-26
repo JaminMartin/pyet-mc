@@ -7,6 +7,7 @@ import numpy.typing as npt
 import glob
 import random as rd
 import scipy.stats as stats
+from datetime import datetime
 
 from typing import Optional
 cache_dir_path = os.path.join(os.path.dirname(__file__), 'cache')
@@ -303,7 +304,7 @@ def fit_logger(result: dict) -> None:
 
             
     out +='Date Start: '+ result['Initialised time'] + '\n'
-    out +='Date Completed: '+ str(datetime.datetime.now()) + '\n'
+    out +='Date Completed: '+ str(datetime.now()) + '\n'
     out += '\n\n'
     out += '%============================================%Fitting Configuration%============================================%\n\n\n'
     out += 'Solver parameters:' + "\n" + 'Solver: ' + str(result['solver']) + "\n" + 'Additional args:' + str(result['args'])  + "\n" + 'Additional kwargs:' + str(result['kwargs'])  + "\n\n"

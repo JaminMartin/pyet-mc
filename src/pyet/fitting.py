@@ -13,8 +13,10 @@ from .pyet_utils import Trace, fit_logger
 from .plotting import Plot
 import warnings
 import datetime
+
 try:
-    from pyet_rs import general_energy_transfer_para
+    from pyet import _pyet as pyrs
+    general_energy_transfer_para = pyrs.general_energy_transfer_para
     use_rust_library = True
 
 except ImportError:

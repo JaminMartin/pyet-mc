@@ -55,7 +55,7 @@ if __name__ == "__main__":
     trace2pt5pct = Trace(data_2pt5pct, time,  '2.5%', interaction_components2pt5pct)
     trace5pct = Trace(data_5pct, time, '5%', interaction_components5pct)
 
-    opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
+    opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'rs')
 
     guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
 
