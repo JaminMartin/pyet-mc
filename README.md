@@ -63,15 +63,26 @@ Setup a new Python virtual environment (I recommend Conda) and specify Python 3.
 ```
 conda create --name 'name of your env' python=3.11
 ```
+
 Activate this virtual environment with "conda activate 'name of your env'". This ensures the package doesn't overwrite any of your existing Numpy/Scipy `Python` libraries
-Clone this repository in a location of your choosing, or download it as a zip file and extract it
+There are two options to install this package either through the provided wheels or building from source. Building from source will require the `rust` compiler and `maturin` to be installed.
+This will be outlined in a future release. The most straightforward way is to do, simply download the latest release build from the GitHub repository. 
+
+then after activating your conda or environment manager of your choice simply 
+
 ```
-git clone git@github.com:JaminMartin/pyet-mc.git
+pip install path/to/pyet/wheel
 ```
-In the terminal, cd into this directory and tell pip to install this package
+
+If you encounter any issues, this may be due to `pymatgen` recommending you install its `numpy` and `matplotlib` dependencies via conda first.
+
 ```
-path/to/my/package/ pip install . 
+conda install numpy matplotlib
 ```
+
+pyet should now successfully be installed! 
+
+
 To test that this was successful, create a new Python file (wherever you would like to use pyet-mc, not from within the pyet-mc source code).
 Try to import pyet; assuming no error messages appear, pyet has been successfully installed in your virtual environment
 ```python
