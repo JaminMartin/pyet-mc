@@ -3,7 +3,7 @@ requires = ["maturin>=1.4,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "pyet"
+name = "pyet-mc"
 dependencies = [
     "matplotlib==3.7.2",
     "numpy==1.25.1",
