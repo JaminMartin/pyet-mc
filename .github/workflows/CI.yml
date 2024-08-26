@@ -160,23 +160,63 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.platform.target }}
+          name: wheels-linux-aarch64
           path: dist
       - uses: actions/download-artifact@v4
         with:
-          name: wheels-musllinux-${{ matrix.platform.target }}
+          name: wheels-linux-armv7
           path: dist
       - uses: actions/download-artifact@v4
         with:
-          name: wheels-windows-${{ matrix.platform.target }}
+          name: wheels-linux-ppc64le
           path: dist
       - uses: actions/download-artifact@v4
         with:
-          name: wheels-macos-${{ matrix.platform.target }}
+          name: wheels-linux-s390x
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-linux-x86
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-linux-x86_64
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-macos-aarch64
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-macos-x86_64
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-musllinux-aarch64
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-musllinux-armv7
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-musllinux-x86
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-musllinux-x86_64
           path: dist
       - uses: actions/download-artifact@v4
         with:
           name: wheels-sdist
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-windows-x64
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-windows-x86
           path: dist
       - name: Install twine
         run: python -m pip install --upgrade twine
