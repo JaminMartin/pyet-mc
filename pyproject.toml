@@ -33,7 +33,7 @@ description = "Python package for calculating energy transfer rates between lant
 readme = "README.md"
 license = {file = "LICENSE"}
 
-version = "0.2.0"
+version = "0.2.1"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
@@ -41,5 +41,5 @@ module-name = "pyet._pyet"
 
 [project.urls]
 Homepage = "https://github.com/JaminMartin/pyet-mc"
-Documentation = "https://github.com/JaminMartin/pyet-mc"
+Documentation = "https://jaminmartin.github.io/pyet-mc/"
 Repository = "https://github.com/JaminMartin/pyet-mc"
