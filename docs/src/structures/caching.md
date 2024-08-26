@@ -4,18 +4,20 @@ As these calculations can be quite time-consuming for large iterations, and for 
 When first used, pyet will create a cache directory. All interaction simulations will cache their interaction components along with info regarding the simulation conditions in JSON format. The generated JSON file is named in the following convention:
 
 ```
-process_radius_concentration_interactiontype_iterations_intrinsic.json
+process_radius_concentration_interactiontype_iterations_intrinsic_timedatestamp.json
 ```
 Resulting in a file name: 
 ```
-singlecross_20_2pt5_DQ_50000_intrinsic_False
+singlecross_10_2pt5_DQ_1000_intrinsic_False_20240827080449.json
 ```
+When generating interaction components it also takes note of the `.cif` file used, that way you can have multiple interaction components of identical parameters, but from different crystal structures. 
+
 We can query and return the interaction components of the JSON file with the following code:
 ```python
 from pyet.pyet_utils import cache_reader, cache_clear, cache_list
 
-interaction_components2pt5pct = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False)
-interaction_components5pct =  cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False)
+interaction_components2pt5pct = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False, sourcefile = "KY3F10.cif")
+interaction_components5pct =  cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False, sourcefile = "KY3F10.cif")
 ```
 If what you have specified is not found in the cache, there will be a console log such as this:
 ```
@@ -43,11 +45,23 @@ If you want to know the status of your cache, you can also use the cache list to
 ```python
 cache_list()
 ```
+
 ```
 #======# Cached Files #======#
-singlecross_10_2pt5_DQ_50000.json (958053 bytes)
-singlecross_10_5_DQ_50000.json (1121375 bytes)
-Total cache size: 2.08 MB
+[0] singlecross_10_2pt5_DQ_1000_intrinsic_False_20240827080449.json (18017 bytes), Source file: KY3F10.cif, Date created: 2024-08-27T08:04:49.396355
+[1] singlecross_10_5pt0_DQ_1000_intrinsic_False_20240827080449.json (20593 bytes), Source file: KY3F10.cif, Date created: 2024-08-27T08:04:49.622935
+Total cache size: 0.04 MB
 Run "cache_clear()" to clear the cache
 #============================#
+```
+
+You can then delete a selected file like so:
+
+```
+cache_clear(0)
+File to delete: singlecross_10_2pt5_DQ_1000_intrinsic_False_20240827080449.json Source file: KY3F10.cif, Date created: 2024-08-27T08:04:49.396355
+Are you sure you want to delete this file? [Y/N]
+y
+Deleted file: singlecross_10_2pt5_DQ_1000_intrinsic_False_20240827080449.json
+
 ```

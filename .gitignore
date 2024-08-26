@@ -161,3 +161,4 @@ cython_debug/
 src/pyet/cache/
 .DS_Store
 temp/
+*.pyet
