@@ -5,15 +5,15 @@ build-backend = "maturin"
 [project]
 name = "pyet_mc"
 dependencies = [
-    "matplotlib==3.7.2",
-    "numpy==1.25.1",
-    "pandas==2.0.3",
-    "plotly==5.15.0",
-    "pymatgen==2024.1.27",
-    "scipy==1.11.1",
-    "toml==0.10.2",
-    "pywebview==4.4.1",
-    "kaleido == 0.2.1",
+    "matplotlib>=3.7.0,<4.0",
+    "numpy>=1.25.0",
+    "pandas>=2.0.0",
+    "plotly>=5.15.0",
+    "pymatgen>=2024.1.27",
+    "scipy>=1.11.0",
+    "toml>=0.10.2",
+    "pywebview>=4.4.0",
+    "kaleido>=0.2.0",
 ]
 
 requires-python = ">=3.11"
