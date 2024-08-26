@@ -4,9 +4,10 @@ build-backend = "maturin"
 
 [project]
 name = "pyet_mc"
+readme = "README.md"
 dependencies = [
-    "matplotlib>=3.7.0,<4.0",
     "numpy>=1.25.0",
+    "matplotlib>=3.7.0",
     "pandas>=2.0.0",
     "plotly>=5.15.0",
     "pymatgen>=2024.1.27",
@@ -33,7 +34,7 @@ description = "Python package for calculating energy transfer rates between lant
 readme = "README.md"
 license = {file = "LICENSE"}
 
-version = "0.2.3"
+version = "0.2.4"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
