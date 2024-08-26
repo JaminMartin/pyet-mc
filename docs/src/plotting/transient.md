@@ -1,0 +1,6 @@
+# Transient plots
+The figures plotted using the `transient` plot type have been shown extensively in the section on [fitting](../fitting/fitting.md#fitting-experimental-data-to-energy-transfer-models) however it is worth discussing the purpose and limitations of this plot type.
+
+The goal of this plot type is to quickly plot transients on an appropriate log scale for easy interpretation. It does, however, have its limitations - It may not correctly display this data, if so you may have to look at setting custom `x,y` axis limits. It then plots ~3 orders of magnitude on the `y-axis` and the `x-axis` limits are set from zero to the maximum value of your data. The `x-axis` label default is milliseconds; however, as was the case for the spectra plot, this can be easily [reconfigured](configuration.md) to an appropriate time base.
+
+The `transient` plot type is designed to handle either `x,y` data as might be returned from the fitting process, for example, or it can take a `Trace`. This was to minimise code/data duplication. If you have defined a `Trace` for your data and given it a name, you can pass this in directly without having to worry about providing any `y` values. 

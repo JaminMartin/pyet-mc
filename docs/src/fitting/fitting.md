@@ -1,0 +1,2 @@
+# Fitting experimental data to energy transfer models
+The following covers the core aspect of this library, the fitting. The core purpose of this is to make the fitting of multiple lifetime data sets as simple as possible. It also allows for each dataset to contribute to a single fit rather than running multiple fits for different concentrations. 

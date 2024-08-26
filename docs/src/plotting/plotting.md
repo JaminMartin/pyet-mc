@@ -1,0 +1,3 @@
+# Plotting
+The pyet-mc library comes with a built-in plotting library that 1. Provides a matplotlib style plotting wrapper for `Plotly`. It achieves this by rendering `Plotly`'s `html + js` figures in a `Qt5 WebEngine` in a separate Python process. 
+It also provides sensible defaults for plotting the spectra, lifetimes and crystal structures that may be of use to people not taking advantage of the fitting functionality of this library. Lastly, it features a unique plotting configuration method to make your code more readable at more readily checked between peers without clutter associated with plotting configuration.
