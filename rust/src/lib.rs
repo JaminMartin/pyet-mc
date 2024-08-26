@@ -35,7 +35,7 @@ pub fn general_energy_transfer_para(time: Vec<f64>, radial_data: Vec<f64>, amp: 
 
 
 #[pymodule]
-fn _pyet(_py: Python, m: &PyModule) -> PyResult<()> {
+fn _pyet_mc(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(general_energy_transfer, m)?)?;
     m.add_function(wrap_pyfunction!(general_energy_transfer_para, m)?)?;
     Ok(())

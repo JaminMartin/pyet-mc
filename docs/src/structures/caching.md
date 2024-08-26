@@ -14,7 +14,7 @@ When generating interaction components it also takes note of the `.cif` file use
 
 We can query and return the interaction components of the JSON file with the following code:
 ```python
-from pyet.pyet_utils import cache_reader, cache_clear, cache_list
+from pyet_mc.pyet_utils import cache_reader, cache_clear, cache_list
 
 interaction_components2pt5pct = cache_reader(process = 'singlecross', radius = 10 , concentration = 2.5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False, sourcefile = "KY3F10.cif")
 interaction_components5pct =  cache_reader(process = 'singlecross', radius = 10 , concentration = 5 , iterations = 50000 , interaction_type = 'DQ', intrinsic = False, sourcefile = "KY3F10.cif")

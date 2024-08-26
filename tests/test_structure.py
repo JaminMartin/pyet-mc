@@ -1,5 +1,5 @@
 
-from src.pyet.structure_calc import Structure
+from src.pyet_mc.structure_calc import Structure
 import matplotlib.pyplot as plt
 import os
 import unittest

@@ -15,7 +15,7 @@ import warnings
 import datetime
 
 try:
-    from pyet import _pyet as pyrs
+    from pyet_mc import _pyet_mc as pyrs
     general_energy_transfer_para = pyrs.general_energy_transfer_para
     use_rust_library = True
 

@@ -3,7 +3,7 @@ requires = ["maturin>=1.4,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "pyet-mc"
+name = "pyet_mc"
 dependencies = [
     "matplotlib==3.7.2",
     "numpy==1.25.1",
@@ -37,7 +37,7 @@ version = "0.2.1"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
-module-name = "pyet._pyet"
+module-name = "pyet_mc._pyet_mc"
 
 [project.urls]
 Homepage = "https://github.com/JaminMartin/pyet-mc"

@@ -1,7 +1,7 @@
-from pyet.structure import Structure, Interaction
-from pyet.fitting import Optimiser, general_energy_transfer
-from pyet.pyet_utils import Trace, cache_reader, cache_list, cache_clear
-from pyet.plotting import Plot
+from pyet_mc.structure import Structure, Interaction
+from pyet_mc.fitting import Optimiser, general_energy_transfer
+from pyet_mc.pyet_utils import Trace, cache_reader, cache_list, cache_clear
+from pyet_mc.plotting import Plot
 import numpy as np 
 
 
