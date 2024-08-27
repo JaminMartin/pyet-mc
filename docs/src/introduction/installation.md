@@ -15,7 +15,7 @@ The most straightforward way is to do, simply download the latest release build 
 then after activating your conda or environment manager of your choice simply 
 
 ```
-pip install path/to/pyet/wheel
+pip install pyet-mc
 ```
 
 If you encounter any issues, this may be due to `pymatgen` recommending you install its `numpy` and `matplotlib` dependencies via conda first.

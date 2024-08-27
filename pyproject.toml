@@ -33,7 +33,7 @@ description = "Python package for calculating energy transfer rates between lant
 readme = "README.md"
 license = {file = "LICENSE"}
 
-version = "0.2.5"
+version = "0.3.0"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
