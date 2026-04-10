@@ -46,7 +46,7 @@ We must first specify our independent and dependent parameters. We can achieve t
 params2pt5pct = ['amp1', 'cr', 'rad', 'offset1']
 params5pct = ['amp2', 'cr', 'rad', 'offset2']
 ```
-We then construct a trace object that takes our experimental data (e.g. signal, time), a label, and our interaction components 
+We then construct a [Trace](traces.md) object that takes our experimental data (e.g. signal, time), a label, and our interaction components. The `Trace` can also optionally thin out your data using a parser and carry a per-trace weighting for the fit, see the [Traces](traces.md) documentation for details.
 ```python
 trace2pt5pct = Trace(data_2pt5pct, time,  '2.5%', interaction_components2pt5pct)
 trace5pct = Trace(data_5pct, time, '5%', interaction_components5pct)
@@ -55,7 +55,22 @@ These objects and our list of variables can be passed to the optimiser for fitti
 ```python
 opti = Optimiser([trace2pt5pct,trace5pct],[params2pt5pct,params5pct], model = 'default')
 ```
-We choose the default model, which is our energy transfer model discussed above, and is the same model we used to generate the synthetic data. Note: This model can be supplemented with your own energy transfer model if it differs from the default model. 
+The `model` parameter controls which energy transfer model the optimiser uses internally. You have three options:
+
+- **`model='default'`** uses the pure Python/NumPy implementation of `general_energy_transfer`. This is the same model we used to generate the synthetic data above. It works everywhere and is the safest choice.
+
+- **`model='rs'`** uses the Rust-accelerated parallel implementation, which is significantly faster for large datasets. This requires the Rust extension to be installed (see [Rust Bindings](../information/rust_bindings.md)). If the extension isn't available, the optimiser will fail at fit time, so only use this if you know the extension is installed. The parallel version will use all available CPU cores. If that is consuming too many resources or you are running multiple fits at once, use **`model='rs_single'`** instead, which uses the same Rust backend but runs on a single thread.
+
+- **A custom callable** lets you pass your own model function directly. The function must accept `(time, radial_data, dictionary)` where `time` is a numpy array, `radial_data` is a numpy array of interaction components, and `dictionary` is a dict of the current parameter values. It must return a numpy array of the same length as `time`. For example:
+
+```python
+def my_model(time, radial_data, params):
+    # your custom energy transfer model here
+    return result
+
+opti = Optimiser([trace1, trace2], [params1, params2], model=my_model)
+```
+
 We then give our model a guess. This can be inferred by inspecting the data or being very patient with the fitting / choice of the optimiser. 
 ```python
 guess = {'amp1': 1, 'amp2': 1, 'cr': 100,'rad' : 0.500, 'offset1': 0 , 'offset2': 0}
@@ -75,19 +90,24 @@ Which is close to our given parameters and can be used to plot our final fitted 
 
 ```python
 if __name__ == "__main__":
-    fig5 = Plot()
-    fig5.transient(trace2pt5pct)
-    fig5.transient(trace5pct)
-    #generate the data to show the fitted results 
     rdict = res.x #the dictionary within the result of the optimiser
     
     fit1 = general_energy_transfer(time, interaction_components2pt5pct, {'a': rdict['amp1'], 'b': rdict['cr'], 'c': rdict['rad'],'d': rdict['offset1']})
     fit2 = general_energy_transfer(time, interaction_components5pct, {'a': rdict['amp2'], 'b': rdict['cr'], 'c': rdict['rad'], 'd': rdict['offset2']})
-    fig5.transient(time,fit1, fit=True, name = 'fit 2.5%')
-    fig5.transient(time,fit2, fit = True, name = 'fit 5%')
+
+    fig5 = Plot()
+    fig5.transient(trace2pt5pct, offset=rdict['offset1'])
+    fig5.transient(trace5pct, offset=rdict['offset2'])
+    fig5.transient(time, fit1, fit=True, name='fit 2.5%', offset=rdict['offset1'])
+    fig5.transient(time, fit2, fit=True, name='fit 5%', offset=rdict['offset2'])
     fig5.show()
 ```
-Note the `transient()` method can take either a `Trace` or `x, y` data. the option `fit = True` will display the data in line mode rather than markers. 
+Note the `transient()` method can take either a `Trace` or `x, y` data. The option `fit=True` will display the data in line mode rather than markers.
+
+Because transient plots use a log scale by default, fitted curves that include an offset term will bend downward at long time scales where the exponential has decayed and the constant offset dominates. To avoid this, pass the fitted offset to the `offset` parameter and it will be subtracted from the y-data before plotting. You need to do this for both the data traces and the fit curves so they stay consistent. See the [transient plotting](../plotting/transient.md#subtracting-offsets) docs for more details on this and how it works with normalised data.
+
+If you would rather see a linear y-axis you can also disable the log scale entirely with `fig5.show(log_y=False)`.
+
 <p align="center">
  <img width="700" alt="example lifetime and energy transfer fitting plot" src="../images/generated_data_fited.png">
 </p>

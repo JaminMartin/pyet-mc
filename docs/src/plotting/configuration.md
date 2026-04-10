@@ -108,10 +108,12 @@ where each of the three currently available plotting types has their layouts con
       size = 20
       color = 'red'
 
-    [spectra_layout.xaxis.titlefont]
-      family = 'Times new roman, monospace'
-      size = 20
-      color = 'red'
+    [spectra_layout.xaxis.title]
+      text = 'Wavenumber (cm<sup>-1</sup>)'
+      [spectra_layout.xaxis.title.font]
+        family = 'Times new roman, monospace'
+        size = 20
+        color = 'red'
 ```
 By simply adding the `load_local_config` function we can update our plots:
 

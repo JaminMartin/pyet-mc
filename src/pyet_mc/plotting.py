@@ -1,29 +1,32 @@
-import plotly.graph_objs as go
-import plotly.offline
-import plotly.io as pio
-from multiprocessing import Process
 import tempfile
+from multiprocessing import Process
+
+import plotly.graph_objs as go
+import plotly.io as pio
+
 pio.templates.default = "none"
-import toml
-import pkg_resources
-import os
-import sys
-import numpy as np
-from .pyet_utils import Trace , random_spectra
 import copy
-from typing import Union
-import pandas as pd
+import glob
+import os
 import re
+import sys
+import tomllib
+from importlib.resources import files
+from typing import Union
+
+import numpy as np
+import pandas as pd
 import webview
-import glob 
+
+from .pyet_utils import Trace, random_spectra
 
 # Load configuration and ion colours data
-config_file = pkg_resources.resource_filename(__name__, 'plotting_config/plotting_config.toml')
-jmol_file = pkg_resources.resource_filename(__name__, 'plotting_config/ion_colours.csv')
+config_file = str(files(__package__).joinpath("plotting_config/plotting_config.toml"))
+jmol_file = str(files(__package__).joinpath("plotting_config/ion_colours.csv"))
 jmol_data = pd.read_csv(jmol_file)
 # Load the configuration file
-with open(config_file, "r") as f:
-    config = toml.load(f)
+with open(config_file, "rb") as f:
+    config = tomllib.load(f)
 
 
 def run_webview(temp_file_path: str) -> None:
@@ -33,10 +36,11 @@ def run_webview(temp_file_path: str) -> None:
     Args:
         temp_file_path (str): The path to the temporary file to be displayed in the webview window.
     """
-    window = webview.create_window('pyet-mc viewer', temp_file_path)
+    window = webview.create_window("pyet-mc viewer", temp_file_path)
     webview.start()
-    
-def get_colours(ion:str) -> Union[str,None]:
+
+
+def get_colours(ion: str) -> Union[str, None]:
     """
     Get the colour associated with a given ion.
 
@@ -49,13 +53,14 @@ def get_colours(ion:str) -> Union[str,None]:
         str: The colour associated with the ion, if found. Otherwise, None.
     """
     # Remove the charge and any numbers from the ion string
-    ion = re.sub(r'[0-9\+|-].*', '', ion)
-    
-    colour = jmol_data.loc[jmol_data['Ion'] == ion, 'Colour']
+    ion = re.sub(r"[0-9\+|-].*", "", ion)
+
+    colour = jmol_data.loc[jmol_data["Ion"] == ion, "Colour"]
     if not colour.empty:
         return colour.values[0]
     else:
         return None
+
 
 def load_local_config(local_config_path: str) -> None:
     """
@@ -66,7 +71,8 @@ def load_local_config(local_config_path: str) -> None:
     """
 
     # Load the local configuration file
-    local_config = toml.load(local_config_path)
+    with open(local_config_path, "rb") as f:
+        local_config = tomllib.load(f)
 
     # Update the default configuration with the local configuration
     config.update(local_config)
@@ -76,7 +82,7 @@ class Plot:
     """
     A class used to represent a Plot.
 
-    This class creates a plot figure and sets default layouts for different types of plots. 
+    This class creates a plot figure and sets default layouts for different types of plots.
     It also updates these default layouts with any provided layout keyword arguments.
 
     Attributes:
@@ -99,6 +105,7 @@ class Plot:
         __del__(self): Cleans up the temporary file created for the plot.
         cleanup_temp_file(self): Removes the temporary file created for the plot if it exists.
     """
+
     def __init__(self, **layout_kwargs):
         """
         Initializes the Plot class and updates the default layouts with any provided layout keyword arguments.
@@ -107,13 +114,16 @@ class Plot:
             **layout_kwargs: Arbitrary keyword arguments to update the default layouts.
         """
         self.fig = go.Figure()
-        self.plot_type = 'default'
+        self.plot_type = "default"
         self.default_spectra_layout = copy.deepcopy(config.get("spectra_layout", {}))
-        self.default_transient_layout = copy.deepcopy(config.get("transient_layout", {}))
-        self.default_structure3d_layout = copy.deepcopy(config.get("structure_3d_layout", {}))
-            
-        self.layout = layout_kwargs
+        self.default_transient_layout = copy.deepcopy(
+            config.get("transient_layout", {})
+        )
+        self.default_structure3d_layout = copy.deepcopy(
+            config.get("structure_3d_layout", {})
+        )
 
+        self.layout = layout_kwargs
 
         # Update any specified keys in the default layout with the provided values
         for key, value in layout_kwargs.items():
@@ -121,7 +131,7 @@ class Plot:
                 self.default_spectra_layout[key].update(value)
             else:
                 self.default_spectra_layout[key] = value
-        
+
             if key in self.default_transient_layout:
                 self.default_transient_layout[key].update(value)
             else:
@@ -131,9 +141,14 @@ class Plot:
                 self.default_structure3d_layout[key].update(value)
             else:
                 self.default_structure3d_layout[key] = value
-      
 
-    def spectra(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], *args, **plotting_kwargs) -> None:
+    def spectra(
+        self,
+        x: Union[np.ndarray, list],
+        y: Union[np.ndarray, list],
+        *args,
+        **plotting_kwargs,
+    ) -> None:
         """
         Create a scatter plot with the given x and y data.
 
@@ -152,11 +167,10 @@ class Plot:
         """
         # Set default scatter trace options
         default_trace_options = {
-            'mode': 'lines',
-            'line': {
-        'color': 'black',  
-        'width': 3 }}
-        
+            "mode": "lines",
+            "line": {"color": "black", "width": 3},
+        }
+
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
                 if isinstance(default_trace_options[key], dict):
@@ -165,37 +179,47 @@ class Plot:
                     default_trace_options[key] = value
             else:
                 default_trace_options[key] = value
-       
+
         trace = go.Scatter(x=x, y=y, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
-
-    def transient(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list, None] = None, fit: bool =False, *args, **plotting_kwargs) -> None:
+    def transient(
+        self,
+        x: Union[np.ndarray, list],
+        y: Union[np.ndarray, list, None] = None,
+        fit: bool = False,
+        offset: float = 0.0,
+        *args,
+        **plotting_kwargs,
+    ) -> None:
         """
         Create a transient plot with the given x and y data.
 
-        The function sets the plot type to 'transient' and defines default trace options based on the fit parameter. 
+        The function sets the plot type to 'transient' and defines default trace options based on the fit parameter.
         It then updates these options with any provided in plotting_kwargs.
 
         If x is an instance of Trace, a scatter trace is created with the time and trace data from x and the trace options.
-        Otherwise, a scatter trace is created with the x and y data and the trace options. 
-        This trace is then added to the figure.
+        Otherwise, a scatter trace is created with the x and y data and the trace options.
 
         Parameters:
             x (Union[np.ndarray, list]): The x data for the scatter plot, or a Trace instance.
             y (Union[np.ndarray, list, None]): The y data for the scatter plot. Ignored if x is a Trace instance.
             fit (bool): If True, the trace mode is set to 'lines'. Otherwise, it's set to 'markers'.
+            offset (float): A baseline offset to subtract from the y-data before plotting.
+                This is useful when plotting on a log scale — subtracting the fitted offset
+                prevents the curve from bending downward at long time scales where the
+                constant offset term dominates. Defaults to 0.0 (no subtraction).
             *args: Variable length argument list.
             **plotting_kwargs: Arbitrary keyword arguments to update the default trace options.
 
         Returns:
             None
         """
-        self.plot_type = 'transient'
+        self.plot_type = "transient"
         if fit:
-            default_trace_options = {'mode': 'lines'}
+            default_trace_options = {"mode": "lines"}
         else:
-            default_trace_options = {'mode': 'markers'}
+            default_trace_options = {"mode": "markers"}
 
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
@@ -208,21 +232,31 @@ class Plot:
 
         # Check if x is a Trace instance
         if isinstance(x, Trace):
-            trace = go.Scatter(x=x.time, y=x.trace, name=x.name, *args, **default_trace_options)
+            y_data = np.asarray(x.trace) - offset
+            trace = go.Scatter(
+                x=x.time, y=y_data, name=x.name, *args, **default_trace_options
+            )
 
         else:
-            trace = go.Scatter(x=x, y=y, *args, **default_trace_options)
+            y_data = np.asarray(y) - offset if y is not None else y
+            trace = go.Scatter(x=x, y=y_data, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
-    def structure_3d(self, x: Union[np.ndarray, list], y: Union[np.ndarray, list], z: Union[np.ndarray, list], *args, **plotting_kwargs) -> None:
-
+    def structure_3d(
+        self,
+        x: Union[np.ndarray, list],
+        y: Union[np.ndarray, list],
+        z: Union[np.ndarray, list],
+        *args,
+        **plotting_kwargs,
+    ) -> None:
         """
         Create a 3D scatter plot with the given x, y, and z data.
 
-        The function sets the plot type to 'structure_3d' and defines default trace options. 
+        The function sets the plot type to 'structure_3d' and defines default trace options.
         It then updates these options with any provided in plotting_kwargs.
 
-        A 3D scatter trace is created with the x, y, and z data and the trace options, 
+        A 3D scatter trace is created with the x, y, and z data and the trace options,
         and this trace is added to the figure.
 
         Parameters:
@@ -235,13 +269,8 @@ class Plot:
         Returns:
             None
         """
-        self.plot_type = 'structure_3d'
-        default_trace_options = {
-            'mode': 'markers',
-            'marker': {
-                'size': 10
-            }
-        }
+        self.plot_type = "structure_3d"
+        default_trace_options = {"mode": "markers", "marker": {"size": 10}}
         for key, value in plotting_kwargs.items():
             if key in default_trace_options:
                 if isinstance(default_trace_options[key], dict):
@@ -250,15 +279,17 @@ class Plot:
                     default_trace_options[key] = value
             else:
                 default_trace_options[key] = value
-        
+
         trace = go.Scatter3d(x=x, y=y, z=z, *args, **default_trace_options)
         self.fig.add_trace(trace)
 
-    def calculate_nice_round_number(self, value: Union[float, int]) -> Union[float,int]:
+    def calculate_nice_round_number(
+        self, value: Union[float, int]
+    ) -> Union[float, int]:
         """
         Calculate a nice round number that is a factor of the given value.
 
-        This function iterates over a list of nice round numbers. If the given value divided by a nice round number is less than or equal to 5, 
+        This function iterates over a list of nice round numbers. If the given value divided by a nice round number is less than or equal to 5,
         that nice round number is returned.
 
         If no suitable nice round number is found, the function returns a fallback value of 1.
@@ -276,24 +307,24 @@ class Plot:
 
         # If no suitable nice round number is found, return a fallback value
         return 1
-    
+
     def update_layout_bounds(self) -> None:
         """
         Update the layout bounds of the figure.
 
-        This function iterates over the data in the figure. If the x and y data are not empty or None, 
-        it updates the x and y-axis bounds. 
+        This function iterates over the data in the figure. If the x and y data are not empty or None,
+        it updates the x and y-axis bounds.
 
-        If the 'xaxis' or 'yaxis' range and 'xaxis' dtick are not set in the layout, 
+        If the 'xaxis' or 'yaxis' range and 'xaxis' dtick are not set in the layout,
         it updates them in the default and transient layouts.
 
         Returns:
             None
         """
 
-        x_min, x_max = float('inf'), float('-inf')
-        y_min, y_max = float('inf'), float('-inf')
-        z_min, z_max = float('inf'), float('-inf')
+        x_min, x_max = float("inf"), float("-inf")
+        y_min, y_max = float("inf"), float("-inf")
+        z_min, z_max = float("inf"), float("-inf")
         for trace in self.fig.data:
             # Check if x is not empty or None
             if trace.x is not None and len(trace.x) > 0:
@@ -306,65 +337,74 @@ class Plot:
                 # Update y-axis bounds
                 y_min = min(y_min, min(trace.y))
                 y_max = max(y_max, max(trace.y))
-            
-                # Only update the layout bounds if they are not set in layout_kwargs
-            if 'xaxis' not in self.layout or 'range' not in self.layout['xaxis']:
-                self.default_transient_layout['xaxis']['range'] = [0, x_max]
-                self.default_spectra_layout['xaxis']['range'] = [x_min, x_max]
 
-            if 'xaxis' not in self.layout or 'dtick' not in self.layout['xaxis']:
+                # Only update the layout bounds if they are not set in layout_kwargs
+            if "xaxis" not in self.layout or "range" not in self.layout["xaxis"]:
+                self.default_transient_layout["xaxis"]["range"] = [0, x_max]
+                self.default_spectra_layout["xaxis"]["range"] = [x_min, x_max]
+
+            if "xaxis" not in self.layout or "dtick" not in self.layout["xaxis"]:
                 x_range = x_max - x_min
                 dtick = self.calculate_nice_round_number(x_range)
-                self.default_transient_layout['xaxis']['dtick'] = dtick
-                self.default_spectra_layout['xaxis']['dtick'] = dtick    
+                self.default_transient_layout["xaxis"]["dtick"] = dtick
+                self.default_spectra_layout["xaxis"]["dtick"] = dtick
 
-
-    def show(self, browser = False):
+    def show(self, browser=False, log_y=True):
         """
         Display the figure based on the plot type.
 
-        If the plot type is 'default' or 'transient', the layout bounds are updated before displaying only if they are not explicitly over written in the config.toml or passed to Plot() when itinitalising the class. 
+        If the plot type is 'default' or 'transient', the layout bounds are updated before displaying only if they are not explicitly over written in the config.toml or passed to Plot() when itinitalising the class.
         If the plot type is 'structure_3d', the 3D scatter layout is used.
         If the plot type is not recognized, it defaults to 'default'.
 
         The figure is saved as a temporary HTML file in the system's temporary directory, and a new QT5 webegine process is started to display it.
 
+        Parameters:
+            browser (bool): If True, opens the plot in the default web browser. Defaults to False.
+            log_y (bool): If True, the y-axis is set to log scale for transient plots.
+                Defaults to True. Set to False if you want a linear y-axis (e.g. when
+                offsets have not been subtracted and the log tail is distracting).
+
         Returns:
             None
         """
-        if self.plot_type == 'default':
+        if self.plot_type == "default":
             # Set default layout options
             self.update_layout_bounds()
             self.fig.update_layout(**self.default_spectra_layout)
 
-        elif self.plot_type == 'transient':
+        elif self.plot_type == "transient":
             self.update_layout_bounds()
-            self.fig.update_layout(**self.default_transient_layout) 
-            self.fig.update_yaxes(type="log")  
+            self.fig.update_layout(**self.default_transient_layout)
+            if log_y:
+                self.fig.update_yaxes(type="log")
 
-        elif self.plot_type == 'structure_3d':  
-            #self.update_layout_bounds()
+        elif self.plot_type == "structure_3d":
+            # self.update_layout_bounds()
             self.fig.update_layout(**self.default_structure3d_layout)
         else:
-            print('invalid plot type, defaulting to default')  
+            print("invalid plot type, defaulting to default")
             self.fig.update_layout(**self.default_spectra_layout)
 
-    
         # Use the system's temporary directory
         temp_dir = tempfile.gettempdir()
-        #print(f"Temporary directory for debugging: {temp_dir}")
-        
+        # print(f"Temporary directory for debugging: {temp_dir}")
+
         # Use NamedTemporaryFile to create a temporary file in the system's temp directory
-        if sys.platform == 'linux' or browser:
-            print('Plotting in browser:')
-            with tempfile.NamedTemporaryFile(suffix="_pyet.html", dir=temp_dir, delete=False) as temp:
+        if sys.platform == "linux" or browser:
+            print("Plotting in browser:")
+            with tempfile.NamedTemporaryFile(
+                suffix="_pyet.html", dir=temp_dir, delete=False
+            ) as temp:
                 self.temp_file_path = os.path.abspath(temp.name)
-                plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=True)
+                self.fig.write_html(self.temp_file_path, auto_open=True)
 
         else:
-            with tempfile.NamedTemporaryFile(suffix="_pyet.html", dir=temp_dir, delete=False) as temp:
+            with tempfile.NamedTemporaryFile(
+                suffix="_pyet.html", dir=temp_dir, delete=False
+            ) as temp:
                 self.temp_file_path = os.path.abspath(temp.name)
-                plotly.offline.plot(self.fig, filename=self.temp_file_path, auto_open=False)
+                self.fig.write_html(self.temp_file_path, auto_open=False)
                 p = Process(target=run_webview, args=(self.temp_file_path,))
                 p.start()
 
@@ -382,8 +422,7 @@ class Plot:
         directory_withname = os.path.join(path, name)
         self.fig.write_image(directory_withname)
 
-
-    #First layer temp file clean up (as these can be quite large) system level clean up handles any python process / garbage collection failure at reboot (rarely needed)
+    # First layer temp file clean up (as these can be quite large) system level clean up handles any python process / garbage collection failure at reboot (rarely needed)
     def __del__(self):
         self.cleanup_temp_file()
 
@@ -392,22 +431,20 @@ class Plot:
         temp_files = glob.glob(os.path.join(tempfile.gettempdir(), "*_pyet.html"))
         temp_files.sort(key=os.path.getctime)
         # Delete all but the most recent 20 files
-        #a reasonable number of plotting tabs openned while not using too much storage space on system /tmp folder. This is in place as windows doesnt always empty its temp folder.
-        for temp_file in temp_files[:-20]:  
+        # a reasonable number of plotting tabs openned while not using too much storage space on system /tmp folder. This is in place as windows doesnt always empty its temp folder.
+        for temp_file in temp_files[:-20]:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
 
-    
-        
 
 if __name__ == "__main__":
-    #margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
+    # margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
     # figure = Plot()
-    
+
     # figure.structure_3d([0,1,2],[0,5,2],[0,1,5], name = 'Si')
     # figure.structure_3d([5,1,1],[2,0,1],[2,2,1], name='Y')
     # figure.show()
-    # margins = {'l': 30, 'r': 0, 't': 30, 'b': 30} 
+    # margins = {'l': 30, 'r': 0, 't': 30, 'b': 30}
     # x = [0,2,3,4,6,7,8,9,10]
     # y = [11,12,13,14,15,16,17,18,19]
     # x2 = [5,6,74,8,99,83,91,100]
@@ -421,13 +458,22 @@ if __name__ == "__main__":
     # figure2.show()
 
     # load_local_config('/Users/jamin/Documents/local_plotting_config.toml')
-    wavelengths = np.arange(400,450, 0.1) #generate some values between 400 and 450 nm
+    wavelengths = np.arange(
+        400, 450, 0.1
+    )  # generate some values between 400 and 450 nm
     wavenumbers, signal = random_spectra(wavelengths, wavenumbers=True)
-    x_range = [23000,23500]
+    x_range = [23000, 23500]
     ticks = 50
-    figure1 = Plot(xaxis={'range': x_range,'dtick': 100,})
-    figure1.spectra(wavenumbers, signal, name='an example', mode='markers', marker={'color': 'red'}) 
+    figure1 = Plot(
+        xaxis={
+            "range": x_range,
+            "dtick": 100,
+        }
+    )
+    figure1.spectra(
+        wavenumbers, signal, name="an example", mode="markers", marker={"color": "red"}
+    )
     figure1.show()
-    #path = '/Users/jamin/Documents/'
-    #name = 'temp2.svg'
-    #figure1.save(path, name)
+    # path = '/Users/jamin/Documents/'
+    # name = 'temp2.svg'
+    # figure1.save(path, name)

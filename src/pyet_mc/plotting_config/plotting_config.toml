@@ -13,7 +13,6 @@
     color = 'black'
 
   [spectra_layout.xaxis]
-    title = 'Wavenumber (cm<sup>-1</sup>)'
     exponentformat = 'none'
     showgrid = false
     showline = true
@@ -37,13 +36,14 @@
       size = 20
       color = 'black'
 
-    [spectra_layout.xaxis.titlefont]
-      family = 'Times new roman, monospace'
-      size = 20
-      color = 'black'
+    [spectra_layout.xaxis.title]
+      text = 'Wavenumber (cm<sup>-1</sup>)'
+      [spectra_layout.xaxis.title.font]
+        family = 'Times new roman, monospace'
+        size = 20
+        color = 'black'
 
   [spectra_layout.yaxis]
-    title = 'Intensity (arb. units.)'
     exponentformat = 'none'
     showgrid = false
     zeroline = false
@@ -57,10 +57,12 @@
     linewidth = 4
     linecolor = 'black'
 
-    [spectra_layout.yaxis.titlefont]
-      family = 'Times new roman, monospace'
-      size = 20
-      color = 'black'
+    [spectra_layout.yaxis.title]
+      text = 'Intensity (arb. units.)'
+      [spectra_layout.yaxis.title.font]
+        family = 'Times new roman, monospace'
+        size = 20
+        color = 'black'
 
 
 
@@ -74,7 +76,6 @@
     color = 'black'
 
   [transient_layout.xaxis]
-    title = 'Time (ms)'
     exponentformat = 'none'
     showgrid = false
     showline = true
@@ -100,13 +101,14 @@
       size = 20
       color = 'black'
 
-    [transient_layout.xaxis.titlefont]
-      family = 'Times new roman, monospace'
-      size = 20
-      color = 'black'
+    [transient_layout.xaxis.title]
+      text = 'Time (ms)'
+      [transient_layout.xaxis.title.font]
+        family = 'Times new roman, monospace'
+        size = 20
+        color = 'black'
 
   [transient_layout.yaxis]
-    title = 'Intensity (arb. units.)'
     exponentformat = 'none'
     showgrid = false
     zeroline = false
@@ -114,7 +116,7 @@
     ticks = 'outside'
     dtick = 1
     tickwidth = 4
-    showticklabels = false 
+    showticklabels = false
     ticklen = 14
     linewidth = 4
     linecolor = 'black'
@@ -124,22 +126,25 @@
       ticklen = 7
       showgrid = false
 
-    [transient_layout.yaxis.titlefont]
-      family = 'Times new roman, monospace'
-      size = 20
-      color = 'black'
+    [transient_layout.yaxis.title]
+      text = 'Intensity (arb. units.)'
+      [transient_layout.yaxis.title.font]
+        family = 'Times new roman, monospace'
+        size = 20
+        color = 'black'
 
 
 
 [structure_3d_layout]
-  title = ""
   margin = { l = 15, r = 30, t = 0, b = 15 }
   paper_bgcolor = "white"
 
-  [structure_3d_layout.titlefont]
-    family = "Times New Roman, monospace"
-    size = 30
-    color = "black"
+  [structure_3d_layout.title]
+    text = ""
+    [structure_3d_layout.title.font]
+      family = "Times New Roman, monospace"
+      size = 30
+      color = "black"
 
   [structure_3d_layout.scene]
     [structure_3d_layout.scene.camera]
@@ -148,7 +153,6 @@
     [structure_3d_layout.scene.xaxis]
       showbackground = true
       backgroundcolor = "rgb(255, 255, 255)"
-      title = ""
       showgrid = true
       zeroline = true
       showline = true
@@ -169,15 +173,16 @@
         size = 16
         color = "black"
 
-      [structure_3d_layout.scene.xaxis.titlefont]
-        family = "Times New Roman, monospace"
-        size = 16
-        color = "black"
+      [structure_3d_layout.scene.xaxis.title]
+        text = ""
+        [structure_3d_layout.scene.xaxis.title.font]
+          family = "Times New Roman, monospace"
+          size = 16
+          color = "black"
 
     [structure_3d_layout.scene.yaxis]
       showbackground = true
       backgroundcolor = "rgb(255, 255, 255)"
-      title = ""
       showgrid = true
       zeroline = true
       showline = true
@@ -198,15 +203,16 @@
         size = 16
         color = "black"
 
-      [structure_3d_layout.scene.yaxis.titlefont]
-        family = "Times New Roman, monospace"
-        size = 16
-        color = "black"
+      [structure_3d_layout.scene.yaxis.title]
+        text = ""
+        [structure_3d_layout.scene.yaxis.title.font]
+          family = "Times New Roman, monospace"
+          size = 16
+          color = "black"
 
     [structure_3d_layout.scene.zaxis]
       showbackground = true
       backgroundcolor = "rgb(255, 255, 255)"
-      title = ""
       showgrid = true
       zeroline = true
       showline = true
@@ -227,7 +233,9 @@
         size = 16
         color = "black"
 
-      [structure_3d_layout.scene.zaxis.titlefont]
-        family = "Times New Roman, monospace"
-        size = 16
-        color = "black"
+      [structure_3d_layout.scene.zaxis.title]
+        text = ""
+        [structure_3d_layout.scene.zaxis.title.font]
+          family = "Times New Roman, monospace"
+          size = 16
+          color = "black"

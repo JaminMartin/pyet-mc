@@ -17,6 +17,7 @@
 - [A note on caching](./structures/caching.md)
 
 # Data Fitting
+- [Traces](./fitting/traces.md)
 - [Fitting experimental data to energy transfer models](./fitting/fitting.md)
    - [General fitting](./fitting/general_fitting.md)
    - [Weighted fitting examples](./fitting/weighted_fitting.md)

@@ -5,39 +5,44 @@ build-backend = "maturin"
 [project]
 name = "pyet_mc"
 dependencies = [
-    "numpy>=1.25.0",
-    "matplotlib>=3.7.0",
-    "pandas>=2.0.0",
-    "plotly>=5.15.0",
-    "pymatgen>=2024.1.27",
-    "scipy>=1.11.0",
-    "toml>=0.10.2",
-    "pywebview>=4.4.0",
-    "kaleido>=0.2.0",
+    "numpy>=2.0.0",
+    "matplotlib>=3.9.0",
+    "pandas>=2.2.0",
+    "plotly>=6.0.0",
+    "pymatgen>=2024.6.10",
+    "scipy>=1.14.0",
+    "pywebview>=5.0",
+    "kaleido>=1.0.0",
 ]
 
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3.13",
 ]
 authors = [
     {name = "Jamin Martin", email = "jamin.martin@pg.canterbury.ac.nz"},
-  
 ]
-maintainers = [ 
+maintainers = [
     {name = "Jamin Martin", email = "jamin.martin@pg.canterbury.ac.nz"}
 ]
 description = "Python package for calculating energy transfer rates between lanthanide ions"
 readme = "README.md"
 license = {file = "LICENSE"}
 
-version = "0.3.0"
+version = "0.3.1"
 
 [tool.maturin]
+manifest-path = "rust/Cargo.toml"
+python-source = "src"
 features = ["pyo3/extension-module"]
 module-name = "pyet_mc._pyet_mc"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+norecursedirs = ["src", ".git", "rust", "docs", "examples"]
 
 [project.urls]
 Homepage = "https://github.com/JaminMartin/pyet-mc"
