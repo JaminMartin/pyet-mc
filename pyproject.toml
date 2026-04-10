@@ -35,6 +35,7 @@ version = "0.3.1"
 
 [tool.maturin]
 manifest-path = "rust/Cargo.toml"
+python-source = "src"
 features = ["pyo3/extension-module"]
 module-name = "pyet_mc._pyet_mc"
 

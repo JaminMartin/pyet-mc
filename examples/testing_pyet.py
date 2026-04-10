@@ -184,7 +184,7 @@ if __name__ == "__main__":
     }
 
     # Run the fit
-    res = opti.fit(guess, method="Nelder-Mead", tol=1e-13)
+    res = opti.fit(guess, model="rs", method="Nelder-Mead", tol=1e-13)
 
     # =========================================================================
     # 9. Plot the fitted results
