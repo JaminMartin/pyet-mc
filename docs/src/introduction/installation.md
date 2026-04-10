@@ -1,34 +1,48 @@
 # Installation
- Installation
-Currently, pyet is not on the PyPI package repository; this will be the case until this project is more stable. It is still a work in progress. However, if you do wish to use pyet in its current form, it is as simple as the following:
 
-Setup a new Python virtual environment (I recommend Conda, via [miniforge]()) and specify Python 3.11. The conda recomendation stems from the depedencies of this project, outlined below. 
+`pyet-mc` is available on [PyPI](https://pypi.org/project/pyet-mc/) with pre-built wheels for Linux, macOS, and Windows. It requires **Python 3.13** or newer.
 
-```
-conda create --name 'name of your env' python=3.11
-```
+## Quick Install
 
-Activate this virtual environment with "conda activate 'name of your env'". This ensures the package doesn't overwrite any of your existing Numpy/Scipy `Python` libraries
-There are two options to install this package either through the provided wheels or building from source. Building from source will require the `rust` compiler and `maturin` to be installed.
-The most straightforward way is to do, simply download the latest release build from the GitHub repository. 
+Choose whichever environment manager you prefer — the examples below cover **conda** (via [miniforge](https://github.com/conda-forge/miniforge)) and **uv**.
 
-then after activating your conda or environment manager of your choice simply 
+### Using conda
 
-```
+Create and activate a new environment, then install `pyet-mc`:
+
+```bash
+conda create -n pyet python=3.13
+conda activate pyet
 pip install pyet-mc
 ```
 
-If you encounter any issues, this may be due to `pymatgen` recommending you install its `numpy` and `matplotlib` dependencies via conda first.
+> **Note:** If you encounter dependency issues (particularly with `numpy` or `matplotlib`), install them from conda-forge first:
+> ```bash
+> conda install -c conda-forge numpy matplotlib
+> pip install pyet-mc
+> ```
 
+### Using uv
+
+[uv](https://docs.astral.sh/uv/) is a fast, modern Python package manager. If you don't have it yet, see the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+
+Create a new project directory and add `pyet-mc` as a dependency:
+
+```bash
+uv init my-project --python 3.13
+cd my-project
+uv add pyet-mc
 ```
-conda install numpy matplotlib
+
+This creates a `pyproject.toml`, sets up a virtual environment, and installs `pyet-mc` along with all its dependencies. You can then run your scripts with:
+
+```bash
+uv run my_script.py
 ```
 
-pyet should now successfully be installed! 
+## Verify the Installation
 
-
-To test that this was successful, create a new Python file (wherever you would like to use pyet-mc, not from within the pyet-mc source code).
-Try to import pyet; assuming no error messages appear, pyet has been successfully installed in your virtual environment
+Create a new Python file (not inside the `pyet-mc` source tree) and try the following imports:
 
 ```python
 from pyet_mc.structure import Structure, Interaction
@@ -37,15 +51,35 @@ from pyet_mc.pyet_utils import Trace, cache_reader, cache_list, cache_clear
 from pyet_mc.plotting import Plot
 ```
 
+If no errors appear, `pyet-mc` is ready to use. 🎉
+
 ## Building From Source
 
-If you prefer, you can build from source. 
+Building from source is useful if you want to hack on `pyet-mc` itself or need a build for an unsupported platform. This requires the **Rust** toolchain and **maturin**.
 
-Firstly, ensure you have the `rust` toolchain and `maturin` installed. You can install it directly into your virtual environment you plan to use with this project by running:
+### Prerequisites
+
+1. Install [Rust](https://rustup.rs/) (via `rustup`).
+2. Install [maturin](https://www.maturin.rs/) — it will be pulled in automatically by the build, but you can also install it explicitly.
+
+### With uv (recommended)
 
 ```bash
-conda activate "name of your env"
-git clone git@github.com:JaminMartin/pyet-mc.git && cd pyet-mc 
+git clone https://github.com/JaminMartin/pyet-mc.git && cd pyet-mc
+uv venv --python 3.13
+source .venv/bin/activate
+uv sync
+maturin develop --uv --release
+```
+
+### With conda
+
+```bash
+git clone https://github.com/JaminMartin/pyet-mc.git && cd pyet-mc
+conda create -n pyet-dev python=3.13
+conda activate pyet-dev
+pip install maturin
 maturin develop --release
 ```
-The location of this does not matter as it is installed into the virtual environment. 
+
+The compiled extension module is installed directly into your active virtual environment — the location of the cloned repository does not matter.

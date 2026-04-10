@@ -1,0 +1,54 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - pyet-devel
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.platform.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - runner: ubuntu-latest
+            target: x86_64
+          - runner: macos-14
+            target: aarch64
+        python-version: ["3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install maturin and build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install maturin pytest
+
+      - name: Build and install the package (with Rust extension)
+        run: |
+          python -m pip install -e ".[dev]" || python -m pip install -e .
+        env:
+          MATURIN_PEP517_ARGS: "--release"
+
+      - name: Verify Rust extension is available
+        run: |
+          python -c "from pyet_mc._pyet_mc import general_energy_transfer, general_energy_transfer_para; print('Rust extension loaded successfully')"
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v --tb=short

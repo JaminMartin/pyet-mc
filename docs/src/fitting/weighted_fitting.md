@@ -1,6 +1,6 @@
 # Weighted Fitting
 
-There is also the ability to have the fitting process weight each trace differently, as well as adjust the weighting of all traces when their length is not even. Take, for example, the case where we have two traces of different lengths. We can generate this as before with some slight modifications.
+The [Trace](traces.md) class supports per-trace weighting that influences how much each dataset contributes to the fit. There is also the ability to have the fitting process weight each trace differently, as well as adjust the weighting of all traces when their length is not even. Take, for example, the case where we have two traces of different lengths. We can generate this as before with some slight modifications.
 
 ```python
 if __name__ == "__main__":

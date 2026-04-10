@@ -60,3 +60,63 @@ This gives us a filtered plot:
 <p align="center">
  <img width="700" alt="example lifetime and energy transfer fitting plot" src="../images/filtered_crystal_jmol.png">
 </p>
+
+## Querying coordinates
+
+The `nearest_neighbours_info()` method we used earlier is handy for a quick look at what's around the central ion, but it just prints text to the console. If you want the actual coordinate data for further analysis or custom workflows, there are two methods that return Pandas DataFrames.
+
+`nearest_neighbours_coords(radius)` returns the Cartesian coordinates of all ions within the given radius:
+
+```python
+coords = KY3F10.nearest_neighbours_coords(3.2)
+print(coords)
+```
+```
+          x         y         z species
+0 -7.430692 -4.284692 -2.816917      F-
+1 -4.284692 -5.857692 -1.044117      F-
+2 -4.284692 -5.857692 -4.589717      F-
+...
+```
+
+The returned DataFrame has columns `x`, `y`, `z`, and `species`.
+
+`nearest_neighbours_spherical_coords(radius)` returns spherical polar coordinates relative to the central ion:
+
+```python
+sph_coords = KY3F10.nearest_neighbours_spherical_coords(3.2)
+print(sph_coords)
+```
+```
+          r      theta        phi species
+0  2.386628  90.000000 -135.00000      F-
+1  2.227665  37.94576  -180.00000      F-
+2  2.227665  142.05424 -180.00000      F-
+...
+```
+
+The returned DataFrame has columns `r` (radial distance in Angstroms), `theta` (polar angle in degrees), `phi` (azimuthal angle in degrees), and `species`.
+
+Think of `nearest_neighbours_info()` as the print-friendly summary and these two methods as the ones you reach for when you actually need the data, for example to feed into your own distance calculations, filtering logic, or visualisation code.
+
+## R₀ and the nearest neighbour distance
+
+You may have noticed this line in the output when we called `centre_ion()`:
+
+```
+with a nearest neighbour Y3+ at 3.914906764969714 angstroms
+```
+
+This comes from `get_R0()`, which is called automatically inside `centre_ion()`. You don't need to call it yourself. What it does is search for the closest ion of the same species as the central ion within 50 Angstroms and store that distance as `self.r0`.
+
+This value, $R_0$, is the nearest-neighbour distance and plays a key role in the interaction component formula:
+
+$$C_{cr} \sum_i \left(\frac{R_0}{R_i}\right)^s$$
+
+The energy transfer rate between a donor and each acceptor ion at distance $R_i$ scales as $(R_0 / R_i)^s$, where $s$ depends on the interaction type (e.g. 6 for dipole-dipole, 8 for dipole-quadrupole). Because everything is normalised by $R_0$, the nearest-neighbour distance effectively sets the scale for how quickly the transfer rate drops off with distance. A closer nearest neighbour means a larger $R_0$ and stronger coupling at any given $R_i$.
+
+If you ever need to inspect the value directly, it's available as an attribute after calling `centre_ion()`:
+
+```python
+print(KY3F10.r0)  # e.g. 3.914906764969714
+```
