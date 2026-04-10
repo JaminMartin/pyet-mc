@@ -34,6 +34,7 @@ license = {file = "LICENSE"}
 version = "0.3.1"
 
 [tool.maturin]
+manifest-path = "rust/Cargo.toml"
 features = ["pyo3/extension-module"]
 module-name = "pyet_mc._pyet_mc"
 

@@ -162,6 +162,7 @@ src/pyet_mc/cache/
 src/pyet/cache/
 .DS_Store
 temp/
+
 *.pyet
 .direnv
 data/
