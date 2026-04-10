@@ -1,6 +1,7 @@
 [build-system]
 requires = ["maturin>=1.4,<2.0"]
 build-backend = "maturin"
+include = ["LICENSE"]
 
 [project]
 name = "pyet_mc"
@@ -29,7 +30,7 @@ maintainers = [
 ]
 description = "Python package for calculating energy transfer rates between lanthanide ions"
 readme = "README.md"
-license = {file = "LICENSE"}
+license-files = ["LICENSE"]
 
 version = "0.3.1"
 
